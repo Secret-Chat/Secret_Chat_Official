@@ -11,8 +11,13 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          body: Container(
-         child: Text("Auth Screen"),
+      body: Container(
+        child: Column(
+          children: [
+            SizedBox(height: 50),
+            Text("Auth Screen"),
+          ],
+        ),
       ),
     );
   }
