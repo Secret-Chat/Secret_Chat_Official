@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "89493679778",
+    "project_id": "secretchat-dd074",
+    "storage_bucket": "secretchat-dd074.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:89493679778:android:d9c5f34de42c5097baf1fb",
+        "android_client_info": {
+          "package_name": "com.example.secretchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "89493679778-ft1grqjukasubv3jaluicqv2aq1dteh9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy41gQ5l0FUdTMTDlN__UiyK6boDbYJgg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "89493679778-ft1grqjukasubv3jaluicqv2aq1dteh9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
