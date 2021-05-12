@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:secretchat/view/searchPage.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -48,9 +49,27 @@ class _MainPageState extends State<MainPage> {
       ),
       body: Center(
         child: Container(
-          alignment: Alignment.center,
-          child: Text('Oh common man'),
+          alignment: Alignment.topCenter,
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.note),
+                title: Text('Note to self'),
+                tileColor: Color.fromRGBO(20, 20, 20, 0.2),
+                onTap: () {},
+              )
+            ],
+          ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        elevation: 2,
+        child: Icon(Icons.add_a_photo),
+        backgroundColor: Colors.blue,
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => SearchPage()));
+        },
       ),
     );
   }
