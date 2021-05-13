@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+import 'package:secretchat/controller/auth_controller.dart';
 
 class NoteSelf extends StatefulWidget {
   @override
@@ -11,8 +13,9 @@ class _NoteSelfState extends State<NoteSelf> {
   final _auth = FirebaseAuth.instance;
   final _titleController = TextEditingController();
 
-  CollectionReference stream = FirebaseFirestore.instance
-      .collection('users/FlcIcaaSnmc4DFWDTBXgUuruxI22/messages');
+  final getxController = Get.put(AuthController());
+  // CollectionReference stream = FirebaseFirestore.instance
+  //     .collection('users/${getxController.authData}/messages');
   //.orderBy('createdOn', descending: false);
   //.orderBy('createdOn', descending: true);
 
@@ -41,7 +44,8 @@ class _NoteSelfState extends State<NoteSelf> {
               //child:
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(
-                  stream: stream
+                  stream: FirebaseFirestore.instance
+                      .collection('users/${getxController.authData}/messages')
                       .orderBy('createdOn', descending: false)
                       .snapshots(),
                   builder: (BuildContext context,
@@ -101,11 +105,12 @@ class _NoteSelfState extends State<NoteSelf> {
                         if (_titleController.text.isNotEmpty) {
                           FirebaseFirestore.instance
                               .collection(
-                                  'users/FlcIcaaSnmc4DFWDTBXgUuruxI22/messages')
+                                  'users/${getxController.authData}/messages')
                               .add({
                             'text': _titleController.text,
                             'createdOn': Timestamp.now(),
                           });
+                          getxController.printer();
                         }
                         _titleController.text = '';
                       },

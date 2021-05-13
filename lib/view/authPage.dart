@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:secretchat/controller/auth_controller.dart';
 import '../widgets/authForm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,6 +13,7 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
   final _auth = FirebaseAuth.instance;
+  final getxController = Get.put(AuthController());
   bool _isLoading = false;
 
   void _submitAuthForm(
@@ -28,9 +31,13 @@ class _AuthPageState extends State<AuthPage> {
       if (isLogin) {
         authResult = await _auth.signInWithEmailAndPassword(
             email: email, password: password);
+        getxController.authData.value = authResult.user.uid;
+        getxController.printer();
       } else {
         authResult = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
+        getxController.authData.value = authResult.user.uid;
+        getxController.printer();
         FirebaseFirestore.instance
             .collection('users')
             .doc(authResult.user.uid)
