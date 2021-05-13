@@ -15,19 +15,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: StreamBuilder(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, userSnapshot) {
-            if (userSnapshot.hasData) {
-              //return ChatPage();
-              return MainPage();
-            }
-            return AuthPage();
-          },
-        ));
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, userSnapshot) {
+          if (userSnapshot.hasData) {
+            //return ChatPage();
+            return MainPage();
+          }
+          return AuthPage();
+        },
+      ),
+    );
   }
 }
