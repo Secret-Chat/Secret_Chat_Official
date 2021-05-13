@@ -55,7 +55,11 @@ class _NoteSelfState extends State<NoteSelf> {
                     }
 
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text("Loading");
+                      return Center(
+                        child: Container(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
                     }
 
                     return new ListView(
