@@ -34,9 +34,12 @@ class _NoteSelfState extends State<NoteSelf> {
           height: MediaQuery.of(context).size.height - 68,
           child: Column(
             children: <Widget>[
-              Container(
-                color: Color.fromRGBO(200, 200, 200, 0.3),
-                height: MediaQuery.of(context).size.height - 250,
+              // Container(
+              //   width: MediaQuery.of(context).size.width,
+              //   color: Color.fromRGBO(200, 200, 200, 0.3),
+              //   height: MediaQuery.of(context).size.height - 250,
+              //child:
+              Expanded(
                 child: StreamBuilder<QuerySnapshot>(
                   stream: stream
                       .orderBy('createdOn', descending: false)
