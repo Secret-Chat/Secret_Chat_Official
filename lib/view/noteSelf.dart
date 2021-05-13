@@ -12,8 +12,8 @@ class _NoteSelfState extends State<NoteSelf> {
   final _titleController = TextEditingController();
 
   CollectionReference stream = FirebaseFirestore.instance
-      .collection('users/FlcIcaaSnmc4DFWDTBXgUuruxI22/messages')
-      .orderBy('text', descending: false);
+      .collection('users/FlcIcaaSnmc4DFWDTBXgUuruxI22/messages');
+  //.orderBy('createdOn', descending: false);
   //.orderBy('createdOn', descending: true);
 
   @override
@@ -38,7 +38,9 @@ class _NoteSelfState extends State<NoteSelf> {
                 color: Color.fromRGBO(200, 200, 200, 0.3),
                 height: MediaQuery.of(context).size.height - 250,
                 child: StreamBuilder<QuerySnapshot>(
-                  stream: stream.snapshots(),
+                  stream: stream
+                      .orderBy('createdOn', descending: false)
+                      .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasError) {
