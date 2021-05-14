@@ -30,68 +30,63 @@ class _SearchPageState extends State<SearchPage> {
       ),
       body: Container(
         height: MediaQuery.of(context).size.height - 68,
-        child: Expanded(
-            child: Container(
-          height: MediaQuery.of(context).size.height - 68,
-          child: Column(
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        child: TextField(
-                          decoration:
-                              InputDecoration(labelText: 'Search by Email'),
-                          controller: _titleController,
-                        ),
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      child: TextField(
+                        decoration:
+                            InputDecoration(labelText: 'Search by Email'),
+                        controller: _titleController,
                       ),
                     ),
-                    SizedBox(
-                      width: 5,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.send,
+                      color: Colors.black,
+                      size: 25,
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.send,
-                        color: Colors.black,
-                        size: 25,
-                      ),
-                      onPressed: () {
-                        // ignore: prefer_is_not_empty
-                        // if (_titleController.text.isNotEmpty) {
-                        //   FirebaseFirestore.instance
-                        //       .collection(
-                        //           'users/${getxController.authData}/messages')
-                        //       .add({
-                        //     'text': _titleController.text,
-                        //     'createdOn': Timestamp.now(),
-                        //   });
-                        //   getxController.printer();
-                        // }
-<<<<<<< Updated upstream
-                        ChatController()
-                            .searchEmailId(email: _titleController.text);
-=======
-                        // if (_titleController.text.isNotEmpty) {
-                        //   search.searchEmailId(email: _titleController.text);
-                        // }
->>>>>>> Stashed changes
-                        _titleController.text = '';
-                      },
-                    ),
-                  ],
-                ),
+                    onPressed: () {
+                      // ignore: prefer_is_not_empty
+                      // if (_titleController.text.isNotEmpty) {
+                      //   FirebaseFirestore.instance
+                      //       .collection(
+                      //           'users/${getxController.authData}/messages')
+                      //       .add({
+                      //     'text': _titleController.text,
+                      //     'createdOn': Timestamp.now(),
+                      //   });
+                      //   getxController.printer();
+                      // }
+                      // if (_titleController.text.isNotEmpty) {
+                      //   search.searchEmailId(email: _titleController.text);
+                      // }
+                      _titleController.text = '';
+                    },
+                  ),
+                ],
               ),
-              SizedBox(
-                height: 10,
-              ),
-              Expanded(
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
                 child: Container(
+                  height: MediaQuery.of(context).size.height - 200,
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('users')
                         .where('email', isEqualTo: _titleController.text)
+                        //.where('email')
                         .snapshots(),
                     // .collection('users/${getxController.authData.value}/mescsages')
 
@@ -118,10 +113,17 @@ class _SearchPageState extends State<SearchPage> {
                         reverse: false,
                         children:
                             snapshot.data.docs.map((DocumentSnapshot document) {
+                          // if (document
+                          //     .data()['email']
+                          //     .contains(_titleController.text)) {
                           return new ListTile(
                             title: new Text(document.data()['email']),
+                            subtitle: new Text(document.data()['username']),
                             //subtitle: new Text(document.data()['company']),
                           );
+
+                          // }
+
                           //return print(document.data()['email']);
                         }).toList(),
                       );
@@ -129,9 +131,9 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
               ),
-            ],
-          ),
-        )),
+            ),
+          ],
+        ),
       ),
     );
   }
