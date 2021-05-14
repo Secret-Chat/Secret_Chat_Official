@@ -14,6 +14,13 @@ class _SearchPageState extends State<SearchPage> {
   final _titleController = TextEditingController();
 
   get child => null;
+  final search = ChatController();
+  // Future<void> searchEmailId({String email}) async {
+  //   var result = await FirebaseFirestore.instance
+  //       .collection('users')
+  //       .where('email', isEqualTo: email)
+  //       .get();
+  //   print(result);
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +69,14 @@ class _SearchPageState extends State<SearchPage> {
                         //   });
                         //   getxController.printer();
                         // }
+<<<<<<< Updated upstream
                         ChatController()
                             .searchEmailId(email: _titleController.text);
+=======
+                        // if (_titleController.text.isNotEmpty) {
+                        //   search.searchEmailId(email: _titleController.text);
+                        // }
+>>>>>>> Stashed changes
                         _titleController.text = '';
                       },
                     ),
@@ -74,9 +87,48 @@ class _SearchPageState extends State<SearchPage> {
                 height: 10,
               ),
               Expanded(
-                  child: Container(
-                child: ListTile(),
-              ))
+                child: Container(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('users')
+                        .where('email', isEqualTo: _titleController.text)
+                        .snapshots(),
+                    // .collection('users/${getxController.authData.value}/mescsages')
+
+                    // .collection('users')
+                    // .doc('${getxController.authData.value}')
+                    // .collection('messages')
+                    // .orderBy('createdOn', descending: false)
+                    // .snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Something went wrong');
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: Container(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      return new ListView(
+                        reverse: false,
+                        children:
+                            snapshot.data.docs.map((DocumentSnapshot document) {
+                          return new ListTile(
+                            title: new Text(document.data()['email']),
+                            //subtitle: new Text(document.data()['company']),
+                          );
+                          //return print(document.data()['email']);
+                        }).toList(),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
         )),
