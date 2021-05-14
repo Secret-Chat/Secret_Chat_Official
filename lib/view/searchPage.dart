@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/controller/chatController.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -61,6 +62,8 @@ class _SearchPageState extends State<SearchPage> {
                         //   });
                         //   getxController.printer();
                         // }
+                        ChatController()
+                            .searchEmailId(email: _titleController.text);
                         _titleController.text = '';
                       },
                     ),
