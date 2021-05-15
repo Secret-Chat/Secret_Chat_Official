@@ -45,7 +45,11 @@ class _NoteSelfState extends State<NoteSelf> {
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
-                      .collection('users/${getxController.authData}/messages')
+                      // .collection('users/${getxController.authData.value}/mescsages')
+
+                      .collection('users')
+                      .doc('${getxController.authData.value}')
+                      .collection('messages')
                       .orderBy('createdOn', descending: false)
                       .snapshots(),
                   builder: (BuildContext context,
