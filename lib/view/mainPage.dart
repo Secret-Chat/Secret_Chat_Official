@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:secretchat/view/chatPage.dart';
 import 'package:secretchat/view/noteSelf.dart';
 import 'package:secretchat/view/searchPage.dart';
 
@@ -61,7 +62,19 @@ class _MainPageState extends State<MainPage> {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => NoteSelf()));
                 },
-              )
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.circle,
+                  color: Colors.black,
+                ),
+                title: Text('Other User'),
+                tileColor: Color.fromRGBO(34, 23, 24, 0.3),
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ChatPage()));
+                },
+              ),
             ],
           ),
         ),
