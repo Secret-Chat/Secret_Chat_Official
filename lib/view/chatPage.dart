@@ -52,26 +52,43 @@ class _ChatPageState extends State<ChatPage> {
                       );
                     }
 
-                    return new ListView(
-                      reverse: false,
-                      children:
-                          snapshot.data.docs.map((DocumentSnapshot document) {
-                        if (getxController.authData.value ==
-                            document.data()['sentBy']) {
-                          return new ListTile(
-                            title: new Text(document.data()['message']),
-                            leading: Text('ME'),
-                            //subtitle: new Text(document.data()['company']),
-                          );
-                        } else {
-                          return new ListTile(
-                            title: new Text(document.data()['message']),
-                            leading: Text('meno'),
-                            //subtitle: new Text(document.data()['company']),
-                          );
-                        }
-                      }).toList(),
-                    );
+                    // return new ListView(
+                    //   reverse: false,
+                    //   children:
+                    //       snapshot.data.docs.map((DocumentSnapshot document) {
+                    //     if (getxController.authData.value ==
+                    //         document.data()['sentBy']) {
+                    //       return new ListTile(
+                    //         title: new Text(document.data()['message']),
+                    //         leading: Text('ME'),
+                    //         //subtitle: new Text(document.data()['company']),
+                    //       );
+                    //     } else {
+                    //       return new ListTile(
+                    //         title: new Text(document.data()['message']),
+                    //         leading: Text('meno'),
+                    //         //subtitle: new Text(document.data()['company']),
+                    //       );
+                    //     }
+                    //   }).toList(),
+                    // );
+
+                    if (snapshot.hasData) {
+                      return ListView.builder(
+                          itemBuilder: (ctx, index) {
+                            return ListTile(
+                              leading: getxController.authData.value ==
+                                      snapshot.data.docs[index]['sentBy']
+                                  ? Text("Me")
+                                  : Text("Not mE"),
+                              title: Text(
+                                  '${snapshot.data.docs[index]['message']}'),
+                            );
+                          },
+                          itemCount: snapshot.data.docs.length);
+                    }
+
+                    return Container();
                   },
                 ),
               ),

@@ -11,7 +11,7 @@ is_chat_of_group
 
 class Chat {
   String senderName;
-  String senderUID;
+  String sentBy;
   String message;
   String timestamp;
 // String imagrURL
