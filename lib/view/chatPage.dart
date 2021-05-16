@@ -95,9 +95,7 @@ class _ChatPageState extends State<ChatPage> {
                                     if (userSnapshot.connectionState ==
                                         ConnectionState.waiting) {
                                       return Center(
-                                        child: Container(
-                                          child: CircularProgressIndicator(),
-                                        ),
+                                        child: Container(),
                                       );
                                     } else if (userSnapshot.hasData) {
                                       // print(
@@ -115,6 +113,7 @@ class _ChatPageState extends State<ChatPage> {
                                             '${snapshot.data.docs[index]['message']}'),
                                       );
                                     }
+                                    return Container();
                                   });
                             },
                             itemCount: snapshot.data.docs.length);
