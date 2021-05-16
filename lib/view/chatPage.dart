@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+import 'package:secretchat/controller/auth_controller.dart';
 
 class ChatPage extends StatefulWidget {
   @override
@@ -6,6 +10,10 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  final _auth = FirebaseAuth.instance;
+
+  final getxController = Get.put(AuthController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,13 +26,56 @@ class _ChatPageState extends State<ChatPage> {
         child: Column(
           children: <Widget>[
             Expanded(
-                flex: 7,
-                child: Container(
-                  color: Color.fromRGBO(23, 34, 24, 0.3),
-                  child: Center(
-                    child: Text('chats'),
-                  ),
-                )),
+              flex: 7,
+              child: Container(
+                color: Color.fromRGBO(23, 34, 24, 0.3),
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      // .collection('users/${getxController.authData.value}/mescsages')
+
+                      .collection('personal_connections')
+                      .doc('bKGgYVxEw2Abbke5t5QG')
+                      .collection('messages')
+                      //.orderBy('createdOn', descending: false)
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Something went wrong');
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: Container(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    return new ListView(
+                      reverse: false,
+                      children:
+                          snapshot.data.docs.map((DocumentSnapshot document) {
+                        if (getxController.authData.value ==
+                            document.data()['sentBy']) {
+                          return new ListTile(
+                            title: new Text(document.data()['message']),
+                            leading: Text('ME'),
+                            //subtitle: new Text(document.data()['company']),
+                          );
+                        } else {
+                          return new ListTile(
+                            title: new Text(document.data()['message']),
+                            leading: Text('meno'),
+                            //subtitle: new Text(document.data()['company']),
+                          );
+                        }
+                      }).toList(),
+                    );
+                  },
+                ),
+              ),
+            ),
             Expanded(
                 child: Container(
               color: Color.fromRGBO(34, 35, 23, 0.5),
