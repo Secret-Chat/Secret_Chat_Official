@@ -38,7 +38,7 @@ class _ChatPageState extends State<ChatPage> {
                         .collection('personal_connections')
                         .doc('bKGgYVxEw2Abbke5t5QG')
                         .collection('messages')
-                        .orderBy('createdOn', descending: false)
+                        .orderBy('createdOn', descending: true)
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -77,6 +77,7 @@ class _ChatPageState extends State<ChatPage> {
 
                       if (snapshot.hasData) {
                         return ListView.builder(
+                            reverse: true,
                             itemBuilder: (ctx, index) {
                               return StreamBuilder<DocumentSnapshot>(
                                   stream: FirebaseFirestore.instance
