@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 class AuthController extends GetxController {
   var authResultId = ''.obs;
   var authData = ''.obs;
+  var userName = ''.obs;
 
   void printer() {
     print(authData);

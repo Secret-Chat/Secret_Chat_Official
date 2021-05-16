@@ -78,14 +78,44 @@ class _ChatPageState extends State<ChatPage> {
                       if (snapshot.hasData) {
                         return ListView.builder(
                             itemBuilder: (ctx, index) {
-                              return ListTile(
-                                leading: getxController.authData.value ==
-                                        snapshot.data.docs[index]['sentBy']
-                                    ? Text("Me")
-                                    : Text("Not mE"),
-                                title: Text(
-                                    '${snapshot.data.docs[index]['message']}'),
-                              );
+                              return StreamBuilder<DocumentSnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      // .collection('users/${getxController.authData.value}/mescsages')
+
+                                      .collection('users')
+                                      .doc(
+                                          '${snapshot.data.docs[index]['sentBy']}')
+                                      .snapshots(),
+                                  builder: (context, userSnapshot) {
+                                    if (userSnapshot.hasError) {
+                                      return Center(
+                                        child: Text("Error occured"),
+                                      );
+                                    }
+                                    if (userSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                        child: Container(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      );
+                                    } else if (userSnapshot.hasData) {
+                                      // print(
+                                      //     userSnapshot.data.data()['username']);
+                                      return ListTile(
+                                        leading: getxController
+                                                    .authData.value ==
+                                                snapshot.data.docs[index]
+                                                    ['sentBy']
+                                            ? Text(
+                                                "${userSnapshot.data.data()['username']}")
+                                            : Text(
+                                                "${userSnapshot.data.data()['username']}"),
+                                        title: Text(
+                                            '${snapshot.data.docs[index]['message']}'),
+                                      );
+                                    }
+                                  });
                             },
                             itemCount: snapshot.data.docs.length);
                       }
