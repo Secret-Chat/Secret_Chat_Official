@@ -34,7 +34,6 @@ class _ChatPageState extends State<ChatPage> {
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         // .collection('users/${getxController.authData.value}/mescsages')
-
                         .collection('personal_connections')
                         .doc('bKGgYVxEw2Abbke5t5QG')
                         .collection('messages')

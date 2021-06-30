@@ -4,8 +4,6 @@ import 'package:secretchat/view/authPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:secretchat/view/mainPage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'controller/auth_controller.dart';
 
 void main() async {

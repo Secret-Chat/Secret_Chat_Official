@@ -22,6 +22,8 @@ class _SearchPageState extends State<SearchPage> {
   //       .get();
   //   print(result);
 
+  final getxController = Get.put(AuthController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,11 +121,26 @@ class _SearchPageState extends State<SearchPage> {
                           return new ListTile(
                             title: new Text(document.data()['email']),
                             subtitle: new Text(document.data()['username']),
+                            onTap: () async {
+                              final docId = await FirebaseFirestore.instance
+                                  .collection("personal_collections")
+                                  .add({
+                                "name": "Test",
+                              });
+
+                              print("taped");
+                              FirebaseFirestore.instance
+                                  .collection("users")
+                                  .doc(getxController.authData.value)
+                                  .collection("connections")
+                                  .add({
+                                "enail": document.data()['email'],
+                                "connectionID": docId.id
+                              });
+                            },
                             //subtitle: new Text(document.data()['company']),
                           );
-
                           // }
-
                           //return print(document.data()['email']);
                         }).toList(),
                       );

@@ -27,6 +27,10 @@ class ChatController extends GetxController {
     print(emailFound);
   }
 
+  void connectWithUser()
+  {
+    
+  }
   
   
 }
