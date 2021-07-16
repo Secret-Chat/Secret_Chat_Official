@@ -123,7 +123,7 @@ class _SearchPageState extends State<SearchPage> {
                             subtitle: new Text(document.data()['username']),
                             onTap: () async {
                               final docId = await FirebaseFirestore.instance
-                                  .collection("personal_collections")
+                                  .collection("personal_connections")
                                   .add({
                                 "name": "Test",
                               });
