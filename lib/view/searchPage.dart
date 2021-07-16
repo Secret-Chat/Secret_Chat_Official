@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -122,20 +124,46 @@ class _SearchPageState extends State<SearchPage> {
                             title: new Text(document.data()['email']),
                             subtitle: new Text(document.data()['username']),
                             onTap: () async {
+                              //don't add if connection is already there
+                              //
                               final docId = await FirebaseFirestore.instance
                                   .collection("personal_connections")
                                   .add({
-                                "name": "Test",
+                                "userOne": {
+                                  "email": getxController.user.value.userEmail,
+                                  "userId": getxController.user.value.userId
+                                },
+                                "userTwo": {
+                                  "email": document.data()['email'],
+                                  "userName": document.data()['username'],
+                                  "userId": document.data()['userId']
+                                }
                               });
-
+                              print("Doc iD ${docId.id}");
                               print("taped");
+
+                              //add for the self user
                               FirebaseFirestore.instance
                                   .collection("users")
                                   .doc(getxController.authData.value)
                                   .collection("connections")
-                                  .add({
-                                "enail": document.data()['email'],
-                                "connectionID": docId.id
+                                  .doc(docId.id)
+                                  .set({
+                                "email": document.data()['email'],
+                                "userId": document.data()['userId']
+                                // "connectionID": docId.id
+                              });
+
+                              //add for the other user
+                              FirebaseFirestore.instance
+                                  .collection("users")
+                                  .doc(document.data()['userId'])
+                                  .collection("connections")
+                                  .doc(docId.id)
+                                  .set({
+                                "email": getxController.user.value.userEmail,
+                                "userId": getxController.user.value.userId
+                                // "connectionID": docId.id
                               });
                             },
                             //subtitle: new Text(document.data()['company']),

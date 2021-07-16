@@ -118,7 +118,7 @@ class _NoteSelfState extends State<NoteSelf> {
                             'text': _titleController.text,
                             'createdOn': Timestamp.now(),
                           });
-                          getxController.printer();
+                          // getxController.printer();
                         }
                         _titleController.text = '';
                       },

@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:secretchat/view/mainPage.dart';
 import 'controller/auth_controller.dart';
+import 'model/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,10 @@ class MyApp extends StatelessWidget {
         builder: (context, AsyncSnapshot<User> userSnapshot) {
           if (userSnapshot.hasData) {
             //return ChatPage();
+
+            getxController.user.value = UserModel(
+                userEmail: userSnapshot.data.email,
+                userId: userSnapshot.data.uid);
             getxController.authData.value = userSnapshot.data.uid;
             print("Check: ${getxController.authData.value}");
             return MainPage();
