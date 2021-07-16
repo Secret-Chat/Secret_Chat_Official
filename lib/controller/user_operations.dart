@@ -56,7 +56,7 @@ class UserOperations extends GetxController {
   }) async {
     // bool userExists = false; //initially the user won't exist
     print("userExists function called");
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('users')
         .doc(getxController.authData.value)
         .collection("connections")

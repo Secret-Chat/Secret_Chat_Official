@@ -139,6 +139,7 @@ class _SearchPageState extends State<SearchPage> {
                                     document, getxController);
                               } else {
                                 //TODO: send the user to chat page if the connection is already there
+                                
                               }
                             },
                             //subtitle: new Text(document.data()['company']),
