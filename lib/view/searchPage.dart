@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/chatController.dart';
+import 'package:secretchat/controller/user_operations.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -25,6 +26,9 @@ class _SearchPageState extends State<SearchPage> {
   //   print(result);
 
   final getxController = Get.put(AuthController());
+  bool userExists = false;
+
+  UserOperations userOperations = Get.put(UserOperations());
 
   @override
   Widget build(BuildContext context) {
@@ -125,55 +129,17 @@ class _SearchPageState extends State<SearchPage> {
                             subtitle: new Text(document.data()['username']),
                             onTap: () async {
                               //don't add if connection is already there
-                              FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(getxController.authData.value)
-                                  .collection("connections")
-                                  .where('email',
-                                      isEqualTo: document.data()['email'])
-                                  .get()
-                                  .then((value) =>
-                                      print("Check : ${value.docs}"));
-
-                              // final docId = await FirebaseFirestore.instance
-                              //     .collection("personal_connections")
-                              //     .add({
-                              //   "userOne": {
-                              //     "email": getxController.user.value.userEmail,
-                              //     "userId": getxController.user.value.userId
-                              //   },
-                              //   "userTwo": {
-                              //     "email": document.data()['email'],
-                              //     "userName": document.data()['username'],
-                              //     "userId": document.data()['userId']
-                              //   }
-                              // });
-                              // print("Doc iD ${docId.id}");
-                              // print("taped");
-
-                              //add for the self user
-                              // FirebaseFirestore.instance
-                              //     .collection("users")
-                              //     .doc(getxController.authData.value)
-                              //     .collection("connections")
-                              //     .doc(docId.id)
-                              //     .set({
-                              //   "email": document.data()['email'],
-                              //   "userId": document.data()['userId']
-                              //   // "connectionID": docId.id
-                              // });
-
-                              //add for the other user
-                              // FirebaseFirestore.instance
-                              //     .collection("users")
-                              //     .doc(document.data()['userId'])
-                              //     .collection("connections")
-                              //     .doc(docId.id)
-                              //     .set({
-                              //   "email": getxController.user.value.userEmail,
-                              //   "userId": getxController.user.value.userId
-                              //   // "connectionID": docId.id
-                              // });
+                              await userOperations.ifUserExist(
+                                document: document,
+                                getxController: getxController,
+                              );
+                              //if user is not there
+                              if (!userOperations.userExists.value) {
+                                await userOperations.addContact(
+                                    document, getxController);
+                              } else {
+                                //TODO: send the user to chat page if the connection is already there
+                              }
                             },
                             //subtitle: new Text(document.data()['company']),
                           );
