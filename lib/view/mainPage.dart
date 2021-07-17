@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:secretchat/view/chatPage.dart';
 import 'package:secretchat/view/noteSelf.dart';
 import 'package:secretchat/view/searchPage.dart';
+import 'package:get/get.dart';
+import 'settingsPage.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -40,10 +42,31 @@ class _MainPageState extends State<MainPage> {
                 ),
                 value: 'logout',
               ),
+              DropdownMenuItem(
+                child: Container(
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.exit_to_app,
+                        color: Colors.black,
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(('Settings'))
+                    ],
+                  ),
+                ),
+                value: 'settings',
+              ),
             ],
             onChanged: (itemIdentifier) {
               if (itemIdentifier == 'logout') {
                 FirebaseAuth.instance.signOut();
+              }
+              if (itemIdentifier == 'settings') {
+                // Navigator.of(context).pushNamed(SettingsPage));
+                Get.to(SettingsPage());
               }
             },
           ),
