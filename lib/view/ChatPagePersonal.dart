@@ -66,7 +66,7 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
                                 leading: getxController.authData.value !=
                                         snapshot.data.docs[index]['sentBy']
                                     ? Text(
-                                        "${snapshot.data.docs[index]['username']}")
+                                        "${widget.otherUserContactModal.otherUserName}")
                                     : SizedBox(
                                         height: 0,
                                         width: 0,
