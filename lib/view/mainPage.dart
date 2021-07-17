@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/controller/chat_sync_controller.dart';
 import 'package:secretchat/view/chatPage.dart';
 import 'package:secretchat/view/noteSelf.dart';
 import 'package:secretchat/view/searchPage.dart';
@@ -12,6 +15,30 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  // final instance = FirebaseFirestore.instance;
+  final getxController = Get.put(AuthController());
+  final ChatSyncController chatSyncController = Get.put(ChatSyncController());
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+    // fetchFromServer();
+  }
+
+  // void fetchFromServer() {
+  //   FirebaseFirestore.instance
+  //       .collection("users")
+  //       .doc(getxController.user.value.userId)
+  //       .collection("connections")
+  //       .snapshots()
+  //       .listen((event) {
+  //     chatSyncController.syncFromServerPersonalConnectionList(
+  //         data: event.docs);
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,6 +125,40 @@ class _MainPageState extends State<MainPage> {
                       MaterialPageRoute(builder: (context) => ChatPage()));
                 },
               ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(getxController.user.value.userId)
+                        .collection("connections")
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      // print(snapshot.data);
+
+                      if (snapshot.hasData) {
+                        chatSyncController.syncFromServerPersonalConnectionList(
+                            data: snapshot.data.docs);
+                        return ListView.builder(
+                          itemBuilder: (ctx, index) {
+                            return ListTile(
+                              title: Text(
+                                  '${snapshot.data.docs[index]["userName"]}'),
+                              subtitle:
+                                  Text('${snapshot.data.docs[index]["email"]}'),
+                              onTap: () async {
+                                
+                                
+
+                              },
+                              //subtitle: new Text(document.data()['company']),
+                            );
+                          },
+                          itemCount: snapshot.data.docs.length,
+                        );
+                      }
+                      return Container();
+                    }),
+              )
             ],
           ),
         ),

@@ -129,17 +129,19 @@ class _SearchPageState extends State<SearchPage> {
                             subtitle: new Text(document.data()['username']),
                             onTap: () async {
                               //don't add if connection is already there
-                              await userOperations.ifUserExist(
+                              bool userExists =
+                                  await userOperations.ifUserExist(
                                 document: document,
                                 getxController: getxController,
                               );
+                              print(userExists);
                               //if user is not there
-                              if (!userOperations.userExists.value) {
+                              if (!userExists) {
                                 await userOperations.addContact(
                                     document, getxController);
                               } else {
                                 //TODO: send the user to chat page if the connection is already there
-                                
+
                               }
                             },
                             //subtitle: new Text(document.data()['company']),
