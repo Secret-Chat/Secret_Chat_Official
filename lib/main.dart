@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/view/authPage.dart';
@@ -30,11 +31,21 @@ class MyApp extends StatelessWidget {
         builder: (context, AsyncSnapshot<User> userSnapshot) {
           if (userSnapshot.hasData) {
             //return ChatPage();
-
-            getxController.user.value = UserModel(
-                userEmail: userSnapshot.data.email,
-                userId: userSnapshot.data.uid);
+            // getxController.user.value = UserModel(
+            //     userEmail: userSnapshot.data.email,
+            //     userId: userSnapshot.data.uid);
             getxController.authData.value = userSnapshot.data.uid;
+            FirebaseFirestore.instance
+                .collection("users")
+                .doc(userSnapshot.data.uid)
+                .get()
+                .then((value) {
+              getxController.user.value = UserModel(
+                userEmail: value['email'],
+                userId: value['userId'],
+                userName: value['username'],
+              );
+            });
             print("Check: ${getxController.authData.value}");
             return MainPage();
           }

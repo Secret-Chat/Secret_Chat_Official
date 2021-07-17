@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 
 class UserOperations extends GetxController {
-  Rx<bool> userExists = false.obs;
+  // Rx<bool> userExists = false.obs;
 
   Future<void> addContact(
       DocumentSnapshot document, AuthController getxController) async {
@@ -33,7 +33,8 @@ class UserOperations extends GetxController {
         .doc(docId.id)
         .set({
       "email": document.data()['email'],
-      "userId": document.data()['userId']
+      "userId": document.data()['userId'],
+      "userName": document.data()['username'],
       // "connectionID": docId.id
     });
 
@@ -45,26 +46,38 @@ class UserOperations extends GetxController {
         .doc(docId.id)
         .set({
       "email": getxController.user.value.userEmail,
-      "userId": getxController.user.value.userId
+      "userId": getxController.user.value.userId,
+      "userName": getxController.user.value.userName
       // "connectionID": docId.id
     });
   }
 
-  Future<void> ifUserExist({
+  Future<bool> ifUserExist({
     DocumentSnapshot document,
     AuthController getxController,
   }) async {
     // bool userExists = false; //initially the user won't exist
-    print("userExists function called");
-    await FirebaseFirestore.instance
+    print("docid ${document.id}");
+    print("emailof other : ${document.data()['email']}");
+    print("userExists function called ${getxController.authData.value}");
+    QuerySnapshot result = await FirebaseFirestore.instance
         .collection('users')
         .doc(getxController.authData.value)
         .collection("connections")
         .where('email', isEqualTo: document.data()['email'])
-        .get()
-        .then((value) {
-      userExists.value = true;
-      print("user is there alread");
-    });
+        .get();
+    //doc length zero - so user doc not exist
+    print("len ${result.docs.length}");
+    // if len 0 - no connection
+    //if len not 0 means connection
+    return result.docs.length == 0 ? false : true;
   }
 }
+
+
+/*
+userExists.value = true;
+      value.docs.forEach((element) {
+        print("sense hai :? ${element.id}");
+
+*/
