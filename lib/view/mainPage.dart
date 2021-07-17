@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/chat_sync_controller.dart';
+import 'package:secretchat/model/contact.dart';
+import 'package:secretchat/view/ChatPagePersonal.dart';
 import 'package:secretchat/view/chatPage.dart';
 import 'package:secretchat/view/noteSelf.dart';
 import 'package:secretchat/view/searchPage.dart';
@@ -134,6 +136,16 @@ class _MainPageState extends State<MainPage> {
                         .snapshots(),
                     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       // print(snapshot.data);
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      // if (snapshot.hasError) {
+                      //   Center(
+                      //     child: CircularProgressIndicator(),
+                      //   );
+                      // }
 
                       if (snapshot.hasData) {
                         chatSyncController.syncFromServerPersonalConnectionList(
@@ -141,14 +153,26 @@ class _MainPageState extends State<MainPage> {
                         return ListView.builder(
                           itemBuilder: (ctx, index) {
                             return ListTile(
+                              leading: ClipOval(
+                                child: Container(
+                                  child: (Text(
+                                      '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}')),
+                                ),
+                              ),
                               title: Text(
                                   '${snapshot.data.docs[index]["userName"]}'),
                               subtitle:
                                   Text('${snapshot.data.docs[index]["email"]}'),
-                              onTap: () async {
-                                
-                                
-
+                              onTap: () {
+                                Get.to(ChatPagePersonal(
+                                  otherUserContactModal: Contacts(
+                                      connectionId:
+                                          snapshot.data.docs[index].id,
+                                      otherUserEmail: snapshot.data.docs[index]
+                                          ["email"],
+                                      otherUserName: snapshot.data.docs[index]
+                                          ["userName"]),
+                                ));
                               },
                               //subtitle: new Text(document.data()['company']),
                             );
