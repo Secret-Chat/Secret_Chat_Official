@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/model/group_model.dart';
+import 'package:secretchat/view/teamName.dart';
 
 class MakeGroup extends StatefulWidget {
   //const MakeGroup({ Key? key }) : super(key: key);
@@ -125,6 +126,7 @@ class _MakeGroupState extends State<MakeGroup> {
               ? () {
                   //go to next page and make a new team connection in firebase
                   print('FAB Tapped');
+                  Get.to(TeamName(contactsToAdd));
                 }
               : null,
         ));
