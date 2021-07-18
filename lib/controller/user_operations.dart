@@ -73,6 +73,8 @@ class UserOperations extends GetxController {
     //if len not 0 means connection
     return result.docs.length == 0 ? false : true;
   }
+
+  Future<void> createGroup() async {}
 }
 
 
