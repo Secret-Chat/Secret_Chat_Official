@@ -8,6 +8,7 @@ import 'package:secretchat/view/ChatPagePersonal.dart';
 import 'package:secretchat/view/chatPage.dart';
 import 'package:secretchat/view/noteSelf.dart';
 import 'package:secretchat/view/searchPage.dart';
+import 'makeGroup.dart';
 import 'package:get/get.dart';
 import 'settingsPage.dart';
 
@@ -88,6 +89,23 @@ class _MainPageState extends State<MainPage> {
                 ),
                 value: 'settings',
               ),
+              DropdownMenuItem(
+                child: Container(
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.exit_to_app,
+                        color: Colors.black,
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(('Make Group'))
+                    ],
+                  ),
+                ),
+                value: 'group',
+              ),
             ],
             onChanged: (itemIdentifier) {
               if (itemIdentifier == 'logout') {
@@ -96,6 +114,10 @@ class _MainPageState extends State<MainPage> {
               if (itemIdentifier == 'settings') {
                 // Navigator.of(context).pushNamed(SettingsPage));
                 Get.to(SettingsPage());
+              }
+              if (itemIdentifier == 'group') {
+                // Navigator.of(context).pushNamed(SettingsPage));
+                Get.to(MakeGroup());
               }
             },
           ),

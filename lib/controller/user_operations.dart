@@ -12,6 +12,7 @@ class UserOperations extends GetxController {
     final docId = await FirebaseFirestore.instance
         .collection("personal_connections")
         .add({
+      "type": 'personal',
       "userOne": {
         "email": getxController.user.value.userEmail,
         "userId": getxController.user.value.userId
