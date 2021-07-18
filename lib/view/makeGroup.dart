@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 
 class MakeGroup extends StatefulWidget {
   //const MakeGroup({ Key? key }) : super(key: key);
@@ -9,7 +10,10 @@ class MakeGroup extends StatefulWidget {
 }
 
 class _MakeGroupState extends State<MakeGroup> {
-  bool onTap = false;
+  onTap(String id, String username) {
+    print(id);
+    print(username);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,19 +51,21 @@ class _MakeGroupState extends State<MakeGroup> {
             }
 
             return new ListView.builder(
-                itemCount: snapshot.data.docs.length,
-                itemBuilder: (context, index) {
-                  return new ListTile(
-                      tileColor:
-                          onTap ? Color.fromRGBO(255, 0, 0, 0.4) : Colors.white,
-                      title: new Text(snapshot.data.docs[index]['username']),
-                      subtitle: new Text(snapshot.data.docs[index]['email']),
-                      onTap: () async {
-                        setState(() {
-                          onTap = !onTap;
-                        });
-                      });
-                });
+              itemCount: snapshot.data.docs.length,
+              itemBuilder: (context, index) {
+                return new ListTile(
+                  tileColor:
+                      //Color.fromRGBO(255, 0, 0, 0.4) :
+                      Colors.white,
+                  title: new Text(snapshot.data.docs[index]['username']),
+                  subtitle: new Text(snapshot.data.docs[index]['email']),
+                  onTap: () async {
+                    onTap(snapshot.data.docs[index]['userId'],
+                        snapshot.data.docs[index]['username']);
+                  },
+                );
+              },
+            );
           },
         ),
       ),
