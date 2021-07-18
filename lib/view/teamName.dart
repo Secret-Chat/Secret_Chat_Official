@@ -166,6 +166,7 @@ class _TeamNameState extends State<TeamName> {
                       .collection('connections')
                       .doc(result.id)
                       .set({
+                    'type': "team",
                     'teamName': _teamNameController.text,
                     'teamId': result.id
                   });
@@ -178,6 +179,7 @@ class _TeamNameState extends State<TeamName> {
                     .collection('connections')
                     .doc(result.id)
                     .set({
+                  'type': "team",
                   'teamName': _teamNameController.text,
                   'teamId': result.id
                 });
