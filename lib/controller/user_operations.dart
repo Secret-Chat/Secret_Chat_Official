@@ -33,6 +33,7 @@ class UserOperations extends GetxController {
         .collection("connections")
         .doc(docId.id)
         .set({
+      "type": "personal",
       "email": document.data()['email'],
       "userId": document.data()['userId'],
       "userName": document.data()['username'],
@@ -46,6 +47,7 @@ class UserOperations extends GetxController {
         .collection("connections")
         .doc(docId.id)
         .set({
+      "type": "personal",
       "email": getxController.user.value.userEmail,
       "userId": getxController.user.value.userId,
       "userName": getxController.user.value.userName

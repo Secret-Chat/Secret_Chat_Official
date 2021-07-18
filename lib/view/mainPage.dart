@@ -5,8 +5,8 @@ import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/chat_sync_controller.dart';
 import 'package:secretchat/model/contact.dart';
 import 'package:secretchat/view/ChatPagePersonal.dart';
-import 'package:secretchat/view/chatPage.dart';
-import 'package:secretchat/view/noteSelf.dart';
+import 'package:secretchat/temp%20files/chatPage.dart';
+import 'package:secretchat/temp%20files/noteSelf.dart';
 import 'package:secretchat/view/searchPage.dart';
 import 'makeGroup.dart';
 import 'package:get/get.dart';
@@ -170,31 +170,44 @@ class _MainPageState extends State<MainPage> {
                       // }
 
                       if (snapshot.hasData) {
-                        chatSyncController.syncFromServerPersonalConnectionList(
-                            data: snapshot.data.docs);
+                        // chatSyncController.syncFromServerPersonalConnectionList(
+                        //     data: snapshot.data.docs);
+
                         return ListView.builder(
                           itemBuilder: (ctx, index) {
+                            print("type: ${snapshot.data.docs[index]['type']}");
                             return ListTile(
                               leading: ClipOval(
                                 child: Container(
-                                  child: (Text(
-                                      '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}')),
+                                  child: (Text(snapshot.data.docs[index]
+                                              ['type'] ==
+                                          "personal"
+                                      ? '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}'
+                                      : '${snapshot.data.docs[index]["teamName"].toString().substring(0, 1)}')),
                                 ),
                               ),
-                              title: Text(
-                                  '${snapshot.data.docs[index]["userName"]}'),
-                              subtitle:
-                                  Text('${snapshot.data.docs[index]["email"]}'),
+                              title: Text(snapshot.data.docs[index]['type'] ==
+                                      "personal"
+                                  ? '${snapshot.data.docs[index]["userName"]}'
+                                  : '${snapshot.data.docs[index]['teamName']}'),
+                              subtitle: Text(snapshot.data.docs[index]
+                                          ['type'] ==
+                                      "personal"
+                                  ? '${snapshot.data.docs[index]["email"]}'
+                                  : ''),
                               onTap: () {
-                                Get.to(ChatPagePersonal(
-                                  otherUserContactModal: Contacts(
-                                      connectionId:
-                                          snapshot.data.docs[index].id,
-                                      otherUserEmail: snapshot.data.docs[index]
-                                          ["email"],
-                                      otherUserName: snapshot.data.docs[index]
-                                          ["userName"]),
-                                ));
+                                //only go to personal if the type is personal
+                                if (snapshot.data.docs[index]['type'] ==
+                                    "personal")
+                                  Get.to(ChatPagePersonal(
+                                    otherUserContactModal: Contacts(
+                                        connectionId:
+                                            snapshot.data.docs[index].id,
+                                        otherUserEmail:
+                                            snapshot.data.docs[index]["email"],
+                                        otherUserName: snapshot.data.docs[index]
+                                            ["userName"]),
+                                  ));
                               },
                               //subtitle: new Text(document.data()['company']),
                             );

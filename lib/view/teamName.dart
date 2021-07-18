@@ -126,6 +126,7 @@ class _TeamNameState extends State<TeamName> {
         child: Icon(Icons.keyboard_arrow_right_outlined),
         onPressed: _teamNameController.text.isNotEmpty
             ? () async {
+                //create the group in personal_connections
                 final result = await FirebaseFirestore.instance
                     .collection('personal_connections')
                     .add({
@@ -135,6 +136,7 @@ class _TeamNameState extends State<TeamName> {
                   'createdOn': FieldValue.serverTimestamp(),
                 });
 
+                //add the users in the users collection in the group
                 print(result.id);
                 widget.teamList.forEach((element) {
                   FirebaseFirestore.instance
@@ -145,6 +147,7 @@ class _TeamNameState extends State<TeamName> {
                       .set({'username': element.name, 'role': 'member'});
                 });
 
+                //add the owner too in the user group
                 FirebaseFirestore.instance
                     .collection('personal_connections')
                     .doc(result.id)
@@ -153,6 +156,30 @@ class _TeamNameState extends State<TeamName> {
                     .set({
                   'username': getxController.user.value.userName,
                   'role': 'owner'
+                });
+
+                //add this connection for all the users in the connection collection for the users
+                widget.teamList.forEach((element) {
+                  FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(element.userId)
+                      .collection('connections')
+                      .doc(result.id)
+                      .set({
+                    'teamName': _teamNameController.text,
+                    'teamId': result.id
+                  });
+                });
+
+                //add the connection for the owner too
+                FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(getxController.user.value.userId)
+                    .collection('connections')
+                    .doc(result.id)
+                    .set({
+                  'teamName': _teamNameController.text,
+                  'teamId': result.id
                 });
               }
             : null,
