@@ -125,14 +125,34 @@ class _TeamNameState extends State<TeamName> {
             _teamNameController.text.isNotEmpty ? Colors.amber : Colors.red,
         child: Icon(Icons.keyboard_arrow_right_outlined),
         onPressed: _teamNameController.text.isNotEmpty
-            ? () {
-                FirebaseFirestore.instance
+            ? () async {
+                final result = await FirebaseFirestore.instance
                     .collection('personal_connections')
                     .add({
                   'type': 'team',
                   'groupName': _teamNameController.text,
                   'createdBy': getxController.user.value.userId,
                   'createdOn': FieldValue.serverTimestamp(),
+                });
+
+                print(result.id);
+                widget.teamList.forEach((element) {
+                  FirebaseFirestore.instance
+                      .collection('personal_connections')
+                      .doc(result.id)
+                      .collection('users')
+                      .doc(element.userId)
+                      .set({'username': element.name, 'role': 'member'});
+                });
+
+                FirebaseFirestore.instance
+                    .collection('personal_connections')
+                    .doc(result.id)
+                    .collection('users')
+                    .doc(getxController.user.value.userId)
+                    .set({
+                  'username': getxController.user.value.userName,
+                  'role': 'owner'
                 });
               }
             : null,
