@@ -1,12 +1,29 @@
-class User {
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+
+class UserModel {
   String userEmail;
   String password;
+  String userName;
   String name;
   String photoUrl;
   String status;
   String userId;
   String phoneNumber;
   List<String> contactDetails; //list of contacts in the phone
+
+  UserModel({
+    this.userEmail,
+    this.password,
+    this.userName,
+    this.name,
+    this.photoUrl,
+    this.status,
+    this.userId,
+    this.phoneNumber,
+    this.contactDetails,
+  });
 }
 
 /*

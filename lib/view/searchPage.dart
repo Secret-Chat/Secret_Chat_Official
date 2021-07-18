@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/chatController.dart';
+import 'package:secretchat/controller/user_operations.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -23,6 +26,9 @@ class _SearchPageState extends State<SearchPage> {
   //   print(result);
 
   final getxController = Get.put(AuthController());
+  bool userExists = false;
+
+  UserOperations userOperations = Get.put(UserOperations());
 
   @override
   Widget build(BuildContext context) {
@@ -122,21 +128,21 @@ class _SearchPageState extends State<SearchPage> {
                             title: new Text(document.data()['email']),
                             subtitle: new Text(document.data()['username']),
                             onTap: () async {
-                              final docId = await FirebaseFirestore.instance
-                                  .collection("personal_collections")
-                                  .add({
-                                "name": "Test",
-                              });
+                              //don't add if connection is already there
+                              bool userExists =
+                                  await userOperations.ifUserExist(
+                                document: document,
+                                getxController: getxController,
+                              );
+                              print(userExists);
+                              //if user is not there
+                              if (!userExists) {
+                                await userOperations.addContact(
+                                    document, getxController);
+                              } else {
+                                //TODO: send the user to chat page if the connection is already there
 
-                              print("taped");
-                              FirebaseFirestore.instance
-                                  .collection("users")
-                                  .doc(getxController.authData.value)
-                                  .collection("connections")
-                                  .add({
-                                "enail": document.data()['email'],
-                                "connectionID": docId.id
-                              });
+                              }
                             },
                             //subtitle: new Text(document.data()['company']),
                           );

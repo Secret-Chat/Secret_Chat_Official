@@ -159,7 +159,7 @@ class _ChatPageState extends State<ChatPage> {
                                 'sentBy': getxController.authData.value,
                                 'createdOn': Timestamp.now(),
                               });
-                              getxController.printer();
+                              // getxController.printer();
                             }
                             _titleController.text = '';
                           },

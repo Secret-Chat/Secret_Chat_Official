@@ -32,18 +32,19 @@ class _AuthPageState extends State<AuthPage> {
         authResult = await _auth.signInWithEmailAndPassword(
             email: email, password: password);
         getxController.authData.value = authResult.user.uid;
-        getxController.printer();
+        // getxController.printer();
       } else {
         authResult = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
         getxController.authData.value = authResult.user.uid;
-        getxController.printer();
+        // getxController.printer();
         FirebaseFirestore.instance
             .collection('users')
             .doc(authResult.user.uid)
             .set({
           'username': username,
           'email': email,
+          'userId': authResult.user.uid,
         });
       }
     } on PlatformException catch (err) {
