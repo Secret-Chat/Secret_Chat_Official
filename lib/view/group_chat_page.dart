@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/view/group_details.dart';
 
 class GroupChatScreen extends StatefulWidget {
   final String groupChatID;
@@ -33,8 +34,63 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         width: size.width,
         child: Scaffold(
           appBar: AppBar(
-              // title: Text('${widget.otherUserContactModal.otherUserName}'),
-              ),
+            // leading: ClipOval(
+            //   child: Container(
+            //     color: Colors.grey,
+            //   ),
+            // ),
+
+            centerTitle: true,
+            title: StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('personal_connections')
+                  .doc('${widget.groupChatID}')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return SizedBox(
+                    child: GestureDetector(
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            height: 40,
+                            width: 40,
+                            child: ClipOval(
+                              child: Container(
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text("${snapshot.data['groupName']}"),
+                        ],
+                      ),
+                      onTap: () {
+                        //show the Group Details
+                        //and the list of users
+                        Get.to(GroupDetailsPage(
+                          groupID: widget.groupChatID,
+                        ));
+                      },
+                    ),
+                  );
+                }
+                //TODO: loading spinners to implement later on
+                return SizedBox(
+                  height: 0,
+                  width: 0,
+                );
+              },
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  //settings page
+                },
+                icon: Icon(Icons.settings),
+              )
+            ],
+          ),
           body: SingleChildScrollView(
             child: Container(
               height: MediaQuery.of(context).size.height - 68,
