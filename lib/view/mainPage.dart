@@ -6,7 +6,7 @@ import 'package:secretchat/controller/chat_sync_controller.dart';
 import 'package:secretchat/model/contact.dart';
 import 'package:secretchat/view/ChatPagePersonal.dart';
 import 'package:secretchat/temp%20files/chatPage.dart';
-import 'package:secretchat/temp%20files/noteSelf.dart';
+import 'package:secretchat/view/noteSelf.dart';
 import 'package:secretchat/view/group_chat_page.dart';
 import 'package:secretchat/view/searchPage.dart';
 import 'makeGroup.dart';
