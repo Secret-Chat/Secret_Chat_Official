@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
-import '../model/contact.dart';
+import '../../model/contact.dart';
 
 class ChatPagePersonal extends StatefulWidget {
   //const ChatPagePro({ Key? key }) : super(key: key);

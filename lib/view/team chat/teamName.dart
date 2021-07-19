@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:secretchat/model/group_model.dart';
+import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:get/get.dart';
 
@@ -131,7 +131,7 @@ class _TeamNameState extends State<TeamName> {
                     .collection('personal_connections')
                     .add({
                   'type': 'team',
-                  'groupName': _teamNameController.text,
+                  'teamName': _teamNameController.text,
                   'createdBy': getxController.user.value.userId,
                   'createdOn': FieldValue.serverTimestamp(),
                 });

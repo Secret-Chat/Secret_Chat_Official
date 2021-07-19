@@ -1,14 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
-import 'package:secretchat/view/addMemberPage.dart';
-import 'package:secretchat/view/profileDetail.dart';
+import 'package:secretchat/model/team_model.dart';
+import 'package:secretchat/model/user_in_group.dart';
+import 'package:secretchat/view/team%20chat/addMemberPage.dart';
+import 'package:secretchat/view/user%20views/profileDetail.dart';
 
 class GroupDetailsPage extends StatefulWidget {
-  final String groupID;
+  // final String groupID;
+  final TeamModel teamModel;
 
-  const GroupDetailsPage({Key key, this.groupID}) : super(key: key);
+  const GroupDetailsPage({Key key, @required this.teamModel}) : super(key: key);
 
   @override
   _GroupDetailsPageState createState() => _GroupDetailsPageState();
@@ -28,7 +32,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
           title: StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('personal_connections')
-                .doc('${widget.groupID}')
+                .doc('${widget.teamModel.teamId}')
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
@@ -45,7 +49,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                         ),
                       ),
                       SizedBox(width: 10),
-                      Text("${snapshot.data['groupName']}"),
+                      Text("${snapshot.data['teamName']}"),
                     ],
                   ),
                 );
@@ -68,7 +72,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
               StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('personal_connections')
-                      .doc('${widget.groupID}')
+                      .doc('${widget.teamModel.teamId}')
                       .collection('users')
                       .doc(getxController.user.value.userId)
                       .snapshots(),
@@ -82,7 +86,9 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                               child: Text('Add Member'),
                             ),
                             onTap: () {
-                              Get.to(AddMemberPage());
+                              Get.to(AddMemberPage(
+                                teamModel: widget.teamModel,
+                              ));
                             },
                           ),
                         );
@@ -100,7 +106,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       child: StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('personal_connections')
-                            .doc('${widget.groupID}')
+                            .doc('${widget.teamModel.teamId}')
                             .collection('users')
                             .snapshots(),
                         builder: (context, snapshots) {
@@ -112,14 +118,12 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                               ),
                             );
                           }
-
                           if (snapshots.hasData) {
                             return Container(
                               child:
                                   Text('${snapshots.data.docs.length} members'),
                             );
                           }
-
                           return Container();
                         },
                       ),
@@ -132,7 +136,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       child: StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('personal_connections')
-                            .doc('${widget.groupID}')
+                            .doc('${widget.teamModel.teamId}')
                             .collection('users')
                             .snapshots(),
                         builder: (context, snapshots) {
@@ -144,43 +148,41 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                               ),
                             );
                           }
-
                           if (snapshots.hasData) {
                             return ListView.builder(
-                                itemCount: snapshots.data.docs.length,
-                                itemBuilder: (context, index) {
-                                  print(
-                                      '${snapshots.data.docs[index]['username']}');
-                                  return ListTile(
-                                    leading: SizedBox(
-                                      height: 40,
-                                      width: 40,
-                                      child: ClipOval(
-                                        child: Container(
-                                          color: Colors.grey,
-                                        ),
+                              itemCount: snapshots.data.docs.length,
+                              itemBuilder: (context, index) {
+                                print(
+                                    '${snapshots.data.docs[index]['username']}');
+                                return ListTile(
+                                  leading: SizedBox(
+                                    height: 40,
+                                    width: 40,
+                                    child: ClipOval(
+                                      child: Container(
+                                        color: Colors.grey,
                                       ),
                                     ),
-                                    title: Text(
-                                        '${snapshots.data.docs[index]['username']}'),
-                                    trailing: Text(
-                                        '${snapshots.data.docs[index]['role']}'),
-                                    onTap: () {
-                                      if (getxController.user.value.userId !=
-                                          snapshots.data.docs[index].id) {
-                                        return Get.to(
-                                          ProfileDetail(
-                                            userId:
-                                                snapshots.data.docs[index].id,
-                                          ),
-                                        );
-                                      }
-                                      return null;
-                                    },
-                                  );
-                                });
+                                  ),
+                                  title: Text(
+                                      '${snapshots.data.docs[index]['username']}'),
+                                  trailing: Text(
+                                      '${snapshots.data.docs[index]['role']}'),
+                                  onTap: () {
+                                    if (getxController.user.value.userId !=
+                                        snapshots.data.docs[index].id) {
+                                      return Get.to(
+                                        ProfileDetail(
+                                          userId: snapshots.data.docs[index].id,
+                                        ),
+                                      );
+                                    }
+                                    return null;
+                                  },
+                                );
+                              },
+                            );
                           }
-
                           return Container();
                         },
                       ),

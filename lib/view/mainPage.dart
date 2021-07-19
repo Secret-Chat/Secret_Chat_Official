@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/chat_sync_controller.dart';
 import 'package:secretchat/model/contact.dart';
-import 'package:secretchat/view/ChatPagePersonal.dart';
+import 'package:secretchat/model/team_model.dart';
+import 'package:secretchat/view/personal%20chat/ChatPagePersonal.dart';
 import 'package:secretchat/temp%20files/chatPage.dart';
-import 'package:secretchat/view/noteSelf.dart';
-import 'package:secretchat/view/group_chat_page.dart';
-import 'package:secretchat/view/searchPage.dart';
-import 'makeGroup.dart';
+import 'package:secretchat/view/user%20views/noteSelf.dart';
+import 'package:secretchat/view/team%20chat/group_chat_page.dart';
+import 'package:secretchat/view/user%20views/searchPage.dart';
+import 'team chat/makeGroup.dart';
 import 'package:get/get.dart';
 import 'settingsPage.dart';
 
@@ -210,9 +211,17 @@ class _MainPageState extends State<MainPage> {
                                             ["userName"]),
                                   ));
                                 else {
+                                  // print(snapshot.data.docs[index]);
                                   Get.to(GroupChatScreen(
-                                      groupChatID:
-                                          snapshot.data.docs[index].id));
+                                    teamModel: TeamModel(
+                                        // createdBy: snapshot.data.docs[index]
+                                        //     ['createdBy'],
+                                        // createdOn: snapshot.data.docs[index]
+                                        //     ['createdOn'],
+                                        teamName: snapshot.data.docs[index]
+                                            ['teamName'],
+                                        teamId: snapshot.data.docs[index].id),
+                                  ));
                                 }
                               },
                               //subtitle: new Text(document.data()['company']),

@@ -5,4 +5,12 @@ class UserEntity {
   String userId;
 
   UserEntity({this.name, this.userId});
+
+  @override
+  toString() {
+    return '''
+    Name: $name
+    UserId $userId
+    ''';
+  }
 }
