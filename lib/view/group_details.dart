@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/view/addMemberPage.dart';
 import 'package:secretchat/view/profileDetail.dart';
 
 class GroupDetailsPage extends StatefulWidget {
@@ -64,8 +65,35 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
               SizedBox(
                 height: 10,
               ),
+              StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('personal_connections')
+                      .doc('${widget.groupID}')
+                      .collection('users')
+                      .doc(getxController.user.value.userId)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data['role'] == 'owner')
+                        return Container(
+                          height: 50,
+                          child: GestureDetector(
+                            child: Center(
+                              child: Text('Add Member'),
+                            ),
+                            onTap: () {
+                              Get.to(AddMemberPage());
+                            },
+                          ),
+                        );
+                    }
+                    return Container();
+                  }),
+              SizedBox(
+                height: 10,
+              ),
               Container(
-                height: MediaQuery.of(context).size.height - 100,
+                height: MediaQuery.of(context).size.height - 170,
                 child: Column(
                   children: <Widget>[
                     Container(
@@ -100,7 +128,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       height: 10,
                     ),
                     Container(
-                      height: 600,
+                      height: 400,
                       child: StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('personal_connections')
