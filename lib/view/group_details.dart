@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/view/profileDetail.dart';
 
 class GroupDetailsPage extends StatefulWidget {
   final String groupID;
@@ -11,6 +14,8 @@ class GroupDetailsPage extends StatefulWidget {
 }
 
 class _GroupDetailsPageState extends State<GroupDetailsPage> {
+  final getxController = Get.put(AuthController());
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -132,6 +137,18 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                                         '${snapshots.data.docs[index]['username']}'),
                                     trailing: Text(
                                         '${snapshots.data.docs[index]['role']}'),
+                                    onTap: () {
+                                      if (getxController.user.value.userId !=
+                                          snapshots.data.docs[index].id) {
+                                        return Get.to(
+                                          ProfileDetail(
+                                            userId:
+                                                snapshots.data.docs[index].id,
+                                          ),
+                                        );
+                                      }
+                                      return null;
+                                    },
                                   );
                                 });
                           }
