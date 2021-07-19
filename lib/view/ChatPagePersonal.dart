@@ -19,6 +19,16 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
   final _textController = TextEditingController();
   final getxController = Get.put(AuthController());
 
+
+  //dispose the controllers
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _textController.dispose();
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     print(widget.otherUserContactModal.connectionId);

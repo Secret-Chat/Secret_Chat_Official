@@ -7,6 +7,7 @@ import 'package:secretchat/model/contact.dart';
 import 'package:secretchat/view/ChatPagePersonal.dart';
 import 'package:secretchat/temp%20files/chatPage.dart';
 import 'package:secretchat/temp%20files/noteSelf.dart';
+import 'package:secretchat/view/group_chat_page.dart';
 import 'package:secretchat/view/searchPage.dart';
 import 'makeGroup.dart';
 import 'package:get/get.dart';
@@ -208,6 +209,11 @@ class _MainPageState extends State<MainPage> {
                                         otherUserName: snapshot.data.docs[index]
                                             ["userName"]),
                                   ));
+                                else {
+                                  Get.to(GroupChatScreen(
+                                      groupChatID:
+                                          snapshot.data.docs[index].id));
+                                }
                               },
                               //subtitle: new Text(document.data()['company']),
                             );
