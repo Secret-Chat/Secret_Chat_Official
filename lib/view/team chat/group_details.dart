@@ -23,6 +23,79 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
   final getxController = Get.put(AuthController());
   var groupname = '';
   var descriptionName = '';
+  List<UserEntity> admins = [UserEntity()];
+
+  onLongPresses(String id, String role) {
+    print(id);
+    print(role);
+    if (role == 'owner') {
+      return theDialog(id, role);
+    }
+    return theDialog(id, role);
+  }
+
+  theDialog(String id, String role) {
+    return Get.defaultDialog(
+        title: '',
+        content: Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              GestureDetector(
+                child: Container(
+                  height: 50,
+                  width: 200,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  color: Color.fromRGBO(233, 34, 12, 0.4),
+                  child: role == 'owner'
+                      ? Center(
+                          child: Text('Take thee ownership'),
+                        )
+                      : Center(
+                          child: Text('Make owner'),
+                        ),
+                ),
+                onTap: () async {
+                  await FirebaseFirestore.instance
+                      .collection('personal_connections')
+                      .doc('${widget.teamModel.teamId}')
+                      .collection('users')
+                      .doc(id)
+                      .update({'role': role == 'owner' ? 'member' : 'onwer'});
+                  Navigator.of(context).pop();
+                },
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                child: Container(
+                  height: 50,
+                  width: 200,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  color: Color.fromRGBO(98, 233, 34, 0.4),
+                  child: role == 'owner'
+                      ? Center(
+                          child: Text('Remove from group'),
+                        )
+                      : Center(
+                          child: Text('Kick this ass'),
+                        ),
+                ),
+                onTap: () async {
+                  await FirebaseFirestore.instance
+                      .collection('personal_connections')
+                      .doc('${widget.teamModel.teamId}')
+                      .collection('users')
+                      .doc(id)
+                      .delete();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -205,32 +278,53 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                             return ListView.builder(
                               itemCount: snapshots.data.docs.length,
                               itemBuilder: (context, index) {
+                                if (snapshots.data.docs[index]['role'] ==
+                                    'owner') {
+                                  admins.add(UserEntity(
+                                      name: snapshots.data.docs[index]
+                                          ['username'],
+                                      userId: snapshots.data.docs[index].id));
+                                }
                                 print(
                                     '${snapshots.data.docs[index]['username']}');
-                                return ListTile(
-                                  leading: SizedBox(
-                                    height: 40,
-                                    width: 40,
-                                    child: ClipOval(
-                                      child: Container(
-                                        color: Colors.grey,
+                                return GestureDetector(
+                                  child: ListTile(
+                                    leading: SizedBox(
+                                      height: 40,
+                                      width: 40,
+                                      child: ClipOval(
+                                        child: Container(
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     ),
+                                    title: Text(
+                                        '${snapshots.data.docs[index]['username']}'),
+                                    trailing: Text(
+                                        '${snapshots.data.docs[index]['role']}'),
+                                    onTap: () {
+                                      if (getxController.user.value.userId !=
+                                          snapshots.data.docs[index].id) {
+                                        return Get.to(
+                                          ProfileDetail(
+                                            userId:
+                                                snapshots.data.docs[index].id,
+                                          ),
+                                        );
+                                      }
+                                      return null;
+                                    },
                                   ),
-                                  title: Text(
-                                      '${snapshots.data.docs[index]['username']}'),
-                                  trailing: Text(
-                                      '${snapshots.data.docs[index]['role']}'),
-                                  onTap: () {
-                                    if (getxController.user.value.userId !=
-                                        snapshots.data.docs[index].id) {
-                                      return Get.to(
-                                        ProfileDetail(
-                                          userId: snapshots.data.docs[index].id,
-                                        ),
-                                      );
+                                  onLongPress: () async {
+                                    final result = admins.where((element) =>
+                                        element.name ==
+                                        getxController.user.value.userName);
+                                    print(result);
+                                    if (result.isNotEmpty) {
+                                      onLongPresses(
+                                          snapshots.data.docs[index].id,
+                                          snapshots.data.docs[index]['role']);
                                     }
-                                    return null;
                                   },
                                 );
                               },
