@@ -159,43 +159,71 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                     color: Color.fromRGBO(34, 35, 23, 0.5),
                     height: 100,
                     width: MediaQuery.of(context).size.width,
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          height: 98,
-                          width: MediaQuery.of(context).size.width - 140,
-                          child: TextField(
-                            decoration:
-                                InputDecoration(labelText: 'Enter Message'),
-                            controller: _textController,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Container(
-                          child: IconButton(
-                            icon: Icon(Icons.send),
-                            onPressed: () {
-                              if (_textController.text.isNotEmpty) {
-                                FirebaseFirestore.instance
-                                    // .collection(
-                                    //     'personal_connections')  //${getxController.authData}/messages')
-                                    .collection('personal_connections')
-                                    .doc('${widget.teamModel.teamId}')
-                                    .collection('messages')
-                                    .add({
-                                  'message': _textController.text,
-                                  'sentBy': getxController.authData.value,
-                                  'createdOn': FieldValue.serverTimestamp(),
-                                });
-                                // getxController.printer();
-                              }
-                              _textController.text = '';
-                            },
-                          ),
-                        )
-                      ],
+                    child: StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          // .collection('users/${getxController.authData.value}/mescsages')
+                          .collection('personal_connections')
+                          .doc('${widget.teamModel.teamId}')
+                          .collection('users')
+                          .doc(getxController.user.value.userId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          if (snapshot.data['status'] == "alive") {
+                            return Row(
+                              children: <Widget>[
+                                Container(
+                                  height: 98,
+                                  width:
+                                      MediaQuery.of(context).size.width - 140,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                        labelText: 'Enter Message'),
+                                    controller: _textController,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Container(
+                                  child: IconButton(
+                                    icon: Icon(Icons.send),
+                                    onPressed: () {
+                                      if (_textController.text.isNotEmpty) {
+                                        FirebaseFirestore.instance
+                                            // .collection(
+                                            //     'personal_connections')  //${getxController.authData}/messages')
+                                            .collection('personal_connections')
+                                            .doc('${widget.teamModel.teamId}')
+                                            .collection('messages')
+                                            .add(
+                                          {
+                                            'message': _textController.text,
+                                            'sentBy':
+                                                getxController.authData.value,
+                                            'createdOn':
+                                                FieldValue.serverTimestamp(),
+                                          },
+                                        );
+                                        // getxController.printer();
+                                      }
+                                      _textController.text = '';
+                                    },
+                                  ),
+                                )
+                              ],
+                            );
+                          } else {
+                            return Container(
+                              child: Center(
+                                child: Text(
+                                    "You can no longer send any messages in this group :("),
+                              ),
+                            );
+                          }
+                        }
+                        return Container();
+                      },
                     ),
                   ),
                 ),
