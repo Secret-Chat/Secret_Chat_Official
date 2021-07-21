@@ -174,8 +174,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
                   print(element.toString());
                 });
                 //add these users in the personal connections group
-                contactsToAdd.forEach((element) {
-                  FirebaseFirestore.instance
+                contactsToAdd.forEach((element) async {
+                  await FirebaseFirestore.instance
                       .collection('personal_connections')
                       .doc(widget.teamModel.teamId)
                       .collection('users')
@@ -183,8 +183,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
                       .set({'username': element.name, 'role': 'member'});
                 });
                 //add this connection for all the users in the connection collection for the individual users
-                contactsToAdd.forEach((element) {
-                  FirebaseFirestore.instance
+                contactsToAdd.forEach((element) async {
+                  await FirebaseFirestore.instance
                       .collection('users')
                       .doc(element.userId)
                       .collection('connections')
@@ -195,6 +195,8 @@ class _AddMemberPageState extends State<AddMemberPage> {
                     'teamId': widget.teamModel.teamId
                   });
                 });
+
+                Navigator.of(context).pop();
               }
             : null,
       ),

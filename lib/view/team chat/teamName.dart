@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:get/get.dart';
+import 'package:secretchat/view/mainPage.dart';
 
 class TeamName extends StatefulWidget {
   final List<UserEntity> teamList;
@@ -138,8 +139,8 @@ class _TeamNameState extends State<TeamName> {
 
                 //add the users in the users collection in the group
                 print(result.id);
-                widget.teamList.forEach((element) {
-                  FirebaseFirestore.instance
+                widget.teamList.forEach((element) async {
+                  await FirebaseFirestore.instance
                       .collection('personal_connections')
                       .doc(result.id)
                       .collection('users')
@@ -148,7 +149,7 @@ class _TeamNameState extends State<TeamName> {
                 });
 
                 //add the owner too in the user group
-                FirebaseFirestore.instance
+                await FirebaseFirestore.instance
                     .collection('personal_connections')
                     .doc(result.id)
                     .collection('users')
@@ -159,8 +160,8 @@ class _TeamNameState extends State<TeamName> {
                 });
 
                 //add this connection for all the users in the connection collection for the users
-                widget.teamList.forEach((element) {
-                  FirebaseFirestore.instance
+                widget.teamList.forEach((element) async {
+                  await FirebaseFirestore.instance
                       .collection('users')
                       .doc(element.userId)
                       .collection('connections')
@@ -173,7 +174,7 @@ class _TeamNameState extends State<TeamName> {
                 });
 
                 //add the connection for the owner too
-                FirebaseFirestore.instance
+                await FirebaseFirestore.instance
                     .collection('users')
                     .doc(getxController.user.value.userId)
                     .collection('connections')
@@ -183,6 +184,8 @@ class _TeamNameState extends State<TeamName> {
                   'teamName': _teamNameController.text,
                   'teamId': result.id
                 });
+
+                Get.offAll(MainPage());
               }
             : null,
       ),
