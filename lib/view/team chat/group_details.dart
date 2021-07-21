@@ -6,6 +6,7 @@ import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/view/team%20chat/addMemberPage.dart';
+import 'package:secretchat/view/team%20chat/teamEditingPage.dart';
 import 'package:secretchat/view/user%20views/profileDetail.dart';
 
 class GroupDetailsPage extends StatefulWidget {
@@ -20,6 +21,8 @@ class GroupDetailsPage extends StatefulWidget {
 
 class _GroupDetailsPageState extends State<GroupDetailsPage> {
   final getxController = Get.put(AuthController());
+  var groupname = '';
+  var descriptionName = '';
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +39,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                groupname = snapshot.data['teamName'];
                 return SizedBox(
                   child: Row(
                     children: [
@@ -61,11 +65,60 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
               );
             },
           ),
+          actions: [
+            Container(
+              child: IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {
+                  Get.to(TeamEditingPage(
+                    teamName: groupname,
+                    teamDescription: descriptionName,
+                    teamModel: widget.teamModel,
+                  ));
+                },
+              ),
+            ),
+          ],
         ),
         body: Container(
           height: MediaQuery.of(context).size.height - 50,
           child: Column(
             children: <Widget>[
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                height: 50,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Text('Description'),
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('personal_connections')
+                            .doc('${widget.teamModel.teamId}')
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            descriptionName = snapshot.data['description'];
+                            return SizedBox(
+                              child: Text("${snapshot.data['description']}"),
+                            );
+                          }
+                          return SizedBox(
+                            height: 0,
+                            width: 0,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               SizedBox(
                 height: 10,
               ),
@@ -99,7 +152,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                 height: 10,
               ),
               Container(
-                height: MediaQuery.of(context).size.height - 170,
+                height: MediaQuery.of(context).size.height - 250,
                 child: Column(
                   children: <Widget>[
                     Container(
@@ -132,7 +185,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       height: 10,
                     ),
                     Container(
-                      height: 400,
+                      height: 300,
                       child: StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('personal_connections')
