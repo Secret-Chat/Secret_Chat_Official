@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/controller/tagListController.dart';
 import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
 
@@ -18,6 +19,8 @@ class GroupChatScreen extends StatefulWidget {
 class _GroupChatScreenState extends State<GroupChatScreen> {
   final _textController = TextEditingController();
   final getxController = Get.put(AuthController());
+  bool showUsersTagList = false;
+  TagListControllr tagListControllr = Get.put(TagListControllr());
 
   //dispose the controllers
   @override
@@ -25,6 +28,29 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     // TODO: implement dispose
     super.dispose();
     _textController.dispose();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    listenForTaggingMembers();
+  }
+
+  void listenForTaggingMembers() {
+    print("listenForTaggingMembers");
+    _textController.addListener(() {
+      if (_textController.text.contains('@')) {
+        print("at the rate hai ");
+        tagListControllr.showUserTagList.value = true;
+        // });
+      } else {
+        // setState(() {
+        //   showUsersTagList = false;
+        // });
+        tagListControllr.showUserTagList.value = false;
+      }
+    });
   }
 
   @override
@@ -98,7 +124,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ),
         body: SingleChildScrollView(
           child: Container(
-            height: MediaQuery.of(context).size.height - 68,
+            height: MediaQuery.of(context).size.height - 50,
             width: MediaQuery.of(context).size.width,
             child: Column(
               children: <Widget>[
@@ -154,10 +180,39 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                     ),
                   ),
                 ),
+
+                //show tag list
+                Obx(() => tagListControllr.showUserTagList.value
+                    ? Expanded(
+                        // width: 200,
+                        // height: 200,
+
+                        child: StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                // .collection('users/${getxController.authData.value}/mescsages')
+                                .collection('personal_connections')
+                                .doc('${widget.teamModel.teamId}')
+                                .collection('users')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return ListView.builder(
+                                  itemBuilder: (ctx, index) {
+                                    return Text(
+                                        "${snapshot.data.docs[index]['username']}");
+                                  },
+                                  itemCount: snapshot.data.docs.length,
+                                );
+                              }
+                              return Container();
+                            }),
+                      )
+                    : Text('')),
                 Expanded(
+                  flex: 2,
                   child: Container(
                     color: Color.fromRGBO(34, 35, 23, 0.5),
-                    height: 100,
+                    height: 300,
                     width: MediaQuery.of(context).size.width,
                     child: StreamBuilder<DocumentSnapshot>(
                       stream: FirebaseFirestore.instance
@@ -173,7 +228,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                             return Row(
                               children: <Widget>[
                                 Container(
-                                  height: 98,
+                                  height: 200,
                                   width:
                                       MediaQuery.of(context).size.width - 140,
                                   child: TextField(
