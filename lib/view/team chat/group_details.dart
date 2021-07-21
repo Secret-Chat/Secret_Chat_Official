@@ -88,7 +88,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       .doc('${widget.teamModel.teamId}')
                       .collection('users')
                       .doc(id)
-                      .delete();
+                      .update({'status': 'dead'});
                   Navigator.of(context).pop();
                 },
               ),
@@ -234,6 +234,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                             .collection('personal_connections')
                             .doc('${widget.teamModel.teamId}')
                             .collection('users')
+                            .where('status', isEqualTo: 'alive')
                             .snapshots(),
                         builder: (context, snapshots) {
                           if (snapshots.connectionState ==
@@ -264,6 +265,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                             .collection('personal_connections')
                             .doc('${widget.teamModel.teamId}')
                             .collection('users')
+                            .where('status', isEqualTo: 'alive')
                             .snapshots(),
                         builder: (context, snapshots) {
                           if (snapshots.connectionState ==

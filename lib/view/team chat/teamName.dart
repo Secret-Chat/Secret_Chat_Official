@@ -146,7 +146,11 @@ class _TeamNameState extends State<TeamName> {
                       .doc(result.id)
                       .collection('users')
                       .doc(element.userId)
-                      .set({'username': element.name, 'role': 'member'});
+                      .set({
+                    'status': 'alive',
+                    'username': element.name,
+                    'role': 'member',
+                  });
                 });
 
                 //add the owner too in the user group
@@ -156,6 +160,7 @@ class _TeamNameState extends State<TeamName> {
                     .collection('users')
                     .doc(getxController.user.value.userId)
                     .set({
+                  'status': 'alive',
                   'username': getxController.user.value.userName,
                   'role': 'owner'
                 });

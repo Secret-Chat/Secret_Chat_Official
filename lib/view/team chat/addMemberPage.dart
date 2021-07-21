@@ -64,6 +64,7 @@ class _AddMemberPageState extends State<AddMemberPage> {
         .collection('personal_connections')
         .doc('${widget.teamModel.teamId}')
         .collection('users')
+        .where('status', isEqualTo: 'alive')
         .get()
         .then((QuerySnapshot value) {
       value.docs.forEach((element) {
@@ -180,7 +181,11 @@ class _AddMemberPageState extends State<AddMemberPage> {
                       .doc(widget.teamModel.teamId)
                       .collection('users')
                       .doc(element.userId)
-                      .set({'username': element.name, 'role': 'member'});
+                      .set({
+                    'username': element.name,
+                    'role': 'member',
+                    'status': "alive"
+                  });
                 });
                 //add this connection for all the users in the connection collection for the individual users
                 contactsToAdd.forEach((element) async {
