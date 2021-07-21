@@ -23,7 +23,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
   final getxController = Get.put(AuthController());
   var groupname = '';
   var descriptionName = '';
-  List<UserEntity> admins = [UserEntity()];
+  List<UserEntity> admins = [];
 
   onLongPresses(String id, String role) {
     print(id);
@@ -61,7 +61,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       .doc('${widget.teamModel.teamId}')
                       .collection('users')
                       .doc(id)
-                      .update({'role': role == 'owner' ? 'member' : 'onwer'});
+                      .update({'role': role == 'owner' ? 'member' : 'owner'});
                   Navigator.of(context).pop();
                 },
               ),
@@ -285,8 +285,8 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                                           ['username'],
                                       userId: snapshots.data.docs[index].id));
                                 }
-                                print(
-                                    '${snapshots.data.docs[index]['username']}');
+                                // print(
+                                //     '${snapshots.data.docs[index]['username']}');
                                 return GestureDetector(
                                   child: ListTile(
                                     leading: SizedBox(
@@ -316,11 +316,39 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                                     },
                                   ),
                                   onLongPress: () async {
-                                    final result = admins.where((element) =>
-                                        element.name ==
-                                        getxController.user.value.userName);
-                                    print(result);
-                                    if (result.isNotEmpty) {
+                                    //
+                                    // final result = admins.where((element) =>
+                                    //     element.userId ==
+                                    //     getxController.user.value.userId);
+                                    // print(result);
+                                    // if (result.isNotEmpty) {
+                                    //   onLongPresses(
+                                    //       snapshots.data.docs[index].id,
+                                    //       snapshots.data.docs[index]['role']);
+                                    //   //check admin ist
+
+                                    // }
+
+                                    //check if user tapping himself
+
+                                    if (getxController.user.value.userId ==
+                                        snapshots.data.docs[index].id) {
+                                      return;
+                                    }
+
+                                    DocumentSnapshot memberWhoPressedRoleCheck =
+                                        await FirebaseFirestore.instance
+                                            .collection('personal_connections')
+                                            .doc('${widget.teamModel.teamId}')
+                                            .collection('users')
+                                            .doc(getxController
+                                                .user.value.userId)
+                                            .get();
+                                    //check if the user tapping the button is a owner
+                                    //don't kick the owner itself lol
+                                    if (memberWhoPressedRoleCheck['role'] ==
+                                        "owner") {
+                                      //the kick function
                                       onLongPresses(
                                           snapshots.data.docs[index].id,
                                           snapshots.data.docs[index]['role']);
