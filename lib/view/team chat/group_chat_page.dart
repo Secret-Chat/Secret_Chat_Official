@@ -40,7 +40,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   void listenForTaggingMembers() {
     print("listenForTaggingMembers");
     _textController.addListener(() {
-      if (_textController.text.contains('@')) {
+      if (_textController.text.endsWith('@')) {
         print("at the rate hai ");
         tagListControllr.showUserTagList.value = true;
         // });
@@ -145,7 +145,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         if (snapshot.hasError) {
                           return Text('Something went wrong');
                         }
-
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Center(
@@ -154,27 +153,28 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                             ),
                           );
                         }
-
                         if (snapshot.hasData) {
-                          return ListView.builder(
-                              reverse: true,
-                              itemBuilder: (ctx, index) {
-                                return ListTile(
-                                  leading: getxController.authData.value !=
-                                          snapshot.data.docs[index]['sentBy']
-                                      ? Text(
-                                          "${snapshot.data.docs[index]['sentBy']}")
-                                      : SizedBox(
-                                          height: 0,
-                                          width: 0,
-                                        ),
-                                  title: Text(
-                                      '${snapshot.data.docs[index]['message']}'),
-                                );
-                              },
-                              itemCount: snapshot.data.docs.length);
+                          return Container(
+                            height: size.height - 200,
+                            child: ListView.builder(
+                                reverse: true,
+                                itemBuilder: (ctx, index) {
+                                  return ListTile(
+                                    leading: getxController.authData.value !=
+                                            snapshot.data.docs[index]['sentBy']
+                                        ? Text(
+                                            "${snapshot.data.docs[index]['sentBy']}")
+                                        : SizedBox(
+                                            height: 0,
+                                            width: 0,
+                                          ),
+                                    title: Text(
+                                        '${snapshot.data.docs[index]['message']}'),
+                                  );
+                                },
+                                itemCount: snapshot.data.docs.length),
+                          );
                         }
-
                         return Container();
                       },
                     ),
@@ -182,14 +182,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 ),
 
                 //show tag list
-                Obx(() => tagListControllr.showUserTagList.value
-                    ? Expanded(
-                        // width: 200,
-                        // height: 200,
-
-                        child: StreamBuilder<QuerySnapshot>(
+                Obx(
+                  () => tagListControllr.showUserTagList.value
+                      ? Expanded(
+                          child: StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
-                                // .collection('users/${getxController.authData.value}/mescsages')
                                 .collection('personal_connections')
                                 .doc('${widget.teamModel.teamId}')
                                 .collection('users')
@@ -198,18 +195,28 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                               if (snapshot.hasData) {
                                 return ListView.builder(
                                   itemBuilder: (ctx, index) {
-                                    return Text(
-                                        "${snapshot.data.docs[index]['username']}");
+                                    return Container(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          print('kk');
+                                          _textController.text +=
+                                              "${snapshot.data.docs[index]['username']}";
+                                        },
+                                        child: Text(
+                                            "${snapshot.data.docs[index]['username']}"),
+                                      ),
+                                    );
                                   },
                                   itemCount: snapshot.data.docs.length,
                                 );
                               }
                               return Container();
-                            }),
-                      )
-                    : Text('')),
+                            },
+                          ),
+                        )
+                      : Container(),
+                ),
                 Expanded(
-                  flex: 2,
                   child: Container(
                     color: Color.fromRGBO(34, 35, 23, 0.5),
                     height: 300,
@@ -237,9 +244,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     controller: _textController,
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 5,
-                                ),
+                                // SizedBox(
+                                //   width: 5,
+                                // ),
                                 Container(
                                   child: IconButton(
                                     icon: Icon(Icons.send),
