@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/model/user_in_group.dart';
+import 'package:secretchat/view/mainPage.dart';
 import 'package:secretchat/view/team%20chat/addMemberPage.dart';
 import 'package:secretchat/view/team%20chat/teamEditingPage.dart';
 import 'package:secretchat/view/user%20views/profileDetail.dart';
@@ -363,6 +364,71 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                           return Container();
                         },
                       ),
+                    ),
+                    SizedBox(height: 5),
+                    GestureDetector(
+                      child: Container(
+                        height: 45,
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          border: Border.all(width: 1, color: Colors.black54),
+                        ),
+                        child: StreamBuilder<DocumentSnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('personal_connections')
+                                .doc('${widget.teamModel.teamId}')
+                                .collection('users')
+                                .doc(getxController.user.value.userId)
+                                .snapshots(),
+                            builder: (context, snapshots) {
+                              if (snapshots.hasData) {
+                                if (snapshots.data['status'] == 'alive') {
+                                  return Center(
+                                    child: Text('Leave Group'),
+                                  );
+                                }
+                                return Center(
+                                  child: Text('Delete Group'),
+                                );
+                              }
+                              return Container();
+                            }),
+                      ),
+                      onTap: () async {
+                        DocumentSnapshot leaveDeleteGroup =
+                            await FirebaseFirestore.instance
+                                .collection('personal_connections')
+                                .doc('${widget.teamModel.teamId}')
+                                .collection('users')
+                                .doc(getxController.user.value.userId)
+                                .get();
+
+                        if (leaveDeleteGroup['status'] == 'alive') {
+                          return FirebaseFirestore.instance
+                              .collection('personal_connections')
+                              .doc('${widget.teamModel.teamId}')
+                              .collection('users')
+                              .doc(getxController.user.value.userId)
+                              .update({'status': 'dead'});
+                        }
+
+                        await FirebaseFirestore.instance
+                            .collection('personal_connections')
+                            .doc('${widget.teamModel.teamId}')
+                            .collection('users')
+                            .doc(getxController.user.value.userId)
+                            .delete();
+
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc('${getxController.user.value.userId}')
+                            .collection('connections')
+                            .doc(widget.teamModel.teamId)
+                            .delete();
+
+                        Get.offAll(MainPage());
+                      },
                     ),
                   ],
                 ),
