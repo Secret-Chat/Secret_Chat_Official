@@ -141,16 +141,43 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
           ),
           actions: [
             Container(
-              child: IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  Get.to(TeamEditingPage(
-                    teamName: groupname,
-                    teamDescription: descriptionName,
-                    teamModel: widget.teamModel,
-                  ));
-                },
-              ),
+              child: StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('personal_connections')
+                      .doc('${widget.teamModel.teamId}')
+                      .collection('users')
+                      .doc(getxController.user.value.userId)
+                      .snapshots(),
+                  builder: (context, snapshots) {
+                    if (snapshots.hasData) {
+                      if (snapshots.data['status'] == 'alive') {
+                        return IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            Get.to(TeamEditingPage(
+                              teamName: groupname,
+                              teamDescription: descriptionName,
+                              teamModel: widget.teamModel,
+                            ));
+                          },
+                        );
+                      }
+                      return Container();
+                    }
+                    return Container();
+                  }),
+
+              //   IconButton(
+              //     icon: Icon(Icons.edit),
+              //     onPressed: () {
+              //       Get.to(TeamEditingPage(
+              //         teamName: groupname,
+              //         teamDescription: descriptionName,
+              //         teamModel: widget.teamModel,
+              //       ));
+              //     },
+              //   ),
+              // ),
             ),
           ],
         ),
@@ -413,21 +440,21 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                               .update({'status': 'dead'});
                         }
 
-                        await FirebaseFirestore.instance
+                        Get.offAll(MainPage());
+
+                        FirebaseFirestore.instance
                             .collection('personal_connections')
                             .doc('${widget.teamModel.teamId}')
                             .collection('users')
                             .doc(getxController.user.value.userId)
                             .delete();
 
-                        await FirebaseFirestore.instance
+                        FirebaseFirestore.instance
                             .collection('users')
                             .doc('${getxController.user.value.userId}')
                             .collection('connections')
                             .doc(widget.teamModel.teamId)
                             .delete();
-
-                        Get.offAll(MainPage());
                       },
                     ),
                   ],
