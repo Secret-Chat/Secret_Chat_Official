@@ -41,6 +41,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   void listenForTaggingMembers() {
     print("listenForTaggingMembers");
     _textController.addListener(() {
+      print("split ${_textController.text.split("@")}");
       if (_textController.text.endsWith('@')) {
         print("at the rate hai ");
         tagListControllr.showUserTagList.value = true;
@@ -237,6 +238,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           print('kk');
                                           _textController.text +=
                                               "${snapshot.data.docs[index]['username']}";
+                                          // print(
+                                          //     "split ${_textController.text.split("@")}");
                                         },
                                         child: Text(
                                             "${snapshot.data.docs[index]['username']}"),
