@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/tagListController.dart';
 import 'package:secretchat/model/team_model.dart';
+import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
 
 class GroupChatScreen extends StatefulWidget {
@@ -114,11 +115,46 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             },
           ),
           actions: [
-            IconButton(
-              onPressed: () {
-                //settings page
-              },
-              icon: Icon(Icons.settings),
+            Container(
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    child: StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          // .collection('users/${getxController.authData.value}/mescsages')
+                          .collection('personal_connections')
+                          .doc('${widget.teamModel.teamId}')
+                          .collection('users')
+                          .doc(getxController.user.value.userId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          if (snapshot.data['role'] == "owner") {
+                            return IconButton(
+                              icon: Icon(Icons.admin_panel_settings),
+                              onPressed: () {
+                                Get.off(AdminLounge(
+                                  teamModel: widget.teamModel,
+                                ));
+                              },
+                            );
+                          }
+                        }
+                        return Container();
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Container(
+                    child: IconButton(
+                      icon: Icon(Icons.settings),
+                      onPressed: () {},
+                    ),
+                  )
+                ],
+              ),
             )
           ],
         ),
