@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/tagListController.dart';
 import 'package:secretchat/model/team_model.dart';
+import 'package:secretchat/view/team%20chat/adminLoungeDetailPage.dart';
 import 'package:secretchat/view/team%20chat/group_chat_page.dart';
 
 class AdminLounge extends StatefulWidget {
@@ -57,7 +58,16 @@ class _AdminLoungeState extends State<AdminLounge> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Lounge'),
+        title: Container(
+          child: GestureDetector(
+            child: Container(width: 212, child: Text('Admin Lounge')),
+            onTap: () {
+              Get.to(AdminLoungeDetailPage(
+                teamModel: widget.teamModel,
+              ));
+            },
+          ),
+        ),
         actions: [
           Container(
             child: Row(
