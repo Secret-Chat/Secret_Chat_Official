@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/tagListController.dart';
 import 'package:secretchat/model/team_model.dart';
+import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
 
@@ -22,6 +23,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   final getxController = Get.put(AuthController());
   bool showUsersTagList = false;
   TagListControllr tagListControllr = Get.put(TagListControllr());
+  bool isTagMessage = false;
+  List<UserEntity> taggedMembers = [];
 
   //dispose the controllers
   @override
@@ -39,18 +42,20 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   }
 
   void listenForTaggingMembers() {
-    print("listenForTaggingMembers");
+    // print("listenForTaggingMembers");
     _textController.addListener(() {
-      print("split ${_textController.text.split("@")}");
+      // print("split ${_textController.text.split("@")}");
       if (_textController.text.endsWith('@')) {
-        print("at the rate hai ");
+        // print("at the rate hai ");
         tagListControllr.showUserTagList.value = true;
+        isTagMessage = true;
         // });
       } else {
         // setState(() {
         //   showUsersTagList = false;
         // });
         tagListControllr.showUserTagList.value = false;
+        // isTagMessage = false;
       }
     });
   }
@@ -232,6 +237,15 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                               if (snapshot.hasData) {
                                 return ListView.builder(
                                   itemBuilder: (ctx, index) {
+                                    if (snapshot.data.docs[index]['username']
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(_textController.text
+                                            .toString()
+                                            .toLowerCase())) {
+                                      print(
+                                          "matches: ${snapshot.data.docs[index]['username']}");
+                                    }
                                     return Container(
                                       child: GestureDetector(
                                         onTap: () {
@@ -240,6 +254,21 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                               "${snapshot.data.docs[index]['username']}";
                                           // print(
                                           //     "split ${_textController.text.split("@")}");
+                                          tagListControllr
+                                                  .showUserTagList.value =
+                                              false; //hide the UI after tapping
+
+                                          taggedMembers.add(UserEntity(
+                                              name: snapshot.data.docs[index]
+                                                  ['username'],
+                                              userId: snapshot
+                                                  .data.docs[index].id));
+
+                                          taggedMembers.forEach((element) {
+                                            print("tagged");
+                                            print(element.toString());
+                                          });
+                                          isTagMessage = true;
                                         },
                                         child: Text(
                                             "${snapshot.data.docs[index]['username']}"),
@@ -304,9 +333,38 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 getxController.authData.value,
                                             'createdOn':
                                                 FieldValue.serverTimestamp(),
+                                            'isTagMessage': isTagMessage
+                                          },
+                                        ).then(
+                                          (value) {
+                                            print("docId: ${value.id}");
+                                            if (isTagMessage) {
+                                              print(
+                                                  "sending taggedmembers to db");
+                                              taggedMembers.forEach(
+                                                (element) {
+                                                  FirebaseFirestore.instance
+                                                      // .collection(
+                                                      //     'personal_connections')  //${getxController.authData}/messages')
+                                                      .collection(
+                                                          'personal_connections')
+                                                      .doc(
+                                                          '${widget.teamModel.teamId}')
+                                                      .collection('messages')
+                                                      .doc(value.id)
+                                                      .collection(
+                                                          'taggedMembers')
+                                                      .doc(element.userId)
+                                                      .set(element.toMap())
+                                                      .then((value) {
+                                                    isTagMessage = false;
+                                                    taggedMembers.clear();
+                                                  });
+                                                },
+                                              );
+                                            }
                                           },
                                         );
-                                        // getxController.printer();
                                       }
                                       _textController.text = '';
                                     },

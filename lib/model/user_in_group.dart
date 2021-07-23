@@ -13,4 +13,8 @@ class UserEntity {
     UserId $userId
     ''';
   }
+
+  Map<String, dynamic> toMap() {
+    return {'userId': userId, 'username': name};
+  }
 }
