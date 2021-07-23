@@ -48,7 +48,7 @@ class _SearchPageState extends State<SearchPage> {
                     child: Container(
                       child: TextField(
                         decoration:
-                            InputDecoration(labelText: 'Search by Email!!'),
+                            InputDecoration(labelText: 'Search by Username!!'),
                         controller: _titleController,
                       ),
                     ),
@@ -93,11 +93,16 @@ class _SearchPageState extends State<SearchPage> {
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('users')
-                        .where('email', isEqualTo: _titleController.text)
+                        //.where('username', isEqualTo: _titleController.text)
+
                         //.where('email')
                         .snapshots(),
                     // .collection('users/${getxController.authData.value}/mescsages')
 
+/////////////////////////////////////////////////////////////////
+                    ///.where((user) =>
+                    ///             user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+////////////////////////////////////////////////////////////////////////////////////////////
                     // .collection('users')
                     // .doc('${getxController.authData.value}')
                     // .collection('messages')
@@ -124,28 +129,38 @@ class _SearchPageState extends State<SearchPage> {
                           // if (document
                           //     .data()['email']
                           //     .contains(_titleController.text)) {
-                          return new ListTile(
-                            title: new Text(document.data()['email']),
-                            subtitle: new Text(document.data()['username']),
-                            onTap: () async {
-                              //don't add if connection is already there
-                              bool userExists =
-                                  await userOperations.ifUserExist(
-                                document: document,
-                                getxController: getxController,
-                              );
-                              print(userExists);
-                              //if user is not there
-                              if (!userExists) {
-                                await userOperations.addContact(
-                                    document, getxController);
-                              } else {
-                                //TODO: send the user to chat page if the connection is already there
+                          print('hjnedkjdkjflfflmnfdkjnfne');
+                          if (document
+                              .data()['username']
+                              .toLowerCase()
+                              .contains(_titleController.text.toLowerCase())) {
+                            print(document.data()['username']);
 
-                              }
-                            },
-                            //subtitle: new Text(document.data()['company']),
-                          );
+                            return ListTile(
+                              title: new Text(document.data()['email']),
+                              subtitle: new Text(document.data()['username']),
+                              onTap: () async {
+                                //don't add if connection is already there
+                                bool userExists =
+                                    await userOperations.ifUserExist(
+                                  document: document,
+                                  getxController: getxController,
+                                );
+                                print(userExists);
+                                //if user is not there
+                                if (!userExists) {
+                                  await userOperations.addContact(
+                                      document, getxController);
+                                } else {
+                                  //TODO: send the user to chat page if the connection is already there
+
+                                }
+                              },
+
+                              //subtitle: new Text(document.data()['company']),
+                            );
+                          }
+                          return Container();
                           // }
                           //return print(document.data()['email']);
                         }).toList(),
