@@ -70,112 +70,126 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   }
 
   pollingSheet() {
-    Get.defaultDialog(
-      // context: context,
-      // isScrollControlled: true,
-      title: "Poll",
-      content: Container(
-        // height: 500,
-        // width: double.infinity,
-        child: Obx(
-          () => Wrap(
-            children: [
-              Column(
-                // mainAxisAlignment: MainAxisAlignment.start,
-                // mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  // Container(
-                  //   child: Center(
-                  //     child: Text('Polling'),
-                  //   ),
-                  // ),
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Poll"),
+          scrollable: true,
+          // context: context,
+          // isScrollControlled: true,
+          //title: "Poll",
 
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Polling Question'),
-                  ),
-                  //question widget display
-                  Container(
-                    child: TextField(
-                      controller: _pollQuestionController,
-                      decoration: InputDecoration(hintText: 'Ask a question'),
-                    ),
-                  ),
-                  SizedBox(height: 10),
+          content: Container(
+            // height: 500,
+            // width: double.infinity,
+            child: Obx(
+              () => Wrap(
+                children: [
+                  Column(
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    // mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      // Container(
+                      //   child: Center(
+                      //     child: Text('Polling'),
+                      //   ),
+                      // ),
 
-                  Container(
-                    child: Text('Options'),
-                  ),
-                  //display options
-                  for (int i = 0; i < pollController.pollOptions.length; i++)
-                    Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              onChanged: (String pollText) {
-                                // print("text: $pollText");
-                                pollController.pollOptions[i].pollText =
-                                    pollText;
-                                print(
-                                    "pText$i: ${pollController.pollOptions[i].pollText} ");
-                              },
-                              decoration: InputDecoration(hintText: 'Option'),
-                            ),
-                          ),
-                          //clear the option
-                          IconButton(
-                              onPressed: () {
-                                //delete that option
-                                if (i != 0) {
-                                  pollController.pollOptions.removeAt(i);
-                                  pollController.pollIndexCounter.value--;
-                                }
-                              },
-                              icon: Icon(Icons.clear))
-                        ],
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Polling Question'),
                       ),
-                    ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  RaisedButton(
-                    onPressed: () {
-                      //add more options
-                      pollController.pollOptions.add(PollOption(
-                          pollIndex: pollController.pollIndexCounter.value));
-                      pollController.pollIndexCounter.value++;
-                      print('Counter ${pollController.pollIndexCounter.value}');
-                    },
-                    child: Text("Add Option"),
-                  ),
-                  Container(
-                    child: GestureDetector(
-                      child: Text('Create Poll'),
-                      onTap: () {
-                        print('iam pressed');
-                        if (_pollQuestionController.text.isNotEmpty &&
-                            !pollController.isThePoleEmpty) {
-                          pollController.sendAllOptionsToFirebase(
-                              teamId: widget.teamModel.teamId,
-                              sentBy: getxController.user.value.userId,
-                              messageText: "Poll",
-                              questionText: _pollQuestionController.text);
-                          // getxController.printer();
-                        }
-                        _pollQuestionController.text = '';
+                      //question widget display
+                      Container(
+                        child: TextField(
+                          controller: _pollQuestionController,
+                          decoration:
+                              InputDecoration(hintText: 'Ask a question'),
+                        ),
+                      ),
+                      SizedBox(height: 10),
 
-                        Navigator.of(context).pop();
-                      },
-                    ),
+                      Container(
+                        child: Text('Options'),
+                      ),
+                      //display options
+                      for (int i = 0;
+                          i < pollController.pollOptions.length;
+                          i++)
+                        Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  onChanged: (String pollText) {
+                                    // print("text: $pollText");
+                                    pollController.pollOptions[i].pollText =
+                                        pollText;
+                                    print(
+                                        "pText$i: ${pollController.pollOptions[i].pollText} ");
+                                  },
+                                  decoration:
+                                      InputDecoration(hintText: 'Option'),
+                                ),
+                              ),
+                              //clear the option
+                              IconButton(
+                                  onPressed: () {
+                                    //delete that option
+                                    if (i != 0) {
+                                      pollController.pollOptions.removeAt(i);
+                                      pollController.pollIndexCounter.value--;
+                                    }
+                                  },
+                                  icon: Icon(Icons.clear))
+                            ],
+                          ),
+                        ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      RaisedButton(
+                        onPressed: () {
+                          //add more options
+                          pollController.pollOptions.add(PollOption(
+                              pollIndex:
+                                  pollController.pollIndexCounter.value));
+                          pollController.pollIndexCounter.value++;
+                          print(
+                              'Counter ${pollController.pollIndexCounter.value}');
+                        },
+                        child: Text("Add Option"),
+                      ),
+                      Container(
+                        child: GestureDetector(
+                          child: Text('Create Poll'),
+                          onTap: () {
+                            print('iam pressed');
+                            if (_pollQuestionController.text.isNotEmpty &&
+                                !pollController.isThePoleEmpty) {
+                              pollController.sendAllOptionsToFirebase(
+                                  teamId: widget.teamModel.teamId,
+                                  sentBy: getxController.user.value.userId,
+                                  messageText: "Poll",
+                                  questionText: _pollQuestionController.text);
+                              // getxController.printer();
+                            }
+                            _pollQuestionController.text = '';
+
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

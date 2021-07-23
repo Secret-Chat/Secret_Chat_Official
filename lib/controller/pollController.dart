@@ -52,15 +52,22 @@ class PollController extends GetxController {
       },
     ).then((value) {
       pollOptions.forEach((element) {
-        FirebaseFirestore.instance
-            // .collection(
-            //     'personal_connections')  //${getxController.authData}/messages')
-            .collection('personal_connections')
-            .doc('$teamId')
-            .collection('messages')
-            .doc(value.id)
-            .collection('pollOptions')
-            .add(element.toMap());
+        print('ohmygodmygod');
+        // if (element({'pollText' == null})) {
+        //   print('yeah');
+        // }
+        print(element.pollText);
+        if (element.pollText != null) {
+          return FirebaseFirestore.instance
+              // .collection(
+              //     'personal_connections')  //${getxController.authData}/messages')
+              .collection('personal_connections')
+              .doc('$teamId')
+              .collection('messages')
+              .doc(value.id)
+              .collection('pollOptions')
+              .add(element.toMap());
+        }
       });
     });
   }
