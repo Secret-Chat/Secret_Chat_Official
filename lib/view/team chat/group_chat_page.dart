@@ -140,11 +140,21 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                               'createdOn': FieldValue.serverTimestamp(),
                               'type': 'pollingMessage',
                               'question': _pollQuestionController.text,
-                              'optionOne': _pollAnswerOne.text,
-                              'optionTwo': _pollAnswerTwo.text,
-                              'optionThree': _pollAnswerThree.text,
+                              // 'optionOne': _pollAnswerOne.text,
+                              // 'optionTwo': _pollAnswerTwo.text,
+                              // 'optionThree': _pollAnswerThree.text,
                             },
-                          );
+                          ).then((value) {
+                            FirebaseFirestore.instance
+                                .collection('personal_connections')
+                                .doc('${widget.teamModel.teamId}')
+                                .collection('messages')
+                                .doc(value.id)
+                                .collection('pollOptions')
+                                .doc('');
+                          });
+
+                          //FirebaseFirestore.instance.collection('personal_connections').doc('${widget.teamModel.teamId}').collection('messages').
                           // getxController.printer();
                         }
                         _pollQuestionController.text = '';
@@ -352,16 +362,24 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         ListTile(
                                           tileColor:
                                               Color.fromRGBO(12, 96, 255, 0.4),
-                                          leading: Radio(
-                                            activeColor: Colors.grey,
-                                            autofocus: true,
-                                            focusColor: Colors.grey,
-                                            fillColor:
-                                                MaterialStateProperty.all(
-                                                    Colors.grey),
-                                            groupValue: null,
-                                            onChanged: (value) {},
-                                            value: null,
+                                          leading: Container(
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    width: 1,
+                                                    color: Colors.black),
+                                                shape: BoxShape.circle),
+                                            child: GestureDetector(
+                                              child: Container(
+                                                height: 20,
+                                                width: 20,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle),
+                                                child: SizedBox(
+                                                  height: 0,
+                                                ),
+                                              ),
+                                              onTap: () {},
+                                            ),
                                           ),
                                           title: Text(
                                               '${snapshot.data.docs[index]['optionOne']}'),
@@ -373,16 +391,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         ListTile(
                                           tileColor:
                                               Color.fromRGBO(12, 96, 255, 0.4),
-                                          leading: Radio(
-                                            activeColor: Colors.grey,
-                                            autofocus: true,
-                                            focusColor: Colors.grey,
-                                            fillColor:
-                                                MaterialStateProperty.all(
-                                                    Colors.grey),
-                                            groupValue: null,
-                                            onChanged: (value) {},
-                                            value: null,
+                                          leading: Container(
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    width: 1,
+                                                    color: Colors.black),
+                                                shape: BoxShape.circle),
+                                            child: GestureDetector(
+                                              child: Container(
+                                                height: 20,
+                                                width: 20,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle),
+                                                child: SizedBox(
+                                                  height: 0,
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                           title: Text(
                                               '${snapshot.data.docs[index]['optionTwo']}'),
@@ -394,16 +419,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         ListTile(
                                           tileColor:
                                               Color.fromRGBO(12, 96, 255, 0.4),
-                                          leading: Radio(
-                                            activeColor: Colors.grey,
-                                            autofocus: true,
-                                            focusColor: Colors.grey,
-                                            fillColor:
-                                                MaterialStateProperty.all(
-                                                    Colors.grey),
-                                            groupValue: null,
-                                            onChanged: (value) {},
-                                            value: null,
+                                          leading: Container(
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    width: 1,
+                                                    color: Colors.black),
+                                                shape: BoxShape.circle),
+                                            child: GestureDetector(
+                                              child: Container(
+                                                height: 20,
+                                                width: 20,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle),
+                                                child: SizedBox(
+                                                  height: 0,
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                           title: Text(
                                               '${snapshot.data.docs[index]['optionThree']}'),
@@ -535,9 +567,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 getxController.authData.value,
                                             'createdOn':
                                                 FieldValue.serverTimestamp(),
-
                                             'type': 'textMessage',
-
                                             'isTagMessage': isTagMessage
                                           },
                                         ).then(
@@ -568,7 +598,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 },
                                               );
                                             }
-                         },
+                                          },
                                         );
                                       }
                                       _textController.text = '';
