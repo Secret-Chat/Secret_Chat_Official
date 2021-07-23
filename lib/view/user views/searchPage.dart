@@ -129,13 +129,15 @@ class _SearchPageState extends State<SearchPage> {
                           // if (document
                           //     .data()['email']
                           //     .contains(_titleController.text)) {
+
+                          ///////////////Searching Logic////////////////////////////////////
                           print('hjnedkjdkjflfflmnfdkjnfne');
                           if (document
                               .data()['username']
                               .toLowerCase()
                               .contains(_titleController.text.toLowerCase())) {
                             print(document.data()['username']);
-
+                            ///////////////////////////////////////////////////////////////////////
                             return ListTile(
                               title: new Text(document.data()['email']),
                               subtitle: new Text(document.data()['username']),

@@ -21,6 +21,10 @@ class GroupChatScreen extends StatefulWidget {
 class _GroupChatScreenState extends State<GroupChatScreen> {
   final _textController = TextEditingController();
   final getxController = Get.put(AuthController());
+  final _pollQuestionController = TextEditingController();
+  final _pollAnswerOne = TextEditingController();
+  final _pollAnswerTwo = TextEditingController();
+  final _pollAnswerThree = TextEditingController();
   bool showUsersTagList = false;
   TagListControllr tagListControllr = Get.put(TagListControllr());
   bool isTagMessage = false;
@@ -58,6 +62,107 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         // isTagMessage = false;
       }
     });
+  }
+
+  pollingSheet() {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height - 40,
+              color: Colors.white,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    child: Center(
+                      child: Text('Polling'),
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Polling Question'),
+                  ),
+                  Container(
+                    child: TextField(
+                      controller: _pollQuestionController,
+                      decoration: InputDecoration(hintText: 'Ask a question'),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    child: Text('Answer Options'),
+                  ),
+                  Container(
+                    child: TextField(
+                      controller: _pollAnswerOne,
+                      decoration: InputDecoration(hintText: 'Option'),
+                    ),
+                  ),
+                  Container(
+                    child: TextField(
+                      controller: _pollAnswerTwo,
+                      decoration: InputDecoration(hintText: 'Option'),
+                    ),
+                  ),
+                  Container(
+                    child: TextField(
+                      controller: _pollAnswerThree,
+                      decoration: InputDecoration(hintText: 'Option'),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    child: GestureDetector(
+                      child: Text('Create Poll'),
+                      onTap: () {
+                        print('iam pressed');
+                        if (_pollQuestionController.text.isNotEmpty &&
+                            _pollAnswerOne.text.isNotEmpty &&
+                            _pollAnswerTwo.text.isNotEmpty &&
+                            _pollAnswerThree.text.isNotEmpty) {
+                          FirebaseFirestore.instance
+                              // .collection(
+                              //     'personal_connections')  //${getxController.authData}/messages')
+                              .collection('personal_connections')
+                              .doc('${widget.teamModel.teamId}')
+                              .collection('messages')
+                              .add(
+                            {
+                              'message': _textController.text,
+                              'sentBy': getxController.authData.value,
+                              'createdOn': FieldValue.serverTimestamp(),
+                              'type': 'pollingMessage',
+                              'question': _pollQuestionController.text,
+                              'optionOne': _pollAnswerOne.text,
+                              'optionTwo': _pollAnswerTwo.text,
+                              'optionThree': _pollAnswerThree.text,
+                            },
+                          );
+                          // getxController.printer();
+                        }
+                        _pollQuestionController.text = '';
+                        _pollAnswerOne.text = '';
+                        _pollAnswerTwo.text = '';
+                        _pollAnswerThree.text = '';
+
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -201,17 +306,114 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                             child: ListView.builder(
                                 reverse: true,
                                 itemBuilder: (ctx, index) {
-                                  return ListTile(
-                                    leading: getxController.authData.value !=
-                                            snapshot.data.docs[index]['sentBy']
-                                        ? Text(
-                                            "${snapshot.data.docs[index]['sentBy']}")
-                                        : SizedBox(
-                                            height: 0,
-                                            width: 0,
+                                  if (snapshot.data.docs[index]['type'] ==
+                                      'textMessage') {
+                                    return ListTile(
+                                      leading: getxController.authData.value !=
+                                              snapshot.data.docs[index]
+                                                  ['sentBy']
+                                          ? Text(
+                                              "${snapshot.data.docs[index]['sentBy']}")
+                                          : SizedBox(
+                                              height: 0,
+                                              width: 0,
+                                            ),
+                                      title: Text(
+                                          '${snapshot.data.docs[index]['message']}'),
+                                    );
+                                  }
+                                  return Container(
+                                    height: 300,
+                                    child: Column(
+                                      children: <Widget>[
+                                        Container(
+                                          color:
+                                              Color.fromRGBO(12, 96, 255, 0.4),
+                                          child: Text(
+                                              '${snapshot.data.docs[index]['question']}'),
+                                        ),
+                                        Container(
+                                          color:
+                                              Color.fromRGBO(12, 96, 255, 0.4),
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'poll',
+                                            style: TextStyle(fontSize: 1),
                                           ),
-                                    title: Text(
-                                        '${snapshot.data.docs[index]['message']}'),
+                                        ),
+                                        Container(
+                                          color:
+                                              Color.fromRGBO(12, 96, 255, 0.4),
+                                          child: Text(
+                                            '${snapshot.data.docs[index]['sentBy']}',
+                                            style: TextStyle(fontSize: 2),
+                                          ),
+                                        ),
+                                        ListTile(
+                                          tileColor:
+                                              Color.fromRGBO(12, 96, 255, 0.4),
+                                          leading: Radio(
+                                            activeColor: Colors.grey,
+                                            autofocus: true,
+                                            focusColor: Colors.grey,
+                                            fillColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.grey),
+                                            groupValue: null,
+                                            onChanged: (value) {},
+                                            value: null,
+                                          ),
+                                          title: Text(
+                                              '${snapshot.data.docs[index]['optionOne']}'),
+                                          subtitle: Text(
+                                            '',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                        ),
+                                        ListTile(
+                                          tileColor:
+                                              Color.fromRGBO(12, 96, 255, 0.4),
+                                          leading: Radio(
+                                            activeColor: Colors.grey,
+                                            autofocus: true,
+                                            focusColor: Colors.grey,
+                                            fillColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.grey),
+                                            groupValue: null,
+                                            onChanged: (value) {},
+                                            value: null,
+                                          ),
+                                          title: Text(
+                                              '${snapshot.data.docs[index]['optionTwo']}'),
+                                          subtitle: Text(
+                                            '',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                        ),
+                                        ListTile(
+                                          tileColor:
+                                              Color.fromRGBO(12, 96, 255, 0.4),
+                                          leading: Radio(
+                                            activeColor: Colors.grey,
+                                            autofocus: true,
+                                            focusColor: Colors.grey,
+                                            fillColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.grey),
+                                            groupValue: null,
+                                            onChanged: (value) {},
+                                            value: null,
+                                          ),
+                                          title: Text(
+                                              '${snapshot.data.docs[index]['optionThree']}'),
+                                          subtitle: Text(
+                                            '',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   );
                                 },
                                 itemCount: snapshot.data.docs.length),
@@ -333,6 +535,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 getxController.authData.value,
                                             'createdOn':
                                                 FieldValue.serverTimestamp(),
+
+                                            'type': 'textMessage',
+
                                             'isTagMessage': isTagMessage
                                           },
                                         ).then(
@@ -363,10 +568,18 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 },
                                               );
                                             }
-                                          },
+                         },
                                         );
                                       }
                                       _textController.text = '';
+                                    },
+                                  ),
+                                ),
+                                Container(
+                                  child: IconButton(
+                                    icon: Icon(Icons.bar_chart),
+                                    onPressed: () {
+                                      pollingSheet();
                                     },
                                   ),
                                 )
