@@ -233,18 +233,18 @@ class _MainPageState extends State<MainPage> {
                       return Container();
                     }),
               ),
-              Container(
-                height: 200,
-                width: 200,
-                child: Image.network(
-                    'https://tse1.mm.bing.net/th?id=OGC.2bdbd4fdb7b20ac6c0718da73c598f3f&pid=Api&rurl=https%3a%2f%2fmedia.giphy.com%2fmedia%2f12XkB6MEykrhU4%2fgiphy.gif&ehk=kss5j0cNswFG2S9YcdxyRyLTAnW%2f2vFJfliBTHRWXwU%3d'),
-              ),
-              Container(
-                height: 200,
-                width: 200,
-                child: Image.network(
-                    'https://tse1.mm.bing.net/th?id=OGC.6bf35a1f1359441764cf832b2d0f698b&pid=Api&rurl=https%3a%2f%2fmedia.tenor.co%2fimages%2f6bf35a1f1359441764cf832b2d0f698b%2fraw&ehk=NIfPGU4Hz93GH%2fwyKnuSpkGzH0lXjD%2fxVPhJL6QAZXM%3d'),
-              ),
+              // Container(
+              //   height: 200,
+              //   width: 200,
+              //   child: Image.network(
+              //       'https://tse1.mm.bing.net/th?id=OGC.2bdbd4fdb7b20ac6c0718da73c598f3f&pid=Api&rurl=https%3a%2f%2fmedia.giphy.com%2fmedia%2f12XkB6MEykrhU4%2fgiphy.gif&ehk=kss5j0cNswFG2S9YcdxyRyLTAnW%2f2vFJfliBTHRWXwU%3d'),
+              // ),
+              // Container(
+              //   height: 200,
+              //   width: 200,
+              //   child: Image.network(
+              //       'https://tse1.mm.bing.net/th?id=OGC.6bf35a1f1359441764cf832b2d0f698b&pid=Api&rurl=https%3a%2f%2fmedia.tenor.co%2fimages%2f6bf35a1f1359441764cf832b2d0f698b%2fraw&ehk=NIfPGU4Hz93GH%2fwyKnuSpkGzH0lXjD%2fxVPhJL6QAZXM%3d'),
+              // ),
             ],
           ),
         ),
