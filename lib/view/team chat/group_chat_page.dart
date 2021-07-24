@@ -34,6 +34,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   bool isTagMessage = false;
   List<UserEntity> taggedMembers = [];
   PollController pollController = Get.put(PollController());
+  bool isGif = false;
 
   //dispose the controllers
   @override
@@ -48,6 +49,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     // TODO: implement initState
     super.initState();
     listenForTaggingMembers();
+    listenForGif();
   }
 
   void listenForTaggingMembers() {
@@ -65,6 +67,63 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         // });
         tagListControllr.showUserTagList.value = false;
         // isTagMessage = false;
+      }
+    });
+  }
+
+  void listenForGif() {
+    _textController.addListener(() {
+      if (_textController.text.contains('https://tse')) {
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Gif file'),
+                content: Container(
+                  height: MediaQuery.of(context).size.height - 40,
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        height: 400,
+                        child: Center(
+                          child: Image.network(
+                              _textController.text.removeAllWhitespace),
+                        ),
+                      ),
+                      Container(
+                        child: GestureDetector(
+                          child: Container(
+                            color: Color.fromRGBO(123, 12, 34, 0.4),
+                            padding: EdgeInsets.all(10),
+                            child: Text('send'),
+                          ),
+                          onTap: () async {
+                            await FirebaseFirestore.instance
+                                // .collection(
+                                //     'personal_connections')  //${getxController.authData}/messages')
+                                .collection('personal_connections')
+                                .doc('${widget.teamModel.teamId}')
+                                .collection('messages')
+                                .add({
+                              'message': _textController.text,
+                              'sentBy': getxController.authData.value,
+                              'createdOn': FieldValue.serverTimestamp(),
+                              'type': 'gifMessage',
+                              'isTagMessage': isTagMessage,
+                              //'isGif': isGif,
+                            }).then((value) => {_textController.text = ''});
+
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            });
       }
     });
   }
@@ -322,11 +381,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         }
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Center(
-                            child: Container(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
+                          return Container();
+                          // Center(
+                          //   child: Container(
+                          //     child: CircularProgressIndicator(),
+                          //   ),
+                          // );
                         }
                         if (snapshot.hasData) {
                           return Container(
@@ -336,6 +396,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                 itemBuilder: (ctx, index) {
                                   if (snapshot.data.docs[index]['type'] ==
                                       'textMessage') {
+                                    // if (snapshot.data.docs[index]['isGif'] ==
+                                    //     false) {
                                     return ListTile(
                                       leading: getxController.authData.value !=
                                               snapshot.data.docs[index]
@@ -349,7 +411,44 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       title: Text(
                                           '${snapshot.data.docs[index]['message']}'),
                                     );
+                                    //}
+
                                   }
+                                  if (snapshot.data.docs[index]['type'] ==
+                                      'gifMessage') {
+                                    var link = snapshot
+                                        .data.docs[index]['message']
+                                        .toString()
+                                        .trimRight();
+                                    print('${link}hi');
+                                    return Container(
+                                      height: 200,
+                                      width: 200,
+                                      child: Image.network(
+                                        '$link',
+                                        loadingBuilder: (BuildContext context,
+                                            Widget child,
+                                            ImageChunkEvent loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              value: loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                          .cumulativeBytesLoaded /
+                                                      loadingProgress
+                                                          .expectedTotalBytes
+                                                  : null,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  }
+
                                   return Container(
                                     decoration: BoxDecoration(
                                         border: Border.all(color: Colors.red)),
@@ -629,6 +728,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     icon: Icon(Icons.send),
                                     onPressed: () {
                                       if (_textController.text.isNotEmpty) {
+                                        // if (_textController.text
+                                        //     .contains('https://tse')) {
+                                        //   setState(() {
+                                        //     isGif = true;
+                                        //   });
+                                        // }
                                         FirebaseFirestore.instance
                                             // .collection(
                                             //     'personal_connections')  //${getxController.authData}/messages')
@@ -643,7 +748,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             'createdOn':
                                                 FieldValue.serverTimestamp(),
                                             'type': 'textMessage',
-                                            'isTagMessage': isTagMessage
+                                            'isTagMessage': isTagMessage,
+                                            //'isGif': isGif,
                                           },
                                         ).then(
                                           (value) {
@@ -673,6 +779,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 },
                                               );
                                             }
+                                            // if (isGif) {
+                                            //   setState(() {
+                                            //     isGif = false;
+                                            //   });
+                                            // }
                                           },
                                         );
                                       }
