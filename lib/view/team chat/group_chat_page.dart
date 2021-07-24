@@ -26,6 +26,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   final _textController = TextEditingController();
   final getxController = Get.put(AuthController());
   final _pollQuestionController = TextEditingController();
+  final _editingController = TextEditingController();
   // final _pollAnswerOne = TextEditingController();
   // final _pollAnswerTwo = TextEditingController();
   // final _pollAnswerThree = TextEditingController();
@@ -71,6 +72,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////////////
+  ///listening if it is gif or not jugad right now
   void listenForGif() {
     _textController.addListener(() {
       if (_textController.text.contains('https://tse')) {
@@ -128,7 +131,129 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     });
   }
 
-  onTapOnMessage(String messageId) {
+  editBottomSheet(String id, String message, doc) {
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          _editingController.text = message;
+          return Container(
+            height: 200,
+            color: Colors.amber,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    child: Text('Edit message'),
+                  ),
+                  Container(
+                    child: Text(message),
+                  ),
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          height: 200,
+                          width: MediaQuery.of(context).size.width - 140,
+                          child: TextField(
+                            decoration:
+                                InputDecoration(labelText: 'Enter Message'),
+                            controller: _editingController,
+                          ),
+                        ),
+                        // SizedBox(
+                        //   width: 5,
+                        // ),
+                        Container(
+                          child: IconButton(
+                            icon: Icon(Icons.send),
+                            onPressed: () {
+                              if (_editingController.text.isNotEmpty) {
+                                // if (_textController.text
+                                //     .contains('https://tse')) {
+                                //   setState(() {
+                                //     isGif = true;
+                                //   });
+                                // }
+                                FirebaseFirestore.instance
+                                    // .collection(
+                                    //     'personal_connections')  //${getxController.authData}/messages')
+                                    .collection('personal_connections')
+                                    .doc('${widget.teamModel.teamId}')
+                                    .collection('messages')
+                                    .add(
+                                  {
+                                    'message': _editingController.text,
+                                    'sentBy': getxController.authData.value,
+                                    'createdOn': doc,
+                                    'type': 'editedMessage',
+                                    'isTagMessage': isTagMessage,
+
+                                    //'isGif': isGif,
+                                  },
+                                ).then(
+                                  (value) {
+                                    print("docId: ${value.id}");
+                                    if (isTagMessage) {
+                                      print("sending taggedmembers to db");
+                                      taggedMembers.forEach(
+                                        (element) {
+                                          FirebaseFirestore.instance
+                                              // .collection(
+                                              //     'personal_connections')  //${getxController.authData}/messages')
+                                              .collection(
+                                                  'personal_connections')
+                                              .doc('${widget.teamModel.teamId}')
+                                              .collection('messages')
+                                              .doc(value.id)
+                                              .collection('taggedMembers')
+                                              .doc(element.userId)
+                                              .set(element.toMap())
+                                              .then((value) {
+                                            isTagMessage = false;
+                                            taggedMembers.clear();
+                                          });
+                                        },
+                                      );
+                                    }
+                                    // if (isGif) {
+                                    //   setState(() {
+                                    //     isGif = false;
+                                    //   });
+                                    // }
+                                  },
+                                );
+                              }
+                              _editingController.text = '';
+                            },
+                          ),
+                        ),
+                        Container(
+                          child: IconButton(
+                            icon: Icon(Icons.bar_chart),
+                            onPressed: () {
+                              pollingSheet();
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////
+  ///seeing if the user tapped on any message basics for editing and deleting
+  onTapOnMessage(
+    String messageId,
+    String message,
+    doc,
+  ) {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -147,6 +272,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         'Edit',
                         style: TextStyle(color: Colors.white70),
                       ),
+                      onTap: () {
+                        editBottomSheet(messageId, message, doc);
+                      },
                     ),
                   ),
                   Container(
@@ -459,15 +587,58 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                               ),
                                         title: Text(
                                             '${snapshot.data.docs[index]['message']}'),
+                                        // trailing: snapshot.data.docs[index]
+                                        //             ['isEdited'] ==
+                                        //         true
+                                        //     ? Text('Edited')
+                                        //     : Container(),
                                       ),
                                       onTap: () {
                                         onTapOnMessage(
-                                            snapshot.data.docs[index].id);
+                                          snapshot.data.docs[index].id,
+                                          snapshot.data.docs[index]['message'],
+                                          snapshot.data.docs[index]
+                                              ['createdOn'],
+                                        );
                                       },
                                     );
                                     //}
 
                                   }
+                                  if (snapshot.data.docs[index]['type'] ==
+                                      'editedMessage') {
+                                    // if (snapshot.data.docs[index]['isGif'] ==
+                                    //     false) {
+                                    return GestureDetector(
+                                      child: ListTile(
+                                        leading: getxController
+                                                    .authData.value !=
+                                                snapshot.data.docs[index]
+                                                    ['sentBy']
+                                            ? Text(
+                                                "${snapshot.data.docs[index]['sentBy']}")
+                                            : SizedBox(
+                                                height: 0,
+                                                width: 0,
+                                              ),
+                                        title: Text(
+                                            '${snapshot.data.docs[index]['message']}'),
+                                        trailing: Text('Edited'),
+                                      ),
+                                      onTap: () {
+                                        onTapOnMessage(
+                                          snapshot.data.docs[index].id,
+                                          snapshot.data.docs[index]['message'],
+                                          snapshot.data.docs[index]
+                                              ['createdOn'],
+                                        );
+                                      },
+                                    );
+                                    //}
+
+                                  }
+                                  //////////////////////////////////////////////////////////////
+                                  ///getting the gif messages over here
                                   if (snapshot.data.docs[index]['type'] ==
                                       'gifMessage') {
                                     var link = snapshot
