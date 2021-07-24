@@ -128,6 +128,53 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     });
   }
 
+  onTapOnMessage(String messageId) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.black87,
+            content: Container(
+              width: MediaQuery.of(context).size.width - 200,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: ListTile(
+                      title: Text(
+                        'Edit',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: ListTile(
+                      title: Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      onTap: () {
+                        FirebaseFirestore.instance
+                            .collection('personal_connections')
+                            .doc('${widget.teamModel.teamId}')
+                            .collection('messages')
+                            .doc('$messageId')
+                            .delete();
+
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   pollingSheet() {
     return showDialog(
       context: context,
@@ -398,18 +445,25 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       'textMessage') {
                                     // if (snapshot.data.docs[index]['isGif'] ==
                                     //     false) {
-                                    return ListTile(
-                                      leading: getxController.authData.value !=
-                                              snapshot.data.docs[index]
-                                                  ['sentBy']
-                                          ? Text(
-                                              "${snapshot.data.docs[index]['sentBy']}")
-                                          : SizedBox(
-                                              height: 0,
-                                              width: 0,
-                                            ),
-                                      title: Text(
-                                          '${snapshot.data.docs[index]['message']}'),
+                                    return GestureDetector(
+                                      child: ListTile(
+                                        leading: getxController
+                                                    .authData.value !=
+                                                snapshot.data.docs[index]
+                                                    ['sentBy']
+                                            ? Text(
+                                                "${snapshot.data.docs[index]['sentBy']}")
+                                            : SizedBox(
+                                                height: 0,
+                                                width: 0,
+                                              ),
+                                        title: Text(
+                                            '${snapshot.data.docs[index]['message']}'),
+                                      ),
+                                      onTap: () {
+                                        onTapOnMessage(
+                                            snapshot.data.docs[index].id);
+                                      },
                                     );
                                     //}
 
