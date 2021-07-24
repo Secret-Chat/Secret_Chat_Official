@@ -138,7 +138,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           _editingController.text = message;
           return Container(
             height: 200,
-            color: Colors.amber,
+            color: Colors.white,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
