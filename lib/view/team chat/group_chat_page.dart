@@ -82,47 +82,69 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text('Gif file'),
-                content: Container(
-                  height: MediaQuery.of(context).size.height - 40,
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        height: 400,
-                        child: Center(
-                          child: Image.network(
-                              _textController.text.removeAllWhitespace),
-                        ),
-                      ),
-                      Container(
-                        child: GestureDetector(
-                          child: Container(
-                            color: Color.fromRGBO(123, 12, 34, 0.4),
-                            padding: EdgeInsets.all(10),
-                            child: Text('send'),
+                content: SingleChildScrollView(
+                  child: Container(
+                    //height: MediaQuery.of(context).size.height - 40,
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          height: 400,
+                          child: Center(
+                            child: Image.network(
+                              _textController.text.removeAllWhitespace,
+                              loadingBuilder: (BuildContext context,
+                                  Widget child,
+                                  ImageChunkEvent loadingProgress) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                }
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes
+                                        : null,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
-                          onTap: () async {
-                            await FirebaseFirestore.instance
-                                // .collection(
-                                //     'personal_connections')  //${getxController.authData}/messages')
-                                .collection('personal_connections')
-                                .doc('${widget.teamModel.teamId}')
-                                .collection('messages')
-                                .add({
-                              'message': _textController.text,
-                              'sentBy': getxController.authData.value,
-                              'createdOn': FieldValue.serverTimestamp(),
-                              'type': 'gifMessage',
-                              'isTagMessage': isTagMessage,
-                              //'isGif': isGif,
-                            }).then((value) => {_textController.text = ''});
-
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pop();
-                          },
                         ),
-                      ),
-                    ],
+                        Container(
+                          child: GestureDetector(
+                            child: Container(
+                              color: Color.fromRGBO(123, 12, 34, 0.4),
+                              padding: EdgeInsets.all(10),
+                              child: Text('send'),
+                            ),
+                            onTap: () async {
+                              await FirebaseFirestore.instance
+                                  // .collection(
+                                  //     'personal_connections')  //${getxController.authData}/messages')
+                                  .collection('personal_connections')
+                                  .doc('${widget.teamModel.teamId}')
+                                  .collection('messages')
+                                  .add({
+                                'message': _textController.text,
+                                'sentBy': getxController.authData.value,
+                                'createdOn': FieldValue.serverTimestamp(),
+                                'type': 'gifMessage',
+                                'isTagMessage': isTagMessage,
+                                'isDeleted': false,
+                                //'isGif': isGif,
+                              }).then((value) => {_textController.text = ''});
+
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -132,119 +154,110 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   }
 
   editBottomSheet(String id, String message, doc) {
-    showModalBottomSheet<void>(
-        context: context,
-        builder: (BuildContext context) {
-          _editingController.text = message;
-          return Container(
-            height: 200,
-            color: Colors.white,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
+    // showModalBottomSheet<void>(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    _editingController.text = message;
+    Get.bottomSheet(
+      Container(
+        //height: 200,
+        color: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              child: Text('Edit message'),
+            ),
+            Container(
+              child: Text(message),
+            ),
+            Container(
+              child: Row(
                 children: <Widget>[
                   Container(
-                    child: Text('Edit message'),
+                    //height: 200,
+                    width: MediaQuery.of(context).size.width - 140,
+                    child: TextField(
+                      decoration: InputDecoration(labelText: 'Enter Message'),
+                      controller: _editingController,
+                    ),
                   ),
+                  // SizedBox(
+                  //   width: 5,
+                  // ),
                   Container(
-                    child: Text(message),
-                  ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          height: 200,
-                          width: MediaQuery.of(context).size.width - 140,
-                          child: TextField(
-                            decoration:
-                                InputDecoration(labelText: 'Enter Message'),
-                            controller: _editingController,
-                          ),
-                        ),
-                        // SizedBox(
-                        //   width: 5,
-                        // ),
-                        Container(
-                          child: IconButton(
-                            icon: Icon(Icons.send),
-                            onPressed: () {
-                              if (_editingController.text.isNotEmpty) {
-                                // if (_textController.text
-                                //     .contains('https://tse')) {
-                                //   setState(() {
-                                //     isGif = true;
-                                //   });
-                                // }
-                                FirebaseFirestore.instance
-                                    // .collection(
-                                    //     'personal_connections')  //${getxController.authData}/messages')
-                                    .collection('personal_connections')
-                                    .doc('${widget.teamModel.teamId}')
-                                    .collection('messages')
-                                    .add(
-                                  {
-                                    'message': _editingController.text,
-                                    'sentBy': getxController.authData.value,
-                                    'createdOn': doc,
-                                    'type': 'editedMessage',
-                                    'isTagMessage': isTagMessage,
+                    child: IconButton(
+                      icon: Icon(Icons.send),
+                      onPressed: () {
+                        if (_editingController.text.isNotEmpty) {
+                          // if (_textController.text
+                          //     .contains('https://tse')) {
+                          //   setState(() {
+                          //     isGif = true;
+                          //   });
+                          // }
+                          FirebaseFirestore.instance
+                              // .collection(
+                              //     'personal_connections')  //${getxController.authData}/messages')
+                              .collection('personal_connections')
+                              .doc('${widget.teamModel.teamId}')
+                              .collection('messages')
+                              .doc(id)
+                              .update(
+                            {
+                              'message': _editingController.text,
+                              'sentBy': getxController.authData.value,
+                              //'createdOn': doc,
+                              'type': 'editedMessage',
+                              'isTagMessage': isTagMessage,
 
-                                    //'isGif': isGif,
-                                  },
-                                ).then(
-                                  (value) {
-                                    print("docId: ${value.id}");
-                                    if (isTagMessage) {
-                                      print("sending taggedmembers to db");
-                                      taggedMembers.forEach(
-                                        (element) {
-                                          FirebaseFirestore.instance
-                                              // .collection(
-                                              //     'personal_connections')  //${getxController.authData}/messages')
-                                              .collection(
-                                                  'personal_connections')
-                                              .doc('${widget.teamModel.teamId}')
-                                              .collection('messages')
-                                              .doc(value.id)
-                                              .collection('taggedMembers')
-                                              .doc(element.userId)
-                                              .set(element.toMap())
-                                              .then((value) {
-                                            isTagMessage = false;
-                                            taggedMembers.clear();
-                                          });
-                                        },
-                                      );
-                                    }
-                                    // if (isGif) {
-                                    //   setState(() {
-                                    //     isGif = false;
-                                    //   });
-                                    // }
+                              //'isGif': isGif,
+                            },
+                          ).then(
+                            (value) {
+                              print("docId: $id");
+                              if (isTagMessage) {
+                                print("sending taggedmembers to db");
+                                taggedMembers.forEach(
+                                  (element) {
+                                    FirebaseFirestore.instance
+                                        // .collection(
+                                        //     'personal_connections')  //${getxController.authData}/messages')
+                                        .collection('personal_connections')
+                                        .doc('${widget.teamModel.teamId}')
+                                        .collection('messages')
+                                        .doc(id)
+                                        .collection('taggedMembers')
+                                        .doc(element.userId)
+                                        .set(element.toMap())
+                                        .then((value) {
+                                      isTagMessage = false;
+                                      taggedMembers.clear();
+                                    });
                                   },
                                 );
                               }
-                              _editingController.text = '';
+                              // if (isGif) {
+                              //   setState(() {
+                              //     isGif = false;
+                              //   });
+                              // }
                             },
-                          ),
-                        ),
-                        Container(
-                          child: IconButton(
-                            icon: Icon(Icons.bar_chart),
-                            onPressed: () {
-                              pollingSheet();
-                            },
-                          ),
-                        )
-                      ],
+                          );
+                          Navigator.of(context).pop();
+                          _editingController.text = '';
+                        }
+                      },
                     ),
-                  )
+                  ),
                 ],
               ),
-            ),
-          );
-        });
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -274,6 +287,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         style: TextStyle(color: Colors.white70),
                       ),
                       onTap: () {
+                        Navigator.of(context).pop();
                         editBottomSheet(messageId, message, doc);
                       },
                     ),
@@ -739,31 +753,42 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         .toString()
                                         .trimRight();
                                     print('${link}hi');
-                                    return Container(
-                                      height: 200,
-                                      width: 200,
-                                      child: Image.network(
-                                        '$link',
-                                        loadingBuilder: (BuildContext context,
-                                            Widget child,
-                                            ImageChunkEvent loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child;
-                                          }
-                                          return Center(
-                                            child: CircularProgressIndicator(
-                                              value: loadingProgress
-                                                          .expectedTotalBytes !=
-                                                      null
-                                                  ? loadingProgress
-                                                          .cumulativeBytesLoaded /
-                                                      loadingProgress
-                                                          .expectedTotalBytes
-                                                  : null,
-                                            ),
-                                          );
-                                        },
+                                    return GestureDetector(
+                                      child: Container(
+                                        height: 200,
+                                        width: 200,
+                                        child: Image.network(
+                                          '$link',
+                                          loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes
+                                                    : null,
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
+                                      onTap: () {
+                                        onTapOnMessage(
+                                          snapshot.data.docs[index].id,
+                                          snapshot.data.docs[index]['message'],
+                                          snapshot.data.docs[index]['sentBy'],
+                                          snapshot.data.docs[index]
+                                              ['createdOn'],
+                                        );
+                                      },
                                     );
                                   }
 
