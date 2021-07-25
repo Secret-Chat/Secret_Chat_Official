@@ -252,6 +252,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   onTapOnMessage(
     String messageId,
     String message,
+    String sentBy,
     doc,
   ) {
     return showDialog(
@@ -285,14 +286,86 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         style: TextStyle(color: Colors.white70),
                       ),
                       onTap: () {
-                        FirebaseFirestore.instance
-                            .collection('personal_connections')
-                            .doc('${widget.teamModel.teamId}')
-                            .collection('messages')
-                            .doc('$messageId')
-                            .delete();
+                        //if (sentBy == getxController.user.value.userId) {
+                        return showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Delete message'),
+                                content: Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Container(
+                                        child: Text(
+                                            'Are you sure you want to delete the message'),
+                                      ),
+                                      sentBy == getxController.user.value.userId
+                                          ? ListTile(
+                                              trailing:
+                                                  Text('Delete for everyone'),
+                                              onTap: () {
+                                                FirebaseFirestore.instance
+                                                    .collection(
+                                                        'personal_connections')
+                                                    .doc(
+                                                        '${widget.teamModel.teamId}')
+                                                    .collection('messages')
+                                                    .doc('$messageId')
+                                                    .delete();
 
-                        Navigator.of(context).pop();
+                                                Navigator.of(context).pop();
+                                                Navigator.of(context).pop();
+                                              },
+                                            )
+                                          : Container(),
+                                      ListTile(
+                                        trailing: Text('No'),
+                                        onTap: () {
+                                          Navigator.of(context).pop();
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      ListTile(
+                                        trailing: Text('Delete for me'),
+                                        onTap: () {
+                                          FirebaseFirestore.instance
+                                              .collection(
+                                                  'personal_connections')
+                                              .doc('${widget.teamModel.teamId}')
+                                              .collection('messages')
+                                              .doc('$messageId')
+                                              .update({'isDeleted': true});
+
+                                          FirebaseFirestore.instance
+                                              .collection(
+                                                  'personal_connections')
+                                              .doc('${widget.teamModel.teamId}')
+                                              .collection('messages')
+                                              .doc('$messageId')
+                                              .collection('notShowFor')
+                                              .doc(sentBy)
+                                              .set({'userId': sentBy});
+                                          //.add({'userId': sentBy});
+
+                                          Navigator.of(context).pop();
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            });
+                        // FirebaseFirestore.instance
+                        //     .collection('personal_connections')
+                        //     .doc('${widget.teamModel.teamId}')
+                        //     .collection('messages')
+                        //     .doc('$messageId')
+                        //     .delete();
+
+                        // Navigator.of(context).pop();
+                        //}
                       },
                     ),
                   ),
@@ -569,6 +642,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                             child: ListView.builder(
                                 reverse: true,
                                 itemBuilder: (ctx, index) {
+                                  print(snapshot.data.docs[index].data());
+                                  if (snapshot.data.docs[index]['isDeleted'] ==
+                                      true) {
+                                    var messageId =
+                                        snapshot.data.docs[index].id;
+                                    print('plsplsplsplslsplspsplsplsps');
+                                    if (!FirebaseFirestore.instance
+                                        .collection('personal_connections')
+                                        .doc(widget.teamModel.teamId)
+                                        .collection('messages')
+                                        .doc(messageId)
+                                        .collection('notShowFor')
+                                        .doc(getxController.user.value.userId)
+                                        .isBlank) {
+                                      return Container();
+                                    }
+                                  }
                                   if (snapshot.data.docs[index]['type'] ==
                                       'textMessage') {
                                     // if (snapshot.data.docs[index]['isGif'] ==
@@ -597,6 +687,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         onTapOnMessage(
                                           snapshot.data.docs[index].id,
                                           snapshot.data.docs[index]['message'],
+                                          snapshot.data.docs[index]['sentBy'],
                                           snapshot.data.docs[index]
                                               ['createdOn'],
                                         );
@@ -629,6 +720,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         onTapOnMessage(
                                           snapshot.data.docs[index].id,
                                           snapshot.data.docs[index]['message'],
+                                          snapshot.data.docs[index]['sentBy'],
                                           snapshot.data.docs[index]
                                               ['createdOn'],
                                         );
@@ -637,6 +729,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     //}
 
                                   }
+
                                   //////////////////////////////////////////////////////////////
                                   ///getting the gif messages over here
                                   if (snapshot.data.docs[index]['type'] ==
@@ -974,6 +1067,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 FieldValue.serverTimestamp(),
                                             'type': 'textMessage',
                                             'isTagMessage': isTagMessage,
+                                            'isDeleted': false,
                                             //'isGif': isGif,
                                           },
                                         ).then(
