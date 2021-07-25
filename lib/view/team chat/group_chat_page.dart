@@ -497,10 +497,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                             if (_pollQuestionController.text.isNotEmpty &&
                                 !pollController.isThePoleEmpty) {
                               pollController.sendAllOptionsToFirebase(
-                                  teamId: widget.teamModel.teamId,
-                                  sentBy: getxController.user.value.userId,
-                                  messageText: "Poll",
-                                  questionText: _pollQuestionController.text);
+                                teamId: widget.teamModel.teamId,
+                                sentBy: getxController.user.value.userId,
+                                messageText: "Poll",
+                                questionText: _pollQuestionController.text,
+                              );
                               // getxController.printer();
                             }
                             _pollQuestionController.text = '';
@@ -874,6 +875,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     //   );
                                     // }
                                   } else {
+
+
+                                    print('rayyanlovessaurab');
+
                                     if (snapshot.data.docs[index]['type'] ==
                                         'textMessage') {
                                       // if (snapshot.data.docs[index]['isGif'] ==
@@ -912,8 +917,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       );
                                       //}
 
-                                    } else if (snapshot.data.docs[index]
-                                            ['type'] ==
+
+                                    
+                                    if (snapshot.data.docs[index]['type'] ==
+
                                         'editedMessage') {
                                       // if (snapshot.data.docs[index]['isGif'] ==
                                       //     false) {
@@ -932,6 +939,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           title: Text(
                                               '${snapshot.data.docs[index]['message']}'),
                                           trailing: Text('Edited'),
+
                                         ),
                                         onTap: () {
                                           onTapOnMessage(
@@ -951,8 +959,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
                                     //////////////////////////////////////////////////////////////
                                     ///getting the gif messages over here
-                                    else if (snapshot.data.docs[index]
-                                            ['type'] ==
+                                    if (snapshot.data.docs[index]['type'] ==
                                         'gifMessage') {
                                       var link = snapshot
                                           .data.docs[index]['message']
@@ -1003,6 +1010,38 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       );
                                     }
                                   }
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.red)),
+                                    height: 300,
+                                    child: Column(
+                                      children: <Widget>[
+                                        Container(
+                                          color:
+                                              Color.fromRGBO(12, 96, 255, 0.4),
+                                          child: Text(
+                                              '${snapshot.data.docs[index]['questionText']}'),
+
+                                        ),
+                                        onTap: () {
+                                          onTapOnMessage(
+                                            snapshot.data.docs[index].id,
+                                            snapshot.data.docs[index]
+                                                ['message'],
+                                            snapshot.data.docs[index]['sentBy'],
+                                            snapshot.data.docs[index]
+                                                ['createdOn'],
+                                            snapshot.data.docs[index]['type'],
+                                          );
+                                        },
+                                      );
+                                      //}
+
+                                    }
+
+                                    
+                                      
+                                   
                                   if (snapshot.data.docs[index]['type'] ==
                                       'pollMessage') {
                                     return Container(

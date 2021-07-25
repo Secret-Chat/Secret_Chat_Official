@@ -29,7 +29,9 @@ class PollController extends GetxController {
       {String teamId,
       String sentBy,
       String questionText,
-      String messageText}) async {
+      String messageText,
+      String type,
+      bool isDeleted}) async {
     print('''
     CHeck data: 
     teamId: $teamId,
