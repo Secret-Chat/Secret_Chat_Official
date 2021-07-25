@@ -267,6 +267,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     String message,
     String sentBy,
     doc,
+    String messageType,
   ) {
     return showDialog(
         context: context,
@@ -279,19 +280,22 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: ListTile(
-                      title: Text(
-                        'Edit',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        editBottomSheet(messageId, message, doc);
-                      },
-                    ),
-                  ),
+                  messageType == 'gifMessage' ||
+                          sentBy != getxController.user.value.userId
+                      ? Container()
+                      : Container(
+                          padding: EdgeInsets.all(10),
+                          child: ListTile(
+                            title: Text(
+                              'Edit',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              editBottomSheet(messageId, message, doc);
+                            },
+                          ),
+                        ),
                   Container(
                     padding: EdgeInsets.all(10),
                     child: ListTile(
@@ -704,6 +708,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           snapshot.data.docs[index]['sentBy'],
                                           snapshot.data.docs[index]
                                               ['createdOn'],
+                                          snapshot.data.docs[index]['type'],
                                         );
                                       },
                                     );
@@ -737,6 +742,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           snapshot.data.docs[index]['sentBy'],
                                           snapshot.data.docs[index]
                                               ['createdOn'],
+                                          snapshot.data.docs[index]['type'],
                                         );
                                       },
                                     );
@@ -787,6 +793,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           snapshot.data.docs[index]['sentBy'],
                                           snapshot.data.docs[index]
                                               ['createdOn'],
+                                          snapshot.data.docs[index]['type'],
                                         );
                                       },
                                     );
