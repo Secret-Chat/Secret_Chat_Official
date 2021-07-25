@@ -92,5 +92,27 @@ class PollController extends GetxController {
         .collection('usersPolled')
         .doc(userPollingId)
         .set({'username': userNameofPoller, 'userId': userPollingId});
+
+    //add the user to polled list
+    FirebaseFirestore.instance
+        // .collection(
+        //     'personal_connections')  //${getxController.authData}/messages')
+        .collection('personal_connections')
+        .doc('$teamId')
+        .collection('messages')
+        .doc(messageId)
+        .collection('usersPolled')
+        .doc(userPollingId)
+        .set({"userId": userPollingId});
+  }
+
+  Stream<QuerySnapshot> usersWhoPolled({String teamId, String messageId}) {
+    return FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc('$teamId')
+        .collection('messages')
+        .doc(messageId)
+        .collection('usersPolled')
+        .snapshots();
   }
 }
