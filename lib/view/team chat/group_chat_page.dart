@@ -37,6 +37,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   List<UserEntity> taggedMembers = [];
   PollController pollController = Get.put(PollController());
   bool isGif = false;
+  bool isDeletedMessage = false;
 
   //dispose the controllers
   @override
@@ -667,137 +668,340 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     var messageId =
                                         snapshot.data.docs[index].id;
                                     print('plsplsplsplslsplspsplsplsps');
-                                    if (!FirebaseFirestore.instance
+                                    var link;
+                                    FirebaseFirestore.instance
                                         .collection('personal_connections')
                                         .doc(widget.teamModel.teamId)
                                         .collection('messages')
                                         .doc(messageId)
                                         .collection('notShowFor')
-                                        .doc(getxController.user.value.userId)
-                                        .isBlank) {
+                                        .where('userId',
+                                            isEqualTo: getxController
+                                                .user.value.userId)
+                                        .snapshots()
+                                        .first
+                                        .then((value) => {
+                                              print(value.docs.isNotEmpty),
+                                              if (value.docs.isNotEmpty)
+                                                {isDeletedMessage = true}
+                                              else
+                                                {isDeletedMessage = false}
+                                            });
+
+                                    if (isDeletedMessage == true) {
                                       return Container();
                                     }
-                                  }
-                                  if (snapshot.data.docs[index]['type'] ==
-                                      'textMessage') {
-                                    // if (snapshot.data.docs[index]['isGif'] ==
-                                    //     false) {
-                                    return GestureDetector(
-                                      child: ListTile(
-                                        leading: getxController
-                                                    .authData.value !=
-                                                snapshot.data.docs[index]
-                                                    ['sentBy']
-                                            ? Text(
-                                                "${snapshot.data.docs[index]['sentBy']}")
-                                            : SizedBox(
-                                                height: 0,
-                                                width: 0,
-                                              ),
-                                        title: Text(
-                                            '${snapshot.data.docs[index]['message']}'),
-                                        // trailing: snapshot.data.docs[index]
-                                        //             ['isEdited'] ==
-                                        //         true
-                                        //     ? Text('Edited')
-                                        //     : Container(),
-                                      ),
-                                      onTap: () {
-                                        onTapOnMessage(
-                                          snapshot.data.docs[index].id,
-                                          snapshot.data.docs[index]['message'],
-                                          snapshot.data.docs[index]['sentBy'],
-                                          snapshot.data.docs[index]
-                                              ['createdOn'],
-                                          snapshot.data.docs[index]['type'],
-                                        );
-                                      },
-                                    );
-                                    //}
-
-                                  } else if (snapshot.data.docs[index]
-                                          ['type'] ==
-                                      'editedMessage') {
-                                    // if (snapshot.data.docs[index]['isGif'] ==
-                                    //     false) {
-                                    return GestureDetector(
-                                      child: ListTile(
-                                        leading: getxController
-                                                    .authData.value !=
-                                                snapshot.data.docs[index]
-                                                    ['sentBy']
-                                            ? Text(
-                                                "${snapshot.data.docs[index]['sentBy']}")
-                                            : SizedBox(
-                                                height: 0,
-                                                width: 0,
-                                              ),
-                                        title: Text(
-                                            '${snapshot.data.docs[index]['message']}'),
-                                        trailing: Text('Edited'),
-                                      ),
-                                      onTap: () {
-                                        onTapOnMessage(
-                                          snapshot.data.docs[index].id,
-                                          snapshot.data.docs[index]['message'],
-                                          snapshot.data.docs[index]['sentBy'],
-                                          snapshot.data.docs[index]
-                                              ['createdOn'],
-                                          snapshot.data.docs[index]['type'],
-                                        );
-                                      },
-                                    );
-                                    //}
-
-                                  }
-
-                                  //////////////////////////////////////////////////////////////
-                                  ///getting the gif messages over here
-                                  else if (snapshot.data.docs[index]['type'] ==
-                                      'gifMessage') {
-                                    var link = snapshot
-                                        .data.docs[index]['message']
-                                        .toString()
-                                        .trimRight();
-                                    print('${link}hi');
-                                    return GestureDetector(
-                                      child: Container(
-                                        height: 200,
-                                        width: 200,
-                                        child: Image.network(
-                                          '$link',
-                                          loadingBuilder: (BuildContext context,
-                                              Widget child,
-                                              ImageChunkEvent loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                value: loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes
-                                                    : null,
-                                              ),
-                                            );
-                                          },
+                                    if (snapshot.data.docs[index]['type'] ==
+                                        'textMessage') {
+                                      // if (snapshot.data.docs[index]['isGif'] ==
+                                      //     false) {
+                                      return GestureDetector(
+                                        child: ListTile(
+                                          leading: getxController
+                                                      .authData.value !=
+                                                  snapshot.data.docs[index]
+                                                      ['sentBy']
+                                              ? Text(
+                                                  "${snapshot.data.docs[index]['sentBy']}")
+                                              : SizedBox(
+                                                  height: 0,
+                                                  width: 0,
+                                                ),
+                                          title: Text(
+                                              '${snapshot.data.docs[index]['message']}'),
+                                          // trailing: snapshot.data.docs[index]
+                                          //             ['isEdited'] ==
+                                          //         true
+                                          //     ? Text('Edited')
+                                          //     : Container(),
                                         ),
-                                      ),
-                                      onTap: () {
-                                        onTapOnMessage(
-                                          snapshot.data.docs[index].id,
-                                          snapshot.data.docs[index]['message'],
-                                          snapshot.data.docs[index]['sentBy'],
-                                          snapshot.data.docs[index]
-                                              ['createdOn'],
-                                          snapshot.data.docs[index]['type'],
-                                        );
-                                      },
-                                    );
+                                        onTap: () {
+                                          onTapOnMessage(
+                                            snapshot.data.docs[index].id,
+                                            snapshot.data.docs[index]
+                                                ['message'],
+                                            snapshot.data.docs[index]['sentBy'],
+                                            snapshot.data.docs[index]
+                                                ['createdOn'],
+                                            snapshot.data.docs[index]['type'],
+                                          );
+                                        },
+                                      );
+                                      //}
+                                    }
+
+                                    if (snapshot.data.docs[index]['type'] ==
+                                        'editedMessage') {
+                                      // if (snapshot.data.docs[index]['isGif'] ==
+                                      //     false) {
+                                      return GestureDetector(
+                                        child: ListTile(
+                                          leading: getxController
+                                                      .authData.value !=
+                                                  snapshot.data.docs[index]
+                                                      ['sentBy']
+                                              ? Text(
+                                                  "${snapshot.data.docs[index]['sentBy']}")
+                                              : SizedBox(
+                                                  height: 0,
+                                                  width: 0,
+                                                ),
+                                          title: Text(
+                                              '${snapshot.data.docs[index]['message']}'),
+                                          trailing: Text('Edited'),
+                                        ),
+                                        onTap: () {
+                                          onTapOnMessage(
+                                            snapshot.data.docs[index].id,
+                                            snapshot.data.docs[index]
+                                                ['message'],
+                                            snapshot.data.docs[index]['sentBy'],
+                                            snapshot.data.docs[index]
+                                                ['createdOn'],
+                                            snapshot.data.docs[index]['type'],
+                                          );
+                                        },
+                                      );
+                                      //}
+                                    }
+
+                                    //////////////////////////////////////////////////////////////
+                                    ///getting the gif messages over here
+                                    if (snapshot.data.docs[index]['type'] ==
+                                        'gifMessage') {
+                                      link = snapshot
+                                          .data.docs[index]['message']
+                                          .toString()
+                                          .trimRight();
+                                      print('${link}hi');
+                                      return GestureDetector(
+                                        child: Container(
+                                          height: 200,
+                                          width: 200,
+                                          child: Image.network(
+                                            '$link',
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent
+                                                        loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes
+                                                      : null,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          onTapOnMessage(
+                                            snapshot.data.docs[index].id,
+                                            snapshot.data.docs[index]
+                                                ['message'],
+                                            snapshot.data.docs[index]['sentBy'],
+                                            snapshot.data.docs[index]
+                                                ['createdOn'],
+                                            snapshot.data.docs[index]['type'],
+                                          );
+                                        },
+                                      );
+                                    }
+
+                                    // .doc(
+                                    //     '${getxController.user.value.userId}')
+                                    // .get()
+                                    // .then((value) => print(
+                                    //     '${value['userId']} ridbah'))
+
+                                    // if (!FirebaseFirestore.instance
+                                    //     .collection('personal_connections')
+                                    //     .doc(widget.teamModel.teamId)
+                                    //     .collection('messages')
+                                    //     .doc(messageId)
+                                    //     .collection('notShowFor')
+                                    //     .doc(getxController.user.value.userId)
+                                    //     .get()
+                                    //     .isBlank) {
+                                    //   print('whyme');
+                                    //   return Container();
+                                    // }
+                                    // if (snapshot.data.docs[index]['type'] ==
+                                    //     'textMessage') {
+                                    //   // if (snapshot.data.docs[index]['isGif'] ==
+                                    //   //     false) {
+                                    //   return GestureDetector(
+                                    //     child: ListTile(
+                                    //       leading: getxController
+                                    //                   .authData.value !=
+                                    //               snapshot.data.docs[index]
+                                    //                   ['sentBy']
+                                    //           ? Text(
+                                    //               "${snapshot.data.docs[index]['sentBy']}")
+                                    //           : SizedBox(
+                                    //               height: 0,
+                                    //               width: 0,
+                                    //             ),
+                                    //       title: Text(
+                                    //           '${snapshot.data.docs[index]['message']}'),
+                                    //       // trailing: snapshot.data.docs[index]
+                                    //       //             ['isEdited'] ==
+                                    //       //         true
+                                    //       //     ? Text('Edited')
+                                    //       //     : Container(),
+                                    //     ),
+                                    //     onTap: () {
+                                    //       onTapOnMessage(
+                                    //         snapshot.data.docs[index].id,
+                                    //         snapshot.data.docs[index]
+                                    //             ['message'],
+                                    //         snapshot.data.docs[index]['sentBy'],
+                                    //         snapshot.data.docs[index]
+                                    //             ['createdOn'],
+                                    //         snapshot.data.docs[index]['type'],
+                                    //       );
+                                    //     },
+                                    //   );
+                                    // }
+                                  } else {
+                                    if (snapshot.data.docs[index]['type'] ==
+                                        'textMessage') {
+                                      // if (snapshot.data.docs[index]['isGif'] ==
+                                      //     false) {
+                                      return GestureDetector(
+                                        child: ListTile(
+                                          leading: getxController
+                                                      .authData.value !=
+                                                  snapshot.data.docs[index]
+                                                      ['sentBy']
+                                              ? Text(
+                                                  "${snapshot.data.docs[index]['sentBy']}")
+                                              : SizedBox(
+                                                  height: 0,
+                                                  width: 0,
+                                                ),
+                                          title: Text(
+                                              '${snapshot.data.docs[index]['message']}'),
+                                          // trailing: snapshot.data.docs[index]
+                                          //             ['isEdited'] ==
+                                          //         true
+                                          //     ? Text('Edited')
+                                          //     : Container(),
+                                        ),
+                                        onTap: () {
+                                          onTapOnMessage(
+                                            snapshot.data.docs[index].id,
+                                            snapshot.data.docs[index]
+                                                ['message'],
+                                            snapshot.data.docs[index]['sentBy'],
+                                            snapshot.data.docs[index]
+                                                ['createdOn'],
+                                            snapshot.data.docs[index]['type'],
+                                          );
+                                        },
+                                      );
+                                      //}
+
+                                    } else if (snapshot.data.docs[index]
+                                            ['type'] ==
+                                        'editedMessage') {
+                                      // if (snapshot.data.docs[index]['isGif'] ==
+                                      //     false) {
+                                      return GestureDetector(
+                                        child: ListTile(
+                                          leading: getxController
+                                                      .authData.value !=
+                                                  snapshot.data.docs[index]
+                                                      ['sentBy']
+                                              ? Text(
+                                                  "${snapshot.data.docs[index]['sentBy']}")
+                                              : SizedBox(
+                                                  height: 0,
+                                                  width: 0,
+                                                ),
+                                          title: Text(
+                                              '${snapshot.data.docs[index]['message']}'),
+                                          trailing: Text('Edited'),
+                                        ),
+                                        onTap: () {
+                                          onTapOnMessage(
+                                            snapshot.data.docs[index].id,
+                                            snapshot.data.docs[index]
+                                                ['message'],
+                                            snapshot.data.docs[index]['sentBy'],
+                                            snapshot.data.docs[index]
+                                                ['createdOn'],
+                                            snapshot.data.docs[index]['type'],
+                                          );
+                                        },
+                                      );
+                                      //}
+
+                                    }
+
+                                    //////////////////////////////////////////////////////////////
+                                    ///getting the gif messages over here
+                                    else if (snapshot.data.docs[index]
+                                            ['type'] ==
+                                        'gifMessage') {
+                                      var link = snapshot
+                                          .data.docs[index]['message']
+                                          .toString()
+                                          .trimRight();
+                                      print('${link}hi');
+                                      return GestureDetector(
+                                        child: Container(
+                                          height: 200,
+                                          width: 200,
+                                          child: Image.network(
+                                            '$link',
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent
+                                                        loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes
+                                                      : null,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          onTapOnMessage(
+                                            snapshot.data.docs[index].id,
+                                            snapshot.data.docs[index]
+                                                ['message'],
+                                            snapshot.data.docs[index]['sentBy'],
+                                            snapshot.data.docs[index]
+                                                ['createdOn'],
+                                            snapshot.data.docs[index]['type'],
+                                          );
+                                        },
+                                      );
+                                    }
                                   }
                                   if (snapshot.data.docs[index]['type'] ==
                                       'pollMessage') {
