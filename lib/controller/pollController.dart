@@ -49,6 +49,7 @@ class PollController extends GetxController {
         'createdOn': FieldValue.serverTimestamp(),
         'type': 'pollMessage',
         'question': questionText,
+        'isDeleted': false
       },
     ).then((value) {
       pollOptions.forEach((element) {

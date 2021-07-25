@@ -714,8 +714,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     );
                                     //}
 
-                                  }
-                                  if (snapshot.data.docs[index]['type'] ==
+                                  } else if (snapshot.data.docs[index]
+                                          ['type'] ==
                                       'editedMessage') {
                                     // if (snapshot.data.docs[index]['isGif'] ==
                                     //     false) {
@@ -752,7 +752,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
                                   //////////////////////////////////////////////////////////////
                                   ///getting the gif messages over here
-                                  if (snapshot.data.docs[index]['type'] ==
+                                  else if (snapshot.data.docs[index]['type'] ==
                                       'gifMessage') {
                                     var link = snapshot
                                         .data.docs[index]['message']
@@ -798,179 +798,124 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       },
                                     );
                                   }
-
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.red)),
-                                    height: 300,
-                                    child: Column(
-                                      children: <Widget>[
-                                        Container(
-                                          color:
-                                              Color.fromRGBO(12, 96, 255, 0.4),
-                                          child: Text(
-                                              '${snapshot.data.docs[index]['question']}'),
-                                        ),
-                                        // Container(
-                                        //   color:
-                                        //       Color.fromRGBO(12, 96, 255, 0.4),
-                                        //   alignment: Alignment.centerLeft,
-                                        //   child: Text(
-                                        //     'poll',
-                                        //     style: TextStyle(fontSize: 10),
-                                        //   ),
-                                        // ),
-                                        Container(
-                                          color:
-                                              Color.fromRGBO(12, 96, 255, 0.4),
-                                          child: Text(
-                                            '${snapshot.data.docs[index]['sentBy']}',
-                                            style: TextStyle(fontSize: 10),
+                                  if (snapshot.data.docs[index]['type'] ==
+                                      'pollMessage') {
+                                    print("hd");
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.red)),
+                                      height: 300,
+                                      child: Column(
+                                        children: <Widget>[
+                                          Container(
+                                            color: Color.fromRGBO(
+                                                12, 96, 255, 0.4),
+                                            // child: Text(
+                                            //     '${snapshot.data.docs[index]['question']}'),
                                           ),
-                                        ),
+                                          // Container(
+                                          //   color:
+                                          //       Color.fromRGBO(12, 96, 255, 0.4),
+                                          //   alignment: Alignment.centerLeft,
+                                          //   child: Text(
+                                          //     'poll',
+                                          //     style: TextStyle(fontSize: 10),
+                                          //   ),
+                                          // ),
+                                          Container(
+                                            color: Color.fromRGBO(
+                                                12, 96, 255, 0.4),
+                                            child: Text(
+                                              '${snapshot.data.docs[index]['sentBy']}',
+                                              style: TextStyle(fontSize: 10),
+                                            ),
+                                          ),
 
-                                        //render options for users to Tap
-                                        Expanded(
-                                          child: StreamBuilder<QuerySnapshot>(
-                                            stream: FirebaseFirestore.instance
-                                                .collection(
-                                                    'personal_connections')
-                                                .doc(
-                                                    '${widget.teamModel.teamId}')
-                                                .collection('messages')
-                                                .doc(snapshot
-                                                    .data.docs[index].id)
-                                                .collection('pollOptions')
-                                                .snapshots(),
-                                            builder: (ctx,
-                                                AsyncSnapshot<QuerySnapshot>
-                                                    optionSnapshot) {
-                                              if (optionSnapshot.hasError) {
-                                                return Text(
-                                                    "Some error occured");
-                                              } else if (optionSnapshot
-                                                  .hasData) {
-                                                return ListView.builder(
-                                                  itemBuilder:
-                                                      (ctx, optionIndex) {
-                                                    return GestureDetector(
-                                                      behavior: HitTestBehavior
-                                                          .opaque,
-                                                      onTap: () {
-                                                        //send the poll of that specific user
-                                                        pollController.sendPollAnswer(
-                                                            messageId: snapshot
-                                                                .data
-                                                                .docs[index]
-                                                                .id,
-                                                            pollOptionId:
-                                                                optionSnapshot
-                                                                    .data
-                                                                    .docs[
-                                                                        optionIndex]
-                                                                    .id,
-                                                            teamId: widget
-                                                                .teamModel
-                                                                .teamId,
-                                                            userNameofPoller:
-                                                                getxController
-                                                                    .user
-                                                                    .value
-                                                                    .userName,
-                                                            userPollingId:
-                                                                getxController
-                                                                    .user
-                                                                    .value
-                                                                    .userId);
-                                                      },
-                                                      child: ListTile(
-                                                        tileColor:
-                                                            Color.fromRGBO(12,
-                                                                96, 255, 0.4),
-                                                        title: Text(
-                                                            '${optionSnapshot.data.docs[optionIndex]['pollText']}'),
-                                                        subtitle: Text(
-                                                          '',
-                                                          style: TextStyle(
-                                                              fontSize: 10),
+                                          //render options for users to Tap
+                                          Expanded(
+                                            child: StreamBuilder<QuerySnapshot>(
+                                              stream: FirebaseFirestore.instance
+                                                  .collection(
+                                                      'personal_connections')
+                                                  .doc(
+                                                      '${widget.teamModel.teamId}')
+                                                  .collection('messages')
+                                                  .doc(snapshot
+                                                      .data.docs[index].id)
+                                                  .collection('pollOptions')
+                                                  .snapshots(),
+                                              builder: (ctx,
+                                                  AsyncSnapshot<QuerySnapshot>
+                                                      optionSnapshot) {
+                                                if (optionSnapshot.hasError) {
+                                                  return Text(
+                                                      "Some error occured");
+                                                } else if (optionSnapshot
+                                                    .hasData) {
+                                                  return ListView.builder(
+                                                    itemBuilder:
+                                                        (ctx, optionIndex) {
+                                                      return GestureDetector(
+                                                        behavior:
+                                                            HitTestBehavior
+                                                                .opaque,
+                                                        onTap: () {
+                                                          //send the poll of that specific user
+                                                          pollController.sendPollAnswer(
+                                                              messageId:
+                                                                  snapshot
+                                                                      .data
+                                                                      .docs[
+                                                                          index]
+                                                                      .id,
+                                                              pollOptionId:
+                                                                  optionSnapshot
+                                                                      .data
+                                                                      .docs[
+                                                                          optionIndex]
+                                                                      .id,
+                                                              teamId: widget
+                                                                  .teamModel
+                                                                  .teamId,
+                                                              userNameofPoller:
+                                                                  getxController
+                                                                      .user
+                                                                      .value
+                                                                      .userName,
+                                                              userPollingId:
+                                                                  getxController
+                                                                      .user
+                                                                      .value
+                                                                      .userId);
+                                                        },
+                                                        child: ListTile(
+                                                          tileColor:
+                                                              Color.fromRGBO(12,
+                                                                  96, 255, 0.4),
+                                                          title: Text(
+                                                              '${optionSnapshot.data.docs[optionIndex]['pollText']}'),
+                                                          subtitle: Text(
+                                                            '',
+                                                            style: TextStyle(
+                                                                fontSize: 10),
+                                                          ),
                                                         ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  itemCount: optionSnapshot
-                                                      .data.docs.length,
-                                                );
-                                              }
-                                              return Container();
-                                            },
-                                          ),
-                                        )
-                                        // ListTile(
-                                        //   tileColor:
-                                        //       Color.fromRGBO(12, 96, 255, 0.4),
-                                        //   leading: Radio(
-                                        //     activeColor: Colors.grey,
-                                        //     autofocus: true,
-                                        //     focusColor: Colors.grey,
-                                        //     fillColor:
-                                        //         MaterialStateProperty.all(
-                                        //             Colors.grey),
-                                        //     groupValue: null,
-                                        //     onChanged: (value) {},
-                                        //     value: null,
-                                        //   ),
-                                        //   title: Text(
-                                        //       '${snapshot.data.docs[index]['optionOne']}'),
-                                        //   subtitle: Text(
-                                        //     '',
-                                        //     style: TextStyle(fontSize: 10),
-                                        //   ),
-                                        // ),
-                                        // ListTile(
-                                        //   tileColor:
-                                        //       Color.fromRGBO(12, 96, 255, 0.4),
-                                        //   leading: Radio(
-                                        //     activeColor: Colors.grey,
-                                        //     autofocus: true,
-                                        //     focusColor: Colors.grey,
-                                        //     fillColor:
-                                        //         MaterialStateProperty.all(
-                                        //             Colors.grey),
-                                        //     groupValue: null,
-                                        //     onChanged: (value) {},
-                                        //     value: null,
-                                        //   ),
-                                        //   title: Text(
-                                        //       '${snapshot.data.docs[index]['optionTwo']}'),
-                                        //   subtitle: Text(
-                                        //     '',
-                                        //     style: TextStyle(fontSize: 10),
-                                        //   ),
-                                        // ),
-                                        // ListTile(
-                                        //   tileColor:
-                                        //       Color.fromRGBO(12, 96, 255, 0.4),
-                                        //   leading: Radio(
-                                        //     activeColor: Colors.grey,
-                                        //     autofocus: true,
-                                        //     focusColor: Colors.grey,
-                                        //     fillColor:
-                                        //         MaterialStateProperty.all(
-                                        //             Colors.grey),
-                                        //     groupValue: null,
-                                        //     onChanged: (value) {},
-                                        //     value: null,
-                                        //   ),
-                                        //   title: Text(
-                                        //       '${snapshot.data.docs[index]['optionThree']}'),
-                                        //   subtitle: Text(
-                                        //     '',
-                                        //     style: TextStyle(fontSize: 10),
-                                        //   ),
-                                        // ),
-                                      ],
-                                    ),
-                                  );
+                                                      );
+                                                    },
+                                                    itemCount: optionSnapshot
+                                                        .data.docs.length,
+                                                  );
+                                                }
+                                                return Container();
+                                              },
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                  return Container();
                                 },
                                 itemCount: snapshot.data.docs.length),
                           );
