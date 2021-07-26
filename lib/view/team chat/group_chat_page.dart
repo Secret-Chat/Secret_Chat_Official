@@ -916,8 +916,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     //   );
                                     // }
                                   } else {
-
-
                                     print('rayyanlovessaurab');
 
                                     if (snapshot.data.docs[index]['type'] ==
@@ -956,12 +954,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           );
                                         },
                                       );
-                                      //}
+                                    }
 
-
-                                    
                                     if (snapshot.data.docs[index]['type'] ==
-
                                         'editedMessage') {
                                       // if (snapshot.data.docs[index]['isGif'] ==
                                       //     false) {
@@ -980,7 +975,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           title: Text(
                                               '${snapshot.data.docs[index]['message']}'),
                                           trailing: Text('Edited'),
-
                                         ),
                                         onTap: () {
                                           onTapOnMessage(
@@ -1051,38 +1045,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       );
                                     }
                                   }
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.red)),
-                                    height: 300,
-                                    child: Column(
-                                      children: <Widget>[
-                                        Container(
-                                          color:
-                                              Color.fromRGBO(12, 96, 255, 0.4),
-                                          child: Text(
-                                              '${snapshot.data.docs[index]['questionText']}'),
 
-                                        ),
-                                        onTap: () {
-                                          onTapOnMessage(
-                                            snapshot.data.docs[index].id,
-                                            snapshot.data.docs[index]
-                                                ['message'],
-                                            snapshot.data.docs[index]['sentBy'],
-                                            snapshot.data.docs[index]
-                                                ['createdOn'],
-                                            snapshot.data.docs[index]['type'],
-                                          );
-                                        },
-                                      );
-                                      //}
-
-                                    }
-
-                                    
-                                      
-                                   
                                   if (snapshot.data.docs[index]['type'] ==
                                       'pollMessage') {
                                     return Container(
