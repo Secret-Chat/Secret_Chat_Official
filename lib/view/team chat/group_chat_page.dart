@@ -669,7 +669,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         snapshot.data.docs[index].id;
                                     print('plsplsplsplslsplspsplsplsps');
                                     var link;
-                                    return StreamBuilder<QuerySnapshot>(
+                                    StreamBuilder<QuerySnapshot>(
                                       stream: FirebaseFirestore.instance
                                           .collection('personal_connections')
                                           .doc(widget.teamModel.teamId)
@@ -683,21 +683,24 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       builder: (BuildContext context,
                                           AsyncSnapshot<QuerySnapshot>
                                               snapshot) {
-                                        if (snapshot.hasError) {
-                                          print('heye say something');
-                                          // setState(() {
-
-                                          // });
-                                          isDeletedMessage = false;
-                                        }
                                         if (snapshot.hasData) {
-                                          print('pls ols say something');
+                                          print(
+                                              '${snapshot.data.docs.length} iod');
+                                          print('has data');
                                           // setState(() {
 
                                           // });
-                                          isDeletedMessage = true;
+                                          if (snapshot.data.docs.length == 0) {
+                                            setState(() {
+                                              isDeletedMessage = false;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              isDeletedMessage = true;
+                                            });
+                                          }
                                         }
-                                        print('hcomeme  ckme ek ej');
+
                                         return Container();
                                       },
                                     );
@@ -724,6 +727,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     print('isitreacheing here');
                                     print(isDeletedMessage);
                                     if (isDeletedMessage == true) {
+                                      setState(() {
+                                        isDeletedMessage = false;
+                                      });
                                       return Container();
                                     }
                                     if (snapshot.data.docs[index]['type'] ==
