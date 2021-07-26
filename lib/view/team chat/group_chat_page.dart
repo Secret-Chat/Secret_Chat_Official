@@ -299,7 +299,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         .delete();
   }
 
-  onPin(String messageId) async {
+  onPin(
+      String messageId, String message, doc, String sentBy, String type) async {
     var pin = await FirebaseFirestore.instance
         .collection('personal_connections')
         .doc(widget.teamModel.teamId)
@@ -328,7 +329,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         .doc(widget.teamModel.teamId)
         .collection('pinMessages')
         .doc(messageId)
-        .set({'messageId': messageId});
+        .set({
+      'messageId': messageId,
+      'createdOn': doc,
+      'sentBy': sentBy,
+      'message': message,
+      'type': type,
+    });
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -421,7 +428,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                     child: Text('Pin'),
                                                   ),
                                                   onTap: () async {
-                                                    await onPin(messageId);
+                                                    await onPin(
+                                                        messageId,
+                                                        message,
+                                                        doc,
+                                                        sentBy,
+                                                        messageType);
                                                     Navigator.of(context).pop();
                                                   },
                                                 ),
@@ -819,7 +831,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     ),
                                     onTap: () {
                                       Get.to(PinMessagesPage(
-                                          teamModel: widget.teamModel));
+                                        teamModel: widget.teamModel,
+                                        pinMessages:
+                                            snapshot.data['pinMessages'],
+                                      ));
                                     },
                                   ),
                                   SizedBox(
