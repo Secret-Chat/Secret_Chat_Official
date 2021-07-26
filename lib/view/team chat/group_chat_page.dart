@@ -956,6 +956,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       );
                                     }
 
+
+
                                     if (snapshot.data.docs[index]['type'] ==
                                         'editedMessage') {
                                       // if (snapshot.data.docs[index]['isGif'] ==
