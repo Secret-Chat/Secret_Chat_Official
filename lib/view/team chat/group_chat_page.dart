@@ -14,6 +14,7 @@ import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
+import 'package:secretchat/view/team%20chat/pinMessagesPage.dart';
 
 class GroupChatScreen extends StatefulWidget {
   // final String groupChatID;
@@ -782,6 +783,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                           if (snapshot.data['pinMessages'] != 0) {
                             return Container(
                               height: 40,
+                              color: Colors.white,
                               child: Row(
                                 children: <Widget>[
                                   SizedBox(
@@ -794,8 +796,31 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                   Spacer(),
                                   GestureDetector(
                                     child: Container(
-                                      child: Icon(Icons.next_plan),
+                                      child: Center(
+                                        child: Stack(
+                                          children: <Widget>[
+                                            Container(
+                                                padding:
+                                                    EdgeInsets.only(left: 7),
+                                                child: Icon(Icons.menu)),
+                                            Transform.rotate(
+                                              angle: -200.6,
+                                              child: Container(
+                                                color: Colors.white,
+                                                child: Icon(
+                                                  Icons.push_pin,
+                                                  size: 18,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
+                                    onTap: () {
+                                      Get.to(PinMessagesPage(
+                                          teamModel: widget.teamModel));
+                                    },
                                   ),
                                   SizedBox(
                                     width: 10,
