@@ -670,26 +670,67 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         snapshot.data.docs[index].id;
                                     print('plsplsplsplslsplspsplsplsps');
                                     var link;
-                                    FirebaseFirestore.instance
-                                        .collection('personal_connections')
-                                        .doc(widget.teamModel.teamId)
-                                        .collection('messages')
-                                        .doc(messageId)
-                                        .collection('notShowFor')
-                                        .where('userId',
-                                            isEqualTo: getxController
-                                                .user.value.userId)
-                                        .snapshots()
-                                        .first
-                                        .then((value) => {
-                                              print(value.docs.isNotEmpty),
-                                              if (value.docs.isNotEmpty)
-                                                {isDeletedMessage = true}
-                                              else
-                                                {isDeletedMessage = false}
-                                            });
+                                    StreamBuilder<QuerySnapshot>(
+                                      stream: FirebaseFirestore.instance
+                                          .collection('personal_connections')
+                                          .doc(widget.teamModel.teamId)
+                                          .collection('messages')
+                                          .doc(messageId)
+                                          .collection('notShowFor')
+                                          .where('userId',
+                                              isEqualTo: getxController
+                                                  .user.value.userId)
+                                          .snapshots(),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<QuerySnapshot>
+                                              snapshot) {
+                                        if (snapshot.hasData) {
+                                          print(
+                                              '${snapshot.data.docs.length} iod');
+                                          print('has data');
+                                          // setState(() {
 
+                                          // });
+                                          if (snapshot.data.docs.length == 0) {
+                                            setState(() {
+                                              isDeletedMessage = false;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              isDeletedMessage = true;
+                                            });
+                                          }
+                                        }
+
+                                        return Container();
+                                      },
+                                    );
+                                    ////////////////////////////////////////////////////////////////////////////
+                                    // FirebaseFirestore.instance
+                                    //     .collection('personal_connections')
+                                    //     .doc(widget.teamModel.teamId)
+                                    //     .collection('messages')
+                                    //     .doc(messageId)
+                                    //     .collection('notShowFor')
+                                    //     .where('userId',
+                                    //         isEqualTo: getxController
+                                    //             .user.value.userId)
+                                    //     .snapshots()
+                                    //     .first
+                                    //     .then((value) => {
+                                    //           print(value.docs.isNotEmpty),
+                                    //           if (value.docs.isNotEmpty)
+                                    //             {isDeletedMessage = true}
+                                    //           else
+                                    //             {isDeletedMessage = false}
+                                    //         });
+                                    ////////////////////////////////////////////////////////////////////////////////
+                                    print('isitreacheing here');
+                                    print(isDeletedMessage);
                                     if (isDeletedMessage == true) {
+                                      setState(() {
+                                        isDeletedMessage = false;
+                                      });
                                       return Container();
                                     }
                                     if (snapshot.data.docs[index]['type'] ==
@@ -914,7 +955,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         },
                                       );
                                     }
-                                    //}
+
+
 
                                     if (snapshot.data.docs[index]['type'] ==
                                         'editedMessage') {
