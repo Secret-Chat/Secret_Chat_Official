@@ -136,6 +136,7 @@ class _TeamNameState extends State<TeamName> {
                   'createdBy': getxController.user.value.userId,
                   'createdOn': FieldValue.serverTimestamp(),
                   'description': '',
+                  'pinMessages': 0,
                 });
 
                 //add the users in the users collection in the group

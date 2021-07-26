@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,6 +40,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   PollController pollController = Get.put(PollController());
   bool isGif = false;
   bool isDeletedMessage = false;
+  var pinMessages = 0;
+  bool isPinMessage = false;
 
   //dispose the controllers
   @override
@@ -262,6 +266,56 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
+  onUnPin(String messageId) {
+    setState(() {
+      pinMessages = pinMessages - 1;
+    });
+
+    FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(widget.teamModel.teamId)
+        .update({'pinMessages': pinMessages});
+
+    FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(widget.teamModel.teamId)
+        .collection('messages')
+        .doc(messageId)
+        .update({'isPinMessage': false});
+
+    FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(widget.teamModel.teamId)
+        .collection('pinMessages')
+        .doc(messageId)
+        .delete();
+  }
+
+  onPin(String messageId) {
+    setState(() {
+      pinMessages = pinMessages + 1;
+    });
+
+    FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(widget.teamModel.teamId)
+        .update({'pinMessages': pinMessages});
+
+    FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(widget.teamModel.teamId)
+        .collection('messages')
+        .doc(messageId)
+        .update({'isPinMessage': true});
+
+    FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(widget.teamModel.teamId)
+        .collection('pinMessages')
+        .doc(messageId)
+        .set({'messageId': messageId});
+  }
+
   ///////////////////////////////////////////////////////////////////////////////////////
   ///seeing if the user tapped on any message basics for editing and deleting
   onTapOnMessage(
@@ -270,6 +324,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     String sentBy,
     doc,
     String messageType,
+    bool isPinMessage,
   ) {
     return showDialog(
         context: context,
@@ -298,6 +353,75 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                             },
                           ),
                         ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: ListTile(
+                      title: isPinMessage == false
+                          ? Text(
+                              'Pin',
+                              style: TextStyle(color: Colors.white70),
+                            )
+                          : Text(
+                              'UnPin',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        isPinMessage == true
+                            ? onUnPin(messageId)
+                            : showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                      title: Text('Pin Message'),
+                                      content: Container(
+                                          child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Container(
+                                            child: Text(
+                                                'Do you want to pin this message in the group?'),
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          Container(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: <Widget>[
+                                                Spacer(),
+                                                GestureDetector(
+                                                  child: Container(
+                                                    child: Text('Cancel'),
+                                                  ),
+                                                  onTap: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                                SizedBox(width: 20),
+                                                GestureDetector(
+                                                  child: Container(
+                                                    child: Text('Pin'),
+                                                  ),
+                                                  onTap: () async {
+                                                    await onPin(messageId);
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      )));
+                                });
+                      },
+                    ),
+                  ),
                   Container(
                     padding: EdgeInsets.all(10),
                     child: ListTile(
@@ -627,13 +751,39 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ),
         body: SingleChildScrollView(
           child: Container(
-            height: MediaQuery.of(context).size.height - 50,
+            height: MediaQuery.of(context).size.height - 83.5,
             width: MediaQuery.of(context).size.width,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                Container(
+                  child: StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          // .collection('users/${getxController.authData.value}/mescsages')
+                          .collection('personal_connections')
+                          .doc('${widget.teamModel.teamId}')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          if (snapshot.data['pinMessages'] != 0) {
+                            return Container(
+                              height: 40,
+                              child: Text(
+                                  '${snapshot.data['pinMessages']} Pin Messages'),
+                            );
+                          }
+                          return Container(
+                            height: 0,
+                            child: Text('No pinned messages'),
+                          );
+                        }
+                        return Container();
+                      }),
+                ),
+
                 SingleChildScrollView(
                   child: Container(
-                    height: MediaQuery.of(context).size.height - 168,
+                    height: MediaQuery.of(context).size.height - 188,
                     color: Color.fromRGBO(23, 34, 24, 0.3),
                     child: StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
@@ -766,6 +916,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             snapshot.data.docs[index]
                                                 ['createdOn'],
                                             snapshot.data.docs[index]['type'],
+                                            snapshot.data.docs[index]
+                                                ['isPinMessage'],
                                           );
                                         },
                                       );
@@ -801,6 +953,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             snapshot.data.docs[index]
                                                 ['createdOn'],
                                             snapshot.data.docs[index]['type'],
+                                            snapshot.data.docs[index]
+                                                ['isPinMessage'],
                                           );
                                         },
                                       );
@@ -855,6 +1009,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             snapshot.data.docs[index]
                                                 ['createdOn'],
                                             snapshot.data.docs[index]['type'],
+                                            snapshot.data.docs[index]
+                                                ['isPinMessage'],
                                           );
                                         },
                                       );
@@ -951,12 +1107,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             snapshot.data.docs[index]
                                                 ['createdOn'],
                                             snapshot.data.docs[index]['type'],
+                                            snapshot.data.docs[index]
+                                                ['isPinMessage'],
                                           );
                                         },
                                       );
                                     }
-
-
 
                                     if (snapshot.data.docs[index]['type'] ==
                                         'editedMessage') {
@@ -987,6 +1143,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             snapshot.data.docs[index]
                                                 ['createdOn'],
                                             snapshot.data.docs[index]['type'],
+                                            snapshot.data.docs[index]
+                                                ['isPinMessage'],
                                           );
                                         },
                                       );
@@ -1042,6 +1200,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             snapshot.data.docs[index]
                                                 ['createdOn'],
                                             snapshot.data.docs[index]['type'],
+                                            snapshot.data.docs[index]
+                                                ['isPinMessage'],
                                           );
                                         },
                                       );
@@ -1300,6 +1460,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             'type': 'textMessage',
                                             'isTagMessage': isTagMessage,
                                             'isDeleted': false,
+                                            'isPinMessage': false,
                                             //'isGif': isGif,
                                           },
                                         ).then(
