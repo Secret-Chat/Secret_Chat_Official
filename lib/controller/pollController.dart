@@ -82,30 +82,47 @@ class PollController extends GetxController {
     String pollOptionId,
     String messageId,
   }) async {
+    //check if user has already polled
     FirebaseFirestore.instance
-        // .collection(
-        //     'personal_connections')  //${getxController.authData}/messages')
-        .collection('personal_connections')
-        .doc('$teamId')
-        .collection('messages')
-        .doc(messageId)
-        .collection('pollOptions')
-        .doc(pollOptionId)
-        .collection('usersPolled')
-        .doc(userPollingId)
-        .set({'username': userNameofPoller, 'userId': userPollingId});
-
-    //add the user to polled list
-    FirebaseFirestore.instance
-        // .collection(
-        //     'personal_connections')  //${getxController.authData}/messages')
         .collection('personal_connections')
         .doc('$teamId')
         .collection('messages')
         .doc(messageId)
         .collection('usersPolled')
-        .doc(userPollingId)
-        .set({"userId": userPollingId});
+        .where('userId', isEqualTo: userPollingId)
+        .get()
+        .then((value) {
+      print("check length${value.docs.length}");
+      //if length is zero then the user has not polled yet then let him proceed otherwise don't
+      if (value.docs.length == 0) {
+        //add the user to polled list
+        FirebaseFirestore.instance
+            // .collection(
+            //     'personal_connections')  //${getxController.authData}/messages')
+            .collection('personal_connections')
+            .doc('$teamId')
+            .collection('messages')
+            .doc(messageId)
+            .collection('usersPolled')
+            .doc(userPollingId)
+            .set({"userId": userPollingId});
+        // //poll in the specific option
+        FirebaseFirestore.instance
+            // .collection(
+            //     'personal_connections')  //${getxController.authData}/messages')
+            .collection('personal_connections')
+            .doc('$teamId')
+            .collection('messages')
+            .doc(messageId)
+            .collection('pollOptions')
+            .doc(pollOptionId)
+            .collection('usersPolled')
+            .doc(userPollingId)
+            .set({'username': userNameofPoller, 'userId': userPollingId});
+      } else {
+        print("Kitna poll karega");
+      }
+    });
   }
 
   Stream<QuerySnapshot> usersWhoPolled({String teamId, String messageId}) {
@@ -116,5 +133,43 @@ class PollController extends GetxController {
         .doc(messageId)
         .collection('usersPolled')
         .snapshots();
+  }
+
+  Stream<QuerySnapshot> usersWhoPolledOnSpecificOption(
+      {String teamId, String messageId, String pollId}) {
+    return FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc('$teamId')
+        .collection('messages')
+        .doc(messageId)
+        .collection('pollOptions')
+        .doc(pollId)
+        .collection('userPolled')
+        .snapshots();
+  }
+
+  void revertPollOptions(
+      {String teamId, String messageId, String pollId, String userId}) {
+    //remove that user from that specific option
+    FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc('$teamId')
+        .collection('messages')
+        .doc(messageId)
+        .collection('pollOptions')
+        .doc(pollId)
+        .collection('usersPolled')
+        .doc(userId)
+        .delete();
+
+    //remove from the complete list of userPolled
+    FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc('$teamId')
+        .collection('messages')
+        .doc(messageId)
+        .collection('usersPolled')
+        .doc(userId)
+        .delete();
   }
 }
