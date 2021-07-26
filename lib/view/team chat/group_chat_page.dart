@@ -266,24 +266,31 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
-  onUnPin(String messageId) {
+  onUnPin(String messageId) async {
+    var pin = await FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(widget.teamModel.teamId)
+        .collection('pinMessages')
+        .get();
+
+    pinMessages = pin.docs.length;
     setState(() {
       pinMessages = pinMessages - 1;
     });
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('personal_connections')
         .doc(widget.teamModel.teamId)
         .update({'pinMessages': pinMessages});
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('personal_connections')
         .doc(widget.teamModel.teamId)
         .collection('messages')
         .doc(messageId)
         .update({'isPinMessage': false});
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('personal_connections')
         .doc(widget.teamModel.teamId)
         .collection('pinMessages')
@@ -291,24 +298,31 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         .delete();
   }
 
-  onPin(String messageId) {
+  onPin(String messageId) async {
+    var pin = await FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(widget.teamModel.teamId)
+        .collection('pinMessages')
+        .get();
+
+    pinMessages = pin.docs.length;
     setState(() {
       pinMessages = pinMessages + 1;
     });
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('personal_connections')
         .doc(widget.teamModel.teamId)
         .update({'pinMessages': pinMessages});
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('personal_connections')
         .doc(widget.teamModel.teamId)
         .collection('messages')
         .doc(messageId)
         .update({'isPinMessage': true});
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('personal_connections')
         .doc(widget.teamModel.teamId)
         .collection('pinMessages')
@@ -768,8 +782,26 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                           if (snapshot.data['pinMessages'] != 0) {
                             return Container(
                               height: 40,
-                              child: Text(
-                                  '${snapshot.data['pinMessages']} Pin Messages'),
+                              child: Row(
+                                children: <Widget>[
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Container(
+                                    child: Text(
+                                        '${snapshot.data['pinMessages']} Pin Messages'),
+                                  ),
+                                  Spacer(),
+                                  GestureDetector(
+                                    child: Container(
+                                      child: Icon(Icons.next_plan),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                ],
+                              ), //('${snapshot.data['pinMessages']} Pin Messages'),
                             );
                           }
                           return Container(
