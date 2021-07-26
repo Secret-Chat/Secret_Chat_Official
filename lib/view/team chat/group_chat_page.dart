@@ -14,7 +14,11 @@ import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
+
+import 'package:secretchat/view/team%20chat/pinMessagesPage.dart';
+
 import 'package:secretchat/widgets/custom_button.dart';
+
 
 class GroupChatScreen extends StatefulWidget {
   // final String groupChatID;
@@ -299,7 +303,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         .delete();
   }
 
-  onPin(String messageId) async {
+  onPin(
+      String messageId, String message, doc, String sentBy, String type) async {
     var pin = await FirebaseFirestore.instance
         .collection('personal_connections')
         .doc(widget.teamModel.teamId)
@@ -328,7 +333,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         .doc(widget.teamModel.teamId)
         .collection('pinMessages')
         .doc(messageId)
-        .set({'messageId': messageId});
+        .set({
+      'messageId': messageId,
+      'createdOn': doc,
+      'sentBy': sentBy,
+      'message': message,
+      'type': type,
+    });
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -421,7 +432,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                     child: Text('Pin'),
                                                   ),
                                                   onTap: () async {
-                                                    await onPin(messageId);
+                                                    await onPin(
+                                                        messageId,
+                                                        message,
+                                                        doc,
+                                                        sentBy,
+                                                        messageType);
                                                     Navigator.of(context).pop();
                                                   },
                                                 ),
@@ -812,6 +828,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                           if (snapshot.data['pinMessages'] != 0) {
                             return Container(
                               height: 40,
+                              color: Colors.white,
                               child: Row(
                                 children: <Widget>[
                                   SizedBox(
@@ -824,8 +841,34 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                   Spacer(),
                                   GestureDetector(
                                     child: Container(
-                                      child: Icon(Icons.next_plan),
+                                      child: Center(
+                                        child: Stack(
+                                          children: <Widget>[
+                                            Container(
+                                                padding:
+                                                    EdgeInsets.only(left: 7),
+                                                child: Icon(Icons.menu)),
+                                            Transform.rotate(
+                                              angle: -200.6,
+                                              child: Container(
+                                                color: Colors.white,
+                                                child: Icon(
+                                                  Icons.push_pin,
+                                                  size: 18,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
+                                    onTap: () {
+                                      Get.to(PinMessagesPage(
+                                        teamModel: widget.teamModel,
+                                        pinMessages:
+                                            snapshot.data['pinMessages'],
+                                      ));
+                                    },
                                   ),
                                   SizedBox(
                                     width: 10,
