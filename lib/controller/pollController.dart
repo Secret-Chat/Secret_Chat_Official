@@ -117,4 +117,25 @@ class PollController extends GetxController {
         .collection('usersPolled')
         .snapshots();
   }
+
+  Stream<QuerySnapshot> usersWhoPolledOnSpecificOption(
+      {String teamId, String messageId, String pollId}) {
+    return FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc('$teamId')
+        .collection('messages')
+        .doc(messageId)
+        .collection('pollOptions')
+        .doc(pollId)
+        .collection('userPolled')
+        .snapshots();
+  }
+
+  void revertPollOptions(
+    String teamId,String messageId,String pollId
+  ){
+    
+
+  }
+  
 }

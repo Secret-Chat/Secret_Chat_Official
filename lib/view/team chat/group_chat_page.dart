@@ -14,6 +14,7 @@ import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
+import 'package:secretchat/widgets/custom_button.dart';
 
 class GroupChatScreen extends StatefulWidget {
   // final String groupChatID;
@@ -615,9 +616,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      RaisedButton(
-                        onPressed: () {
-                          //add more options
+                      CustomButton(
+                        content: 'Add Option',
+                        buttonColor: Colors.blue,
+                        contentSize: 15,
+                        cornerRadius: 10,
+                        height: 30,
+                        textColor: Colors.white,
+                        function: () {
                           pollController.pollOptions.add(PollOption(
                               pollIndex:
                                   pollController.pollIndexCounter.value));
@@ -625,29 +631,53 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                           print(
                               'Counter ${pollController.pollIndexCounter.value}');
                         },
-                        child: Text("Add Option"),
                       ),
-                      Container(
-                        child: GestureDetector(
-                          child: Text('Create Poll'),
-                          onTap: () {
-                            print('iam pressed');
-                            if (_pollQuestionController.text.isNotEmpty &&
-                                !pollController.isThePoleEmpty) {
-                              pollController.sendAllOptionsToFirebase(
-                                teamId: widget.teamModel.teamId,
-                                sentBy: getxController.user.value.userId,
-                                messageText: "Poll",
-                                questionText: _pollQuestionController.text,
-                              );
-                              // getxController.printer();
-                            }
-                            _pollQuestionController.text = '';
+                      SizedBox(height: 10),
+                      CustomButton(
+                        content: 'Create Poll',
+                        buttonColor: Colors.redAccent,
+                        contentSize: 15,
+                        cornerRadius: 10,
+                        height: 30,
+                        textColor: Colors.white,
+                        function: () {
+                          if (_pollQuestionController.text.isNotEmpty &&
+                              !pollController.isThePoleEmpty) {
+                            pollController.sendAllOptionsToFirebase(
+                              teamId: widget.teamModel.teamId,
+                              sentBy: getxController.user.value.userId,
+                              messageText: "Poll",
+                              questionText: _pollQuestionController.text,
+                            );
+                            // getxController.printer();
+                          }
+                          _pollQuestionController.text = '';
 
-                            Navigator.of(context).pop();
-                          },
-                        ),
+                          Navigator.of(context).pop();
+                        },
                       ),
+
+                      // Container(
+                      //   child: GestureDetector(
+                      //     child: Text('Create Poll'),
+                      //     onTap: () {
+                      //       print('iam pressed');
+                      //       if (_pollQuestionController.text.isNotEmpty &&
+                      //           !pollController.isThePoleEmpty) {
+                      //         pollController.sendAllOptionsToFirebase(
+                      //           teamId: widget.teamModel.teamId,
+                      //           sentBy: getxController.user.value.userId,
+                      //           messageText: "Poll",
+                      //           questionText: _pollQuestionController.text,
+                      //         );
+                      //         // getxController.printer();
+                      //       }
+                      //       _pollQuestionController.text = '';
+
+                      //       Navigator.of(context).pop();
+                      //     },
+                      //   ),
+                      // ),
                     ],
                   ),
                 ],
@@ -1290,43 +1320,93 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                         return Container(
                                                           height: 50,
                                                           child: Card(
-                                                            child: ListTile(
-                                                              title: Text(
-                                                                  '${optionSnapshot.data.docs[optionIndex]['pollText']}'),
-                                                              subtitle: Text(
-                                                                '',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        10),
-                                                              ),
-                                                              onTap: () {
-                                                                //send the poll of that specific user
-                                                                pollController.sendPollAnswer(
-                                                                    messageId: snapshot
-                                                                        .data
-                                                                        .docs[
-                                                                            index]
-                                                                        .id,
-                                                                    pollOptionId:
-                                                                        optionSnapshot
+                                                            child: Stack(
+                                                              children: [
+                                                                StreamBuilder(
+                                                                  stream: pollController.usersWhoPolled(
+                                                                      teamId: widget
+                                                                          .teamModel
+                                                                          .teamId,
+                                                                      messageId: snapshot
+                                                                          .data
+                                                                          .docs[
+                                                                              index]
+                                                                          .id),
+                                                                  builder: (ctx,
+                                                                      allUsersPolledSnapShot) {
+                                                                    if (allUsersPolledSnapShot
+                                                                        .hasData) {
+                                                                      return StreamBuilder<
+                                                                          QuerySnapshot>(
+                                                                        stream: FirebaseFirestore
+                                                                            .instance
+                                                                            .collection('personal_connections')
+                                                                            .doc('${widget.teamModel.teamId}')
+                                                                            .collection('messages')
+                                                                            .doc(snapshot.data.docs[index].id)
+                                                                            .collection('pollOptions')
+                                                                            .doc(optionSnapshot.data.docs[optionIndex].id)
+                                                                            .collection('usersPolled')
+                                                                            .snapshots(),
+                                                                        builder:
+                                                                            (context,
+                                                                                specificPollSnapshot) {
+                                                                          print(
+                                                                              'OptionsSnap ${optionSnapshot.data.docs[optionIndex].id}');
+                                                                          if (specificPollSnapshot
+                                                                              .hasData) {
+                                                                            print("pollCount: ${specificPollSnapshot.data.docs.length}");
+                                                                            return FractionallySizedBox(
+                                                                              widthFactor: specificPollSnapshot.data.docs.length / allUsersPolledSnapShot.data.docs.length,
+                                                                              child: Container(
+                                                                                color: Colors.greenAccent,
+                                                                              ),
+                                                                            );
+                                                                          }
+                                                                          return Container();
+                                                                        },
+                                                                      );
+                                                                    }
+                                                                    return Container();
+                                                                  },
+                                                                ),
+                                                                ListTile(
+                                                                  title: Text(
+                                                                      '${optionSnapshot.data.docs[optionIndex]['pollText']}'),
+                                                                  subtitle:
+                                                                      Text(
+                                                                    '',
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            10),
+                                                                  ),
+                                                                  onTap: () {
+                                                                    //send the poll of that specific user
+                                                                    pollController.sendPollAnswer(
+                                                                        messageId: snapshot
+                                                                            .data
+                                                                            .docs[
+                                                                                index]
+                                                                            .id,
+                                                                        pollOptionId: optionSnapshot
                                                                             .data
                                                                             .docs[
                                                                                 optionIndex]
                                                                             .id,
-                                                                    teamId: widget
-                                                                        .teamModel
-                                                                        .teamId,
-                                                                    userNameofPoller:
-                                                                        getxController
+                                                                        teamId: widget
+                                                                            .teamModel
+                                                                            .teamId,
+                                                                        userNameofPoller: getxController
                                                                             .user
                                                                             .value
                                                                             .userName,
-                                                                    userPollingId:
-                                                                        getxController
+                                                                        userPollingId: getxController
                                                                             .user
                                                                             .value
                                                                             .userId);
-                                                              },
+                                                                  },
+                                                                ),
+                                                              ],
                                                             ),
                                                           ),
                                                         );
