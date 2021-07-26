@@ -669,25 +669,60 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         snapshot.data.docs[index].id;
                                     print('plsplsplsplslsplspsplsplsps');
                                     var link;
-                                    FirebaseFirestore.instance
-                                        .collection('personal_connections')
-                                        .doc(widget.teamModel.teamId)
-                                        .collection('messages')
-                                        .doc(messageId)
-                                        .collection('notShowFor')
-                                        .where('userId',
-                                            isEqualTo: getxController
-                                                .user.value.userId)
-                                        .snapshots()
-                                        .first
-                                        .then((value) => {
-                                              print(value.docs.isNotEmpty),
-                                              if (value.docs.isNotEmpty)
-                                                {isDeletedMessage = true}
-                                              else
-                                                {isDeletedMessage = false}
-                                            });
+                                    return StreamBuilder<QuerySnapshot>(
+                                      stream: FirebaseFirestore.instance
+                                          .collection('personal_connections')
+                                          .doc(widget.teamModel.teamId)
+                                          .collection('messages')
+                                          .doc(messageId)
+                                          .collection('notShowFor')
+                                          .where('userId',
+                                              isEqualTo: getxController
+                                                  .user.value.userId)
+                                          .snapshots(),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<QuerySnapshot>
+                                              snapshot) {
+                                        if (snapshot.hasError) {
+                                          print('heye say something');
+                                          // setState(() {
 
+                                          // });
+                                          isDeletedMessage = false;
+                                        }
+                                        if (snapshot.hasData) {
+                                          print('pls ols say something');
+                                          // setState(() {
+
+                                          // });
+                                          isDeletedMessage = true;
+                                        }
+                                        print('hcomeme  ckme ek ej');
+                                        return Container();
+                                      },
+                                    );
+                                    ////////////////////////////////////////////////////////////////////////////
+                                    // FirebaseFirestore.instance
+                                    //     .collection('personal_connections')
+                                    //     .doc(widget.teamModel.teamId)
+                                    //     .collection('messages')
+                                    //     .doc(messageId)
+                                    //     .collection('notShowFor')
+                                    //     .where('userId',
+                                    //         isEqualTo: getxController
+                                    //             .user.value.userId)
+                                    //     .snapshots()
+                                    //     .first
+                                    //     .then((value) => {
+                                    //           print(value.docs.isNotEmpty),
+                                    //           if (value.docs.isNotEmpty)
+                                    //             {isDeletedMessage = true}
+                                    //           else
+                                    //             {isDeletedMessage = false}
+                                    //         });
+                                    ////////////////////////////////////////////////////////////////////////////////
+                                    print('isitreacheing here');
+                                    print(isDeletedMessage);
                                     if (isDeletedMessage == true) {
                                       return Container();
                                     }
