@@ -1351,13 +1351,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                                         builder:
                                                                             (context,
                                                                                 specificPollSnapshot) {
-                                                                          print(
-                                                                              'OptionsSnap ${optionSnapshot.data.docs[optionIndex].id}');
                                                                           if (specificPollSnapshot
                                                                               .hasData) {
-                                                                            print("pollCount: ${specificPollSnapshot.data.docs.length}");
                                                                             return FractionallySizedBox(
-                                                                              widthFactor: specificPollSnapshot.data.docs.length / allUsersPolledSnapShot.data.docs.length,
+                                                                              widthFactor: allUsersPolledSnapShot.data.docs.length == 0 ? 0 : specificPollSnapshot.data.docs.length / allUsersPolledSnapShot.data.docs.length,
                                                                               child: Container(
                                                                                 color: Colors.greenAccent,
                                                                               ),
@@ -1380,6 +1377,19 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                                         fontSize:
                                                                             10),
                                                                   ),
+                                                                  trailing:
+                                                                      IconButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            //remove the poll for that user
+                                                                            pollController.revertPollOptions(
+                                                                                messageId: snapshot.data.docs[index].id,
+                                                                                teamId: widget.teamModel.teamId,
+                                                                                pollId: optionSnapshot.data.docs[optionIndex].id,
+                                                                                userId: getxController.user.value.userId);
+                                                                          },
+                                                                          icon:
+                                                                              Icon(Icons.clear)),
                                                                   onTap: () {
                                                                     //send the poll of that specific user
                                                                     pollController.sendPollAnswer(
@@ -1472,14 +1482,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         .toLowerCase()
                                         .contains(_textController.text
                                             .toString()
-                                            .toLowerCase())) {
-                                      print(
-                                          "matches: ${snapshot.data.docs[index]['username']}");
-                                    }
+                                            .toLowerCase())) {}
                                     return Container(
                                       child: GestureDetector(
                                         onTap: () {
-                                          print('kk');
                                           _textController.text +=
                                               "${snapshot.data.docs[index]['username']}";
                                           // print(
@@ -1494,10 +1500,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                               userId: snapshot
                                                   .data.docs[index].id));
 
-                                          taggedMembers.forEach((element) {
-                                            print("tagged");
-                                            print(element.toString());
-                                          });
+                                          taggedMembers.forEach((element) {});
                                           isTagMessage = true;
                                         },
                                         child: Text(
@@ -1577,10 +1580,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           },
                                         ).then(
                                           (value) {
-                                            print("docId: ${value.id}");
                                             if (isTagMessage) {
-                                              print(
-                                                  "sending taggedmembers to db");
                                               taggedMembers.forEach(
                                                 (element) {
                                                   FirebaseFirestore.instance
