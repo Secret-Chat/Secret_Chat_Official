@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/controller/pollController.dart';
+import 'package:secretchat/model/poll_model.dart';
 import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/model/user_in_group.dart';
+import 'package:secretchat/widgets/custom_button.dart';
 
 import '../main.dart';
 
@@ -403,7 +406,8 @@ class AlertDialogWidget {
                               // }
                             },
                           );
-                          Navigator.of(context).pop();
+                          Navigator.of(navigatorKey.currentContext).pop();
+                          //Navigator.of(context).pop();
                           _editingController.text = '';
                         }
                       },
@@ -487,5 +491,160 @@ class AlertDialogWidget {
         .collection('pinMessages')
         .doc(messageId)
         .delete();
+  }
+
+  pollingSheet({PollController pollController, TeamModel teamModel}) {
+    return showDialog(
+      context: navigatorKey.currentContext,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Poll"),
+          scrollable: true,
+          // context: context,
+          // isScrollControlled: true,
+          //title: "Poll",
+
+          content: Container(
+            // height: 500,
+            // width: double.infinity,
+            child: Obx(
+              () => Wrap(
+                children: [
+                  Column(
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    // mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      // Container(
+                      //   child: Center(
+                      //     child: Text('Polling'),
+                      //   ),
+                      // ),
+
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Polling Question'),
+                      ),
+                      //question widget display
+                      Container(
+                        child: TextField(
+                          decoration:
+                              InputDecoration(hintText: 'Ask a question'),
+                          onChanged: (value) {
+                            pollController.pollQuestion.value = value;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+
+                      Container(
+                        child: Text('Options'),
+                      ),
+                      //display options
+                      for (int i = 0;
+                          i < pollController.pollOptions.length;
+                          i++)
+                        Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  onChanged: (String pollText) {
+                                    // print("text: $pollText");
+                                    pollController.pollOptions[i].pollText =
+                                        pollText;
+                                    print(
+                                        "pText$i: ${pollController.pollOptions[i].pollText} ");
+                                  },
+                                  decoration:
+                                      InputDecoration(hintText: 'Option'),
+                                ),
+                              ),
+                              //clear the option
+                              IconButton(
+                                  onPressed: () {
+                                    //delete that option
+                                    if (i != 0) {
+                                      pollController.pollOptions.removeAt(i);
+                                      pollController.pollIndexCounter.value--;
+                                    }
+                                  },
+                                  icon: Icon(Icons.clear))
+                            ],
+                          ),
+                        ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      CustomButton(
+                        content: 'Add Option',
+                        buttonColor: Colors.blue,
+                        contentSize: 15,
+                        cornerRadius: 10,
+                        height: 30,
+                        textColor: Colors.white,
+                        function: () {
+                          pollController.pollOptions.add(PollOption(
+                              pollIndex:
+                                  pollController.pollIndexCounter.value));
+                          pollController.pollIndexCounter.value++;
+                          print(
+                              'Counter ${pollController.pollIndexCounter.value}');
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      CustomButton(
+                        content: 'Create Poll',
+                        buttonColor: Colors.redAccent,
+                        contentSize: 15,
+                        cornerRadius: 10,
+                        height: 30,
+                        textColor: Colors.white,
+                        function: () {
+                          if (pollController.pollQuestion.value.isNotEmpty &&
+                              !pollController.isThePoleEmpty) {
+                            pollController.sendAllOptionsToFirebase(
+                              teamId: teamModel.teamId,
+                              sentBy: getxController.user.value.userId,
+                              messageText: "Poll",
+                            );
+                            // getxController.printer();
+                          }
+                          pollController.pollQuestion.value = '';
+
+                          Navigator.of(context).pop();
+                        },
+                      ),
+
+                      // Container(
+                      //   child: GestureDetector(
+                      //     child: Text('Create Poll'),
+                      //     onTap: () {
+                      //       print('iam pressed');
+                      //       if (_pollQuestionController.text.isNotEmpty &&
+                      //           !pollController.isThePoleEmpty) {
+                      //         pollController.sendAllOptionsToFirebase(
+                      //           teamId: widget.teamModel.teamId,
+                      //           sentBy: getxController.user.value.userId,
+                      //           messageText: "Poll",
+                      //           questionText: _pollQuestionController.text,
+                      //         );
+                      //         // getxController.printer();
+                      //       }
+                      //       _pollQuestionController.text = '';
+
+                      //       Navigator.of(context).pop();
+                      //     },
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
