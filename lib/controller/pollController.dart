@@ -52,6 +52,7 @@ class PollController extends GetxController {
         'type': 'pollMessage',
         'question': pollQuestion.value,
         'isDeleted': false
+        //'isImage': false,
       },
     ).then((value) {
       pollOptions.forEach((element) {

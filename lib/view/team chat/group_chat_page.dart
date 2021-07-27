@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,9 @@ import 'package:secretchat/view/team%20chat/pinMessagesPage.dart';
 
 import 'package:secretchat/widgets/custom_button.dart';
 import 'package:secretchat/widgets/gifWidget.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../main.dart';
 
 class GroupChatScreen extends StatefulWidget {
   // final String groupChatID;
@@ -50,6 +55,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   bool isDeletedMessage = false;
   var pinMessages = 0;
   bool isPinMessage = false;
+  File pickingImage;
 
   //dispose the controllers
   @override
@@ -95,6 +101,153 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ..showGif(text: _textController.text, teamModel: widget.teamModel);
       }
     });
+  }
+
+  void showImageSendDialog() {
+    showDialog(
+        context: navigatorKey.currentContext,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Image file'),
+            content: SingleChildScrollView(
+              child: Container(
+                //height: MediaQuery.of(context).size.height - 40,
+                //width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      height: 400,
+                      child: Center(
+                        child: Image.file(pickingImage),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          child: GestureDetector(
+                            child: Container(
+                              color: Color.fromRGBO(123, 12, 34, 0.4),
+                              padding: EdgeInsets.all(10),
+                              child: Text('Cancel'),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                        Container(
+                          child: GestureDetector(
+                            child: Container(
+                              color: Color.fromRGBO(123, 12, 34, 0.4),
+                              padding: EdgeInsets.all(10),
+                              child: Text('Retake'),
+                            ),
+                            onTap: pickImage,
+                          ),
+                        ),
+                        Container(
+                          child: GestureDetector(
+                            child: Container(
+                              color: Color.fromRGBO(123, 12, 34, 0.4),
+                              padding: EdgeInsets.all(10),
+                              child: Text('send'),
+                            ),
+                            onTap: () async {
+                              final ref = FirebaseStorage.instance
+                                  .ref()
+                                  .child('personal_connections')
+                                  .child(widget.teamModel.teamId + '.jpg');
+
+                              await ref.putFile(pickingImage);
+
+                              final url = await ref.getDownloadURL();
+
+                              await FirebaseFirestore.instance
+                                  // .collection(
+                                  //     'personal_connections')  //${getxController.authData}/messages')
+                                  .collection('personal_connections')
+                                  .doc('${widget.teamModel.teamId}')
+                                  .collection('messages')
+                                  .add({
+                                'message': url,
+                                'sentBy': getxController.authData.value,
+                                'createdOn': FieldValue.serverTimestamp(),
+                                'type': 'imageMessage',
+                                'isTagMessage': false,
+                                'isDeleted': false,
+                              });
+
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  void pickImage() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 50,
+      maxWidth: 200,
+    );
+    final pickedImageFile = File(pickedImage.path);
+    setState(() {
+      pickingImage = pickedImageFile;
+    });
+    if (pickingImage != null) {
+      showImageSendDialog();
+    }
+  }
+
+  showLinkBottomSheet() {
+    return Get.bottomSheet(
+      Container(
+        height: 70,
+        color: Colors.white,
+        width: MediaQuery.of(context).size.width,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Container(
+              child: IconButton(
+                icon: Icon(Icons.bar_chart),
+                onPressed: () {
+                  AlertDialogWidget()
+                    ..pollingSheet(
+                        pollController: pollController,
+                        teamModel: widget.teamModel);
+                },
+              ),
+            ),
+            Container(
+              child: IconButton(
+                icon: Icon(Icons.camera),
+                onPressed: pickImage,
+              ),
+            ),
+            Container(
+              child: IconButton(
+                icon: Icon(Icons.picture_in_picture),
+                onPressed: () {},
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -534,6 +687,65 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       );
                                     }
 
+                                    if (snapshot.data.docs[index]['type'] ==
+                                        'imageMessage') {
+                                      var link = snapshot
+                                          .data.docs[index]['message']
+                                          .toString()
+                                          .trimRight();
+                                      print('${link}hi');
+                                      return GestureDetector(
+                                        child: Container(
+                                          height: 200,
+                                          width: 200,
+                                          child: Image.network(
+                                            '$link',
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent
+                                                        loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes
+                                                      : null,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          // AlertDialogWidget()
+                                          //   ..onTapOnMessage(
+                                          //       snapshot.data.docs[index].id,
+                                          //       snapshot.data.docs[index]
+                                          //           ['message'],
+                                          //       snapshot.data.docs[index]
+                                          //           ['sentBy'],
+                                          //       snapshot.data.docs[index]
+                                          //           ['createdOn'],
+                                          //       snapshot.data.docs[index]
+                                          //           ['type'],
+                                          //       snapshot.data.docs[index]
+                                          //           ['isPinMessage'],
+                                          //       widget.teamModel,
+                                          //       snapshot.data.docs[index]
+                                          //           ['isTagMessage'],
+                                          //       taggedMembers);
+                                        },
+                                      );
+                                    }
+
                                     // .doc(
                                     //     '${getxController.user.value.userId}')
                                     // .get()
@@ -742,6 +954,62 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         },
                                       );
                                     }
+                                  }
+
+                                  if (snapshot.data.docs[index]['type'] ==
+                                      'imageMessage') {
+                                    var link = snapshot
+                                        .data.docs[index]['message']
+                                        .toString()
+                                        .trimRight();
+                                    print('${link}hi');
+                                    return GestureDetector(
+                                      child: Container(
+                                        height: 200,
+                                        width: 200,
+                                        child: Image.network(
+                                          '$link',
+                                          loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes
+                                                    : null,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        // AlertDialogWidget()
+                                        //   ..onTapOnMessage(
+                                        //       snapshot.data.docs[index].id,
+                                        //       snapshot.data.docs[index]
+                                        //           ['message'],
+                                        //       snapshot.data.docs[index]
+                                        //           ['sentBy'],
+                                        //       snapshot.data.docs[index]
+                                        //           ['createdOn'],
+                                        //       snapshot.data.docs[index]
+                                        //           ['type'],
+                                        //       snapshot.data.docs[index]
+                                        //           ['isPinMessage'],
+                                        //       widget.teamModel,
+                                        //       snapshot.data.docs[index]
+                                        //           ['isTagMessage'],
+                                        //       taggedMembers);
+                                      },
+                                    );
                                   }
 
                                   if (snapshot.data.docs[index]['type'] ==
@@ -1008,11 +1276,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         if (snapshot.hasData) {
                           if (snapshot.data['status'] == "alive") {
                             return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Container(
                                   height: 200,
                                   width:
-                                      MediaQuery.of(context).size.width - 140,
+                                      MediaQuery.of(context).size.width - 130,
                                   child: TextField(
                                     decoration: InputDecoration(
                                         labelText: 'Enter Message'),
@@ -1050,7 +1320,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             'isTagMessage': isTagMessage,
                                             'isDeleted': false,
                                             'isPinMessage': false,
-                                            //'isGif': isGif,
+                                            //'isImage': false,
                                           },
                                         ).then(
                                           (value) {
@@ -1091,15 +1361,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                 ),
                                 Container(
                                   child: IconButton(
-                                    icon: Icon(Icons.bar_chart),
+                                    icon: Icon(Icons.attach_file),
                                     onPressed: () {
-                                      AlertDialogWidget()
-                                        ..pollingSheet(
-                                            pollController: pollController,
-                                            teamModel: widget.teamModel);
+                                      showLinkBottomSheet();
                                     },
                                   ),
-                                )
+                                ),
                               ],
                             );
                           } else {
