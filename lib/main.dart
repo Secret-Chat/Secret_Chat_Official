@@ -8,6 +8,8 @@ import 'package:secretchat/view/mainPage.dart';
 import 'controller/auth_controller.dart';
 import 'model/user.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -53,6 +55,7 @@ class MyApp extends StatelessWidget {
           return AuthPage();
         },
       ),
+      navigatorKey: navigatorKey,
     );
   }
 }

@@ -18,7 +18,7 @@ import 'package:secretchat/view/team%20chat/group_details.dart';
 import 'package:secretchat/view/team%20chat/pinMessagesPage.dart';
 
 import 'package:secretchat/widgets/custom_button.dart';
-
+import 'package:secretchat/widgets/gifWidget.dart';
 
 class GroupChatScreen extends StatefulWidget {
   // final String groupChatID;
@@ -30,11 +30,14 @@ class GroupChatScreen extends StatefulWidget {
   _GroupChatScreenState createState() => _GroupChatScreenState();
 }
 
+TextEditingController _editingController = TextEditingController();
+
 class _GroupChatScreenState extends State<GroupChatScreen> {
   final _textController = TextEditingController();
   final getxController = Get.put(AuthController());
   final _pollQuestionController = TextEditingController();
-  final _editingController = TextEditingController();
+
+  //final GifWidget gifWidget = GifWidget();
   // final _pollAnswerOne = TextEditingController();
   // final _pollAnswerTwo = TextEditingController();
   // final _pollAnswerThree = TextEditingController();
@@ -88,468 +91,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   void listenForGif() {
     _textController.addListener(() {
       if (_textController.text.contains('https://tse')) {
-        return showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Gif file'),
-                content: SingleChildScrollView(
-                  child: Container(
-                    //height: MediaQuery.of(context).size.height - 40,
-                    width: MediaQuery.of(context).size.width,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Container(
-                          height: 400,
-                          child: Center(
-                            child: Image.network(
-                              _textController.text.removeAllWhitespace,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes
-                                        : null,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        Container(
-                          child: GestureDetector(
-                            child: Container(
-                              color: Color.fromRGBO(123, 12, 34, 0.4),
-                              padding: EdgeInsets.all(10),
-                              child: Text('send'),
-                            ),
-                            onTap: () async {
-                              await FirebaseFirestore.instance
-                                  // .collection(
-                                  //     'personal_connections')  //${getxController.authData}/messages')
-                                  .collection('personal_connections')
-                                  .doc('${widget.teamModel.teamId}')
-                                  .collection('messages')
-                                  .add({
-                                'message': _textController.text,
-                                'sentBy': getxController.authData.value,
-                                'createdOn': FieldValue.serverTimestamp(),
-                                'type': 'gifMessage',
-                                'isTagMessage': isTagMessage,
-                                'isDeleted': false,
-                                //'isGif': isGif,
-                              }).then((value) => {_textController.text = ''});
-
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            });
+        AlertDialogWidget()
+          ..showGif(text: _textController.text, teamModel: widget.teamModel);
       }
-    });
-  }
-
-  editBottomSheet(String id, String message, doc) {
-    // showModalBottomSheet<void>(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    _editingController.text = message;
-    Get.bottomSheet(
-      Container(
-        //height: 200,
-        color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              child: Text('Edit message'),
-            ),
-            Container(
-              child: Text(message),
-            ),
-            Container(
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    //height: 200,
-                    width: MediaQuery.of(context).size.width - 140,
-                    child: TextField(
-                      decoration: InputDecoration(labelText: 'Enter Message'),
-                      controller: _editingController,
-                    ),
-                  ),
-                  // SizedBox(
-                  //   width: 5,
-                  // ),
-                  Container(
-                    child: IconButton(
-                      icon: Icon(Icons.send),
-                      onPressed: () {
-                        if (_editingController.text.isNotEmpty) {
-                          // if (_textController.text
-                          //     .contains('https://tse')) {
-                          //   setState(() {
-                          //     isGif = true;
-                          //   });
-                          // }
-                          FirebaseFirestore.instance
-                              // .collection(
-                              //     'personal_connections')  //${getxController.authData}/messages')
-                              .collection('personal_connections')
-                              .doc('${widget.teamModel.teamId}')
-                              .collection('messages')
-                              .doc(id)
-                              .update(
-                            {
-                              'message': _editingController.text,
-                              'sentBy': getxController.authData.value,
-                              //'createdOn': doc,
-                              'type': 'editedMessage',
-                              'isTagMessage': isTagMessage,
-
-                              //'isGif': isGif,
-                            },
-                          ).then(
-                            (value) {
-                              print("docId: $id");
-                              if (isTagMessage) {
-                                print("sending taggedmembers to db");
-                                taggedMembers.forEach(
-                                  (element) {
-                                    FirebaseFirestore.instance
-                                        // .collection(
-                                        //     'personal_connections')  //${getxController.authData}/messages')
-                                        .collection('personal_connections')
-                                        .doc('${widget.teamModel.teamId}')
-                                        .collection('messages')
-                                        .doc(id)
-                                        .collection('taggedMembers')
-                                        .doc(element.userId)
-                                        .set(element.toMap())
-                                        .then((value) {
-                                      isTagMessage = false;
-                                      taggedMembers.clear();
-                                    });
-                                  },
-                                );
-                              }
-                              // if (isGif) {
-                              //   setState(() {
-                              //     isGif = false;
-                              //   });
-                              // }
-                            },
-                          );
-                          Navigator.of(context).pop();
-                          _editingController.text = '';
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  onUnPin(String messageId) async {
-    var pin = await FirebaseFirestore.instance
-        .collection('personal_connections')
-        .doc(widget.teamModel.teamId)
-        .collection('pinMessages')
-        .get();
-
-    pinMessages = pin.docs.length;
-    setState(() {
-      pinMessages = pinMessages - 1;
-    });
-
-    await FirebaseFirestore.instance
-        .collection('personal_connections')
-        .doc(widget.teamModel.teamId)
-        .update({'pinMessages': pinMessages});
-
-    await FirebaseFirestore.instance
-        .collection('personal_connections')
-        .doc(widget.teamModel.teamId)
-        .collection('messages')
-        .doc(messageId)
-        .update({'isPinMessage': false});
-
-    await FirebaseFirestore.instance
-        .collection('personal_connections')
-        .doc(widget.teamModel.teamId)
-        .collection('pinMessages')
-        .doc(messageId)
-        .delete();
-  }
-
-  onPin(
-      String messageId, String message, doc, String sentBy, String type) async {
-    var pin = await FirebaseFirestore.instance
-        .collection('personal_connections')
-        .doc(widget.teamModel.teamId)
-        .collection('pinMessages')
-        .get();
-
-    pinMessages = pin.docs.length;
-    setState(() {
-      pinMessages = pinMessages + 1;
-    });
-
-    await FirebaseFirestore.instance
-        .collection('personal_connections')
-        .doc(widget.teamModel.teamId)
-        .update({'pinMessages': pinMessages});
-
-    await FirebaseFirestore.instance
-        .collection('personal_connections')
-        .doc(widget.teamModel.teamId)
-        .collection('messages')
-        .doc(messageId)
-        .update({'isPinMessage': true});
-
-    await FirebaseFirestore.instance
-        .collection('personal_connections')
-        .doc(widget.teamModel.teamId)
-        .collection('pinMessages')
-        .doc(messageId)
-        .set({
-      'messageId': messageId,
-      'createdOn': doc,
-      'sentBy': sentBy,
-      'message': message,
-      'type': type,
     });
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
   ///seeing if the user tapped on any message basics for editing and deleting
-  onTapOnMessage(
-    String messageId,
-    String message,
-    String sentBy,
-    doc,
-    String messageType,
-    bool isPinMessage,
-  ) {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Colors.black87,
-            content: Container(
-              width: MediaQuery.of(context).size.width - 200,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  messageType == 'gifMessage' ||
-                          sentBy != getxController.user.value.userId
-                      ? Container()
-                      : Container(
-                          padding: EdgeInsets.all(10),
-                          child: ListTile(
-                            title: Text(
-                              'Edit',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              editBottomSheet(messageId, message, doc);
-                            },
-                          ),
-                        ),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: ListTile(
-                      title: isPinMessage == false
-                          ? Text(
-                              'Pin',
-                              style: TextStyle(color: Colors.white70),
-                            )
-                          : Text(
-                              'UnPin',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        isPinMessage == true
-                            ? onUnPin(messageId)
-                            : showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                      title: Text('Pin Message'),
-                                      content: Container(
-                                          child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Container(
-                                            child: Text(
-                                                'Do you want to pin this message in the group?'),
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          Container(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: <Widget>[
-                                                Spacer(),
-                                                GestureDetector(
-                                                  child: Container(
-                                                    child: Text('Cancel'),
-                                                  ),
-                                                  onTap: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                                SizedBox(width: 20),
-                                                GestureDetector(
-                                                  child: Container(
-                                                    child: Text('Pin'),
-                                                  ),
-                                                  onTap: () async {
-                                                    await onPin(
-                                                        messageId,
-                                                        message,
-                                                        doc,
-                                                        sentBy,
-                                                        messageType);
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                                SizedBox(
-                                                  width: 20,
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      )));
-                                });
-                      },
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: ListTile(
-                      title: Text(
-                        'Delete',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      onTap: () {
-                        //if (sentBy == getxController.user.value.userId) {
-                        return showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Delete message'),
-                                content: Container(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Container(
-                                        child: Text(
-                                            'Are you sure you want to delete the message'),
-                                      ),
-                                      sentBy == getxController.user.value.userId
-                                          ? ListTile(
-                                              trailing:
-                                                  Text('Delete for everyone'),
-                                              onTap: () {
-                                                FirebaseFirestore.instance
-                                                    .collection(
-                                                        'personal_connections')
-                                                    .doc(
-                                                        '${widget.teamModel.teamId}')
-                                                    .collection('messages')
-                                                    .doc('$messageId')
-                                                    .delete();
-
-                                                Navigator.of(context).pop();
-                                                Navigator.of(context).pop();
-                                              },
-                                            )
-                                          : Container(),
-                                      ListTile(
-                                        trailing: Text('No'),
-                                        onTap: () {
-                                          Navigator.of(context).pop();
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      ListTile(
-                                        trailing: Text('Delete for me'),
-                                        onTap: () {
-                                          FirebaseFirestore.instance
-                                              .collection(
-                                                  'personal_connections')
-                                              .doc('${widget.teamModel.teamId}')
-                                              .collection('messages')
-                                              .doc('$messageId')
-                                              .update({'isDeleted': true});
-
-                                          FirebaseFirestore.instance
-                                              .collection(
-                                                  'personal_connections')
-                                              .doc('${widget.teamModel.teamId}')
-                                              .collection('messages')
-                                              .doc('$messageId')
-                                              .collection('notShowFor')
-                                              .doc(sentBy)
-                                              .set({'userId': sentBy});
-                                          //.add({'userId': sentBy});
-
-                                          Navigator.of(context).pop();
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            });
-                        // FirebaseFirestore.instance
-                        //     .collection('personal_connections')
-                        //     .doc('${widget.teamModel.teamId}')
-                        //     .collection('messages')
-                        //     .doc('$messageId')
-                        //     .delete();
-
-                        // Navigator.of(context).pop();
-                        //}
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
-  }
 
   pollingSheet() {
     return showDialog(
@@ -1013,17 +562,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           //     : Container(),
                                         ),
                                         onTap: () {
-                                          onTapOnMessage(
-                                            snapshot.data.docs[index].id,
-                                            snapshot.data.docs[index]
-                                                ['message'],
-                                            snapshot.data.docs[index]['sentBy'],
-                                            snapshot.data.docs[index]
-                                                ['createdOn'],
-                                            snapshot.data.docs[index]['type'],
-                                            snapshot.data.docs[index]
-                                                ['isPinMessage'],
-                                          );
+                                          AlertDialogWidget()
+                                            ..onTapOnMessage(
+                                              snapshot.data.docs[index].id,
+                                              snapshot.data.docs[index]
+                                                  ['message'],
+                                              snapshot.data.docs[index]
+                                                  ['sentBy'],
+                                              snapshot.data.docs[index]
+                                                  ['createdOn'],
+                                              snapshot.data.docs[index]['type'],
+                                              snapshot.data.docs[index]
+                                                  ['isPinMessage'],
+                                              widget.teamModel,
+                                              snapshot.data.docs[index]
+                                                  ['isTagMessage'],
+                                              taggedMembers,
+                                            );
                                         },
                                       );
                                       //}
@@ -1050,17 +605,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           trailing: Text('Edited'),
                                         ),
                                         onTap: () {
-                                          onTapOnMessage(
-                                            snapshot.data.docs[index].id,
-                                            snapshot.data.docs[index]
-                                                ['message'],
-                                            snapshot.data.docs[index]['sentBy'],
-                                            snapshot.data.docs[index]
-                                                ['createdOn'],
-                                            snapshot.data.docs[index]['type'],
-                                            snapshot.data.docs[index]
-                                                ['isPinMessage'],
-                                          );
+                                          AlertDialogWidget()
+                                            ..onTapOnMessage(
+                                                snapshot.data.docs[index].id,
+                                                snapshot.data.docs[index]
+                                                    ['message'],
+                                                snapshot.data.docs[index]
+                                                    ['sentBy'],
+                                                snapshot.data.docs[index]
+                                                    ['createdOn'],
+                                                snapshot.data.docs[index]
+                                                    ['type'],
+                                                snapshot.data.docs[index]
+                                                    ['isPinMessage'],
+                                                widget.teamModel,
+                                                snapshot.data.docs[index]
+                                                    ['isTagMessage'],
+                                                taggedMembers);
                                         },
                                       );
                                       //}
@@ -1106,17 +667,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           ),
                                         ),
                                         onTap: () {
-                                          onTapOnMessage(
-                                            snapshot.data.docs[index].id,
-                                            snapshot.data.docs[index]
-                                                ['message'],
-                                            snapshot.data.docs[index]['sentBy'],
-                                            snapshot.data.docs[index]
-                                                ['createdOn'],
-                                            snapshot.data.docs[index]['type'],
-                                            snapshot.data.docs[index]
-                                                ['isPinMessage'],
-                                          );
+                                          AlertDialogWidget()
+                                            ..onTapOnMessage(
+                                                snapshot.data.docs[index].id,
+                                                snapshot.data.docs[index]
+                                                    ['message'],
+                                                snapshot.data.docs[index]
+                                                    ['sentBy'],
+                                                snapshot.data.docs[index]
+                                                    ['createdOn'],
+                                                snapshot.data.docs[index]
+                                                    ['type'],
+                                                snapshot.data.docs[index]
+                                                    ['isPinMessage'],
+                                                widget.teamModel,
+                                                snapshot.data.docs[index]
+                                                    ['isTagMessage'],
+                                                taggedMembers);
                                         },
                                       );
                                     }
@@ -1204,17 +771,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           //     : Container(),
                                         ),
                                         onTap: () {
-                                          onTapOnMessage(
-                                            snapshot.data.docs[index].id,
-                                            snapshot.data.docs[index]
-                                                ['message'],
-                                            snapshot.data.docs[index]['sentBy'],
-                                            snapshot.data.docs[index]
-                                                ['createdOn'],
-                                            snapshot.data.docs[index]['type'],
-                                            snapshot.data.docs[index]
-                                                ['isPinMessage'],
-                                          );
+                                          AlertDialogWidget()
+                                            ..onTapOnMessage(
+                                                snapshot.data.docs[index].id,
+                                                snapshot.data.docs[index]
+                                                    ['message'],
+                                                snapshot.data.docs[index]
+                                                    ['sentBy'],
+                                                snapshot.data.docs[index]
+                                                    ['createdOn'],
+                                                snapshot.data.docs[index]
+                                                    ['type'],
+                                                snapshot.data.docs[index]
+                                                    ['isPinMessage'],
+                                                widget.teamModel,
+                                                snapshot.data.docs[index]
+                                                    ['isTagMessage'],
+                                                taggedMembers);
                                         },
                                       );
                                     }
@@ -1240,17 +813,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           trailing: Text('Edited'),
                                         ),
                                         onTap: () {
-                                          onTapOnMessage(
-                                            snapshot.data.docs[index].id,
-                                            snapshot.data.docs[index]
-                                                ['message'],
-                                            snapshot.data.docs[index]['sentBy'],
-                                            snapshot.data.docs[index]
-                                                ['createdOn'],
-                                            snapshot.data.docs[index]['type'],
-                                            snapshot.data.docs[index]
-                                                ['isPinMessage'],
-                                          );
+                                          AlertDialogWidget()
+                                            ..onTapOnMessage(
+                                                snapshot.data.docs[index].id,
+                                                snapshot.data.docs[index]
+                                                    ['message'],
+                                                snapshot.data.docs[index]
+                                                    ['sentBy'],
+                                                snapshot.data.docs[index]
+                                                    ['createdOn'],
+                                                snapshot.data.docs[index]
+                                                    ['type'],
+                                                snapshot.data.docs[index]
+                                                    ['isPinMessage'],
+                                                widget.teamModel,
+                                                snapshot.data.docs[index]
+                                                    ['isTagMessage'],
+                                                taggedMembers);
                                         },
                                       );
                                       //}
@@ -1297,17 +876,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                           ),
                                         ),
                                         onTap: () {
-                                          onTapOnMessage(
-                                            snapshot.data.docs[index].id,
-                                            snapshot.data.docs[index]
-                                                ['message'],
-                                            snapshot.data.docs[index]['sentBy'],
-                                            snapshot.data.docs[index]
-                                                ['createdOn'],
-                                            snapshot.data.docs[index]['type'],
-                                            snapshot.data.docs[index]
-                                                ['isPinMessage'],
-                                          );
+                                          AlertDialogWidget()
+                                            ..onTapOnMessage(
+                                              snapshot.data.docs[index].id,
+                                              snapshot.data.docs[index]
+                                                  ['message'],
+                                              snapshot.data.docs[index]
+                                                  ['sentBy'],
+                                              snapshot.data.docs[index]
+                                                  ['createdOn'],
+                                              snapshot.data.docs[index]['type'],
+                                              snapshot.data.docs[index]
+                                                  ['isPinMessage'],
+                                              widget.teamModel,
+                                              snapshot.data.docs[index]
+                                                  ['isTagMessage'],
+                                              taggedMembers,
+                                            );
                                         },
                                       );
                                     }
