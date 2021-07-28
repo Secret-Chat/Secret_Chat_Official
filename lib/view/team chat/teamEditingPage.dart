@@ -103,6 +103,26 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                                   .doc('${widget.teamModel.teamId}')
                                   .update({'groupIcon': url});
 
+                              await FirebaseFirestore.instance
+                                  .collection('personal_connections')
+                                  .doc('${widget.teamModel.teamId}')
+                                  .collection('users')
+                                  //.where('status', isEqualTo: 'alive')
+                                  .get()
+                                  .then((QuerySnapshot value) async {
+                                value.docs.forEach((element) async {
+                                  print("doc snap: ${element.id}");
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(element.id)
+                                      .collection('connections')
+                                      .doc(widget.teamModel.teamId)
+                                      .update({
+                                    'groupIcon': url,
+                                  });
+                                });
+                              });
+
                               Navigator.of(context).pop();
                               Navigator.of(context).pop();
                             },
@@ -190,6 +210,26 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                                   .collection('personal_connections')
                                   .doc('${widget.teamModel.teamId}')
                                   .update({'groupIcon': url});
+
+                              await FirebaseFirestore.instance
+                                  .collection('personal_connections')
+                                  .doc('${widget.teamModel.teamId}')
+                                  .collection('users')
+                                  //.where('status', isEqualTo: 'alive')
+                                  .get()
+                                  .then((QuerySnapshot value) async {
+                                value.docs.forEach((element) async {
+                                  print("doc snap: ${element.id}");
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(element.id)
+                                      .collection('connections')
+                                      .doc(widget.teamModel.teamId)
+                                      .update({
+                                    'groupIcon': url,
+                                  });
+                                });
+                              });
 
                               Navigator.of(context).pop();
                               Navigator.of(context).pop();

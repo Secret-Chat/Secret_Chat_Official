@@ -181,12 +181,24 @@ class _MainPageState extends State<MainPage> {
                             return ListTile(
                               leading: ClipOval(
                                 child: Container(
-                                  child: (Text(snapshot.data.docs[index]
-                                              ['type'] ==
-                                          "personal"
-                                      ? '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}'
-                                      : '${snapshot.data.docs[index]["teamName"].toString().substring(0, 1)}')),
-                                ),
+                                    height: 50,
+                                    width: 50,
+                                    child: snapshot.data.docs[index]['type'] ==
+                                            "personal"
+                                        ? Text(
+                                            '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}')
+                                        : snapshot.data.docs[index]
+                                                    ["groupIcon"] !=
+                                                ''
+                                            ? Image.network(
+                                                snapshot.data.docs[index]
+                                                    ['groupIcon'],
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Text(snapshot
+                                                .data.docs[index]['teamName']
+                                                .toString()
+                                                .substring(0, 1))),
                               ),
                               title: Text(snapshot.data.docs[index]['type'] ==
                                       "personal"
@@ -214,13 +226,16 @@ class _MainPageState extends State<MainPage> {
                                   // print(snapshot.data.docs[index]);
                                   Get.to(GroupChatScreen(
                                     teamModel: TeamModel(
-                                        // createdBy: snapshot.data.docs[index]
-                                        //     ['createdBy'],
-                                        // createdOn: snapshot.data.docs[index]
-                                        //     ['createdOn'],
-                                        teamName: snapshot.data.docs[index]
-                                            ['teamName'],
-                                        teamId: snapshot.data.docs[index].id),
+                                      // createdBy: snapshot.data.docs[index]
+                                      //     ['createdBy'],
+                                      // createdOn: snapshot.data.docs[index]
+                                      //     ['createdOn'],
+                                      teamName: snapshot.data.docs[index]
+                                          ['teamName'],
+                                      teamId: snapshot.data.docs[index].id,
+                                      groupIcon: snapshot.data.docs[index]
+                                          ['groupIcon'],
+                                    ),
                                   ));
                                 }
                               },

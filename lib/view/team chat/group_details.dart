@@ -114,22 +114,33 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 groupname = snapshot.data['teamName'];
-                return SizedBox(
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: ClipOval(
-                          child: Container(
-                            color: Colors.grey,
+                return GestureDetector(
+                  child: SizedBox(
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: ClipOval(
+                            child: Container(
+                              color: Colors.grey,
+                              child: widget.teamModel.groupIcon != ''
+                                  ? Image.network(
+                                      widget.teamModel.groupIcon,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 10),
-                      Text("${snapshot.data['teamName']}"),
-                    ],
+                        SizedBox(width: 10),
+                        Text("${snapshot.data['teamName']}"),
+                      ],
+                    ),
                   ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
                 );
               }
               //TODO: loading spinners to implement later on

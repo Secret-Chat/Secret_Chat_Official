@@ -177,7 +177,8 @@ class _TeamNameState extends State<TeamName> {
                       .set({
                     'type': "team",
                     'teamName': _teamNameController.text,
-                    'teamId': result.id
+                    'teamId': result.id,
+                    'groupIcon': '',
                   });
                 });
 
@@ -190,7 +191,8 @@ class _TeamNameState extends State<TeamName> {
                     .set({
                   'type': "team",
                   'teamName': _teamNameController.text,
-                  'teamId': result.id
+                  'teamId': result.id,
+                  'groupIcon': '',
                 });
 
                 Get.offAll(MainPage());

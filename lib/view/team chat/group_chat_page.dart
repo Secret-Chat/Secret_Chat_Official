@@ -402,6 +402,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                           child: ClipOval(
                             child: Container(
                               color: Colors.grey,
+                              child: widget.teamModel.groupIcon != ''
+                                  ? Image.network(
+                                      widget.teamModel.groupIcon,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(),
                             ),
                           ),
                         ),

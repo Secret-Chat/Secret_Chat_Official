@@ -29,7 +29,34 @@ class _AdminLoungeDetailPageState extends State<AdminLoungeDetailPage> {
       width: size.width,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Admin Lounge Detail'),
+          title: Container(
+            child: GestureDetector(
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: ClipOval(
+                      child: Container(
+                        color: Colors.grey,
+                        child: widget.teamModel.groupIcon != ''
+                            ? Image.network(
+                                widget.teamModel.groupIcon,
+                                fit: BoxFit.cover,
+                              )
+                            : Container(),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Container(width: 212, child: Text('Admin Lounge Detail')),
+                ],
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
         ),
         body: Container(
           height: MediaQuery.of(context).size.height - 50,

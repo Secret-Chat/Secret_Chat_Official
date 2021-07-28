@@ -3,8 +3,14 @@ class TeamModel {
   final String teamName;
   final String createdOn;
   final String createdBy;
+  final String groupIcon;
 
-  TeamModel({this.teamId, this.teamName, this.createdOn, this.createdBy});
+  TeamModel(
+      {this.teamId,
+      this.teamName,
+      this.createdOn,
+      this.createdBy,
+      this.groupIcon});
 
   @override
   String toString() {
@@ -13,6 +19,7 @@ class TeamModel {
     teamName: $teamName
     createdOn: $createdOn
     createdBy: $createdBy
+    groupIcon: $groupIcon
     ''';
   }
 }
