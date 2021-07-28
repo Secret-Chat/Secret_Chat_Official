@@ -56,6 +56,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   var pinMessages = 0;
   bool isPinMessage = false;
   File pickingImage;
+  File pickingGallery;
 
   //dispose the controllers
   @override
@@ -126,6 +127,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       height: 10,
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Container(
                           child: GestureDetector(
@@ -196,6 +198,100 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         });
   }
 
+  void showGallerySendDialog() {
+    showDialog(
+        context: navigatorKey.currentContext,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Image file'),
+            content: SingleChildScrollView(
+              child: Container(
+                //height: MediaQuery.of(context).size.height - 40,
+                //width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      height: 400,
+                      child: Center(
+                        child: Image.file(pickingGallery),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          child: GestureDetector(
+                            child: Container(
+                              color: Color.fromRGBO(123, 12, 34, 0.4),
+                              padding: EdgeInsets.all(10),
+                              child: Text('Cancel'),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                        Container(
+                          child: GestureDetector(
+                            child: Container(
+                              color: Color.fromRGBO(123, 12, 34, 0.4),
+                              padding: EdgeInsets.all(10),
+                              child: Text('Retake'),
+                            ),
+                            onTap: pickGallery,
+                          ),
+                        ),
+                        Container(
+                          child: GestureDetector(
+                            child: Container(
+                              color: Color.fromRGBO(123, 12, 34, 0.4),
+                              padding: EdgeInsets.all(10),
+                              child: Text('send'),
+                            ),
+                            onTap: () async {
+                              final ref = FirebaseStorage.instance
+                                  .ref()
+                                  .child('personal_connections')
+                                  .child(widget.teamModel.teamId + '.jpg');
+
+                              await ref.putFile(pickingGallery);
+
+                              final url = await ref.getDownloadURL();
+
+                              await FirebaseFirestore.instance
+                                  // .collection(
+                                  //     'personal_connections')  //${getxController.authData}/messages')
+                                  .collection('personal_connections')
+                                  .doc('${widget.teamModel.teamId}')
+                                  .collection('messages')
+                                  .add({
+                                'message': url,
+                                'sentBy': getxController.authData.value,
+                                'createdOn': FieldValue.serverTimestamp(),
+                                'type': 'imageMessage',
+                                'isTagMessage': false,
+                                'isDeleted': false,
+                              });
+
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   void pickImage() async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(
@@ -210,6 +306,24 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     if (pickingImage != null) {
       showImageSendDialog();
     }
+    Navigator.of(context).pop();
+  }
+
+  void pickGallery() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+      maxWidth: 200,
+    );
+    final pickedImageFile = File(pickedImage.path);
+    setState(() {
+      pickingGallery = pickedImageFile;
+    });
+    if (pickingGallery != null) {
+      showGallerySendDialog();
+    }
+    Navigator.of(context).pop();
   }
 
   showLinkBottomSheet() {
@@ -241,7 +355,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             Container(
               child: IconButton(
                 icon: Icon(Icons.picture_in_picture),
-                onPressed: () {},
+                onPressed: pickGallery,
               ),
             ),
           ],
