@@ -930,17 +930,17 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       //     false) {
                                       return GestureDetector(
                                         child: ListTile(
-                                          leading: getxController
+                                          title: getxController
                                                       .authData.value !=
                                                   snapshot.data.docs[index]
                                                       ['sentBy']
                                               ? Text(
-                                                  "${snapshot.data.docs[index]['sentBy']}")
+                                                  "${snapshot.data.docs[index]['sentByName']}")
                                               : SizedBox(
                                                   height: 0,
                                                   width: 0,
                                                 ),
-                                          title: Text(
+                                          subtitle: Text(
                                               '${snapshot.data.docs[index]['message']}'),
                                           // trailing: snapshot.data.docs[index]
                                           //             ['isEdited'] ==
@@ -976,17 +976,17 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       //     false) {
                                       return GestureDetector(
                                         child: ListTile(
-                                          leading: getxController
+                                          title: getxController
                                                       .authData.value !=
                                                   snapshot.data.docs[index]
                                                       ['sentBy']
                                               ? Text(
-                                                  "${snapshot.data.docs[index]['sentBy']}")
+                                                  "${snapshot.data.docs[index]['sentByName']}")
                                               : SizedBox(
                                                   height: 0,
                                                   width: 0,
                                                 ),
-                                          title: Text(
+                                          subtitle: Text(
                                               '${snapshot.data.docs[index]['message']}'),
                                           trailing: Text('Edited'),
                                         ),
@@ -1440,6 +1440,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             'isTagMessage': isTagMessage,
                                             'isDeleted': false,
                                             'isPinMessage': false,
+                                            'sentByName': getxController
+                                                .user.value.userName,
                                             //'isImage': false,
                                           },
                                         ).then(
