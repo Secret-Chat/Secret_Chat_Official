@@ -58,14 +58,41 @@ class _AdminLoungeState extends State<AdminLounge> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          child: GestureDetector(
-            child: Container(width: 212, child: Text('Admin Lounge')),
-            onTap: () {
-              Get.to(AdminLoungeDetailPage(
-                teamModel: widget.teamModel,
-              ));
-            },
+        title: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Container(
+            child: GestureDetector(
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: ClipOval(
+                      child: Container(
+                        color: Colors.grey,
+                        child: widget.teamModel.groupIcon != ''
+                            ? Image.network(
+                                widget.teamModel.groupIcon,
+                                fit: BoxFit.cover,
+                              )
+                            : Container(),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Container(
+                      width: 190,
+                      child: Text(
+                        'Admin Lounge',
+                      )),
+                ],
+              ),
+              onTap: () {
+                Get.to(AdminLoungeDetailPage(
+                  teamModel: widget.teamModel,
+                ));
+              },
+            ),
           ),
         ),
         actions: [
