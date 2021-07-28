@@ -306,7 +306,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     if (pickingImage != null) {
       showImageSendDialog();
     }
-    Navigator.of(context).pop();
+    //Navigator.of(context).pop();
   }
 
   void pickGallery() async {
@@ -323,7 +323,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     if (pickingGallery != null) {
       showGallerySendDialog();
     }
-    Navigator.of(context).pop();
+    //Navigator.of(context).pop();
   }
 
   showLinkBottomSheet() {

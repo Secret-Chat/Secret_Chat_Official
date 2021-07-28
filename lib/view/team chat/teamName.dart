@@ -137,6 +137,7 @@ class _TeamNameState extends State<TeamName> {
                   'createdOn': FieldValue.serverTimestamp(),
                   'description': '',
                   'pinMessages': 0,
+                  'groupIcon': '',
                 });
 
                 //add the users in the users collection in the group
