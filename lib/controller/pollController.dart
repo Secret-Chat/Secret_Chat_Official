@@ -4,6 +4,7 @@ import 'package:secretchat/model/poll_model.dart';
 
 class PollController extends GetxController {
   var pollOptions = [].obs;
+  var pollQuestion = "".obs;
   Rx<int> pollIndexCounter = 1.obs;
 
   void printAllOptions() {
@@ -28,7 +29,6 @@ class PollController extends GetxController {
   Future<void> sendAllOptionsToFirebase(
       {String teamId,
       String sentBy,
-      String questionText,
       String messageText,
       String type,
       bool isDeleted}) async {
@@ -36,7 +36,7 @@ class PollController extends GetxController {
     CHeck data: 
     teamId: $teamId,
     sentBy: $sentBy,
-    questionText: $questionText,
+    questionText: $pollQuestion,
     messageText: $messageText''');
     FirebaseFirestore.instance
         // .collection(
@@ -50,8 +50,9 @@ class PollController extends GetxController {
         'sentBy': sentBy,
         'createdOn': FieldValue.serverTimestamp(),
         'type': 'pollMessage',
-        'question': questionText,
+        'question': pollQuestion.value,
         'isDeleted': false
+        //'isImage': false,
       },
     ).then((value) {
       pollOptions.forEach((element) {
