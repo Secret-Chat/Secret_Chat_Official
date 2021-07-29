@@ -53,7 +53,7 @@ dependencies:
   flutter_linkify: ^4.1.0
 
   # playing youtube video
-  youtube_player_flutter: ^8.0.0
+  youtube_player_flutter: ^7.0.0+7
 
   # copy stuff to the clipboard
   clipboard: ^0.1.2+8

@@ -24,7 +24,9 @@ import 'package:secretchat/view/webViewPage.dart';
 import 'package:secretchat/widgets/custom_button.dart';
 import 'package:secretchat/widgets/alertDialogWidget.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:secretchat/widgets/youtubeBottomSheet.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../main.dart';
 
@@ -44,6 +46,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   final _textController = TextEditingController();
   final getxController = Get.put(AuthController());
   final _pollQuestionController = TextEditingController();
+  String videoId;
+  YoutubePlayerController _controller;
 
   //final GifWidget gifWidget = GifWidget();
   // final _pollAnswerOne = TextEditingController();
@@ -66,13 +70,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+    _controller.dispose();
     _textController.dispose();
   }
 
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: 'J1gE9xvph-A',
+      flags: YoutubePlayerFlags(
+        mute: false,
+        autoPlay: true,
+        isLive: false,
+      ),
+    );
     listenForTaggingMembers();
     listenForGif();
   }
@@ -336,6 +350,84 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       showGallerySendDialog();
     }
     //Navigator.of(context).pop();
+  }
+
+  showYouBottomSheet(String linkurl) {
+    return Get.bottomSheet(
+      SingleChildScrollView(
+        child: Container(
+          height: 300,
+          color: Colors.white,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              Container(
+                height: 50,
+                color: Color.fromRGBO(20, 20, 20, 1),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    GestureDetector(
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    GestureDetector(
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        child: Text(
+                          'Open YouTube',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                      onTap: () async {
+                        await launch(linkurl);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: 250,
+                child: YoutubePlayer(
+                  controller: YoutubePlayerController(
+                    initialVideoId: '$videoId',
+                    flags: YoutubePlayerFlags(
+                      mute: false,
+                      autoPlay: true,
+                      isLive: false,
+                    ),
+                  ),
+                  showVideoProgressIndicator: true,
+                  progressIndicatorColor: Colors.white54,
+                  //videoProgressIndicatorColor: Colors.amber,
+                  progressColors: ProgressBarColors(
+                    playedColor: Colors.white,
+                    handleColor: Colors.white54,
+                  ),
+                  onReady: () {
+                    _controller.addListener(() {});
+                  },
+                  // onReady: () {
+                  //   _controller.addListener();
+                  // },
+                  // onReady () {
+                  //     _controller.addListener(listener);
+                  // },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   showLinkBottomSheet() {
@@ -975,6 +1067,24 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                   // if (await canLaunch(link.text)) {
                                                   // await launch(
                                                   //     "https://www.google.com/");
+                                                  if (link.url.contains(
+                                                      "www.youtube.com")) {
+                                                    setState(() {
+                                                      videoId = YoutubePlayer
+                                                          .convertUrlToId(
+                                                              "${link.url}");
+                                                      print(videoId);
+                                                    });
+
+                                                    return showYouBottomSheet(
+                                                        link.url);
+                                                    // return YoutubeBottomSheet()
+                                                    //   ..showYouBottomSheet(
+                                                    //       videoId,
+                                                    //       link.url,
+                                                    //       context,
+                                                    //       _controller);
+                                                  }
                                                   Get.to(WebViewPage(link.url));
 
                                                   // } else {

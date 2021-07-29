@@ -239,8 +239,7 @@ class _MainPageState extends State<MainPage> {
                                                 return Text(snapshots
                                                     .data.docs[0]['message']);
                                               },
-                                              itemCount:
-                                                  snapshots.data.docs.length,
+                                              itemCount: 1,
                                             );
                                           }
                                           return Container();
