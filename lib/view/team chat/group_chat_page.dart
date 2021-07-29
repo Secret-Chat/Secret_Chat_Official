@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/pollController.dart';
@@ -18,10 +19,12 @@ import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
 
 import 'package:secretchat/view/team%20chat/pinMessagesPage.dart';
+import 'package:secretchat/view/webViewPage.dart';
 
 import 'package:secretchat/widgets/custom_button.dart';
 import 'package:secretchat/widgets/gifWidget.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../main.dart';
 
@@ -940,8 +943,34 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                   height: 0,
                                                   width: 0,
                                                 ),
-                                          subtitle: Text(
-                                              '${snapshot.data.docs[index]['message']}'),
+                                          subtitle: Linkify(
+                                            onOpen: (link) async {
+                                              print(
+                                                  "Linkify link = ${link.url}");
+                                              var linkurl =
+                                                  "https://${link.url}";
+                                              print(link.url);
+                                              // if (await canLaunch(link.text)) {
+                                              // await launch(
+                                              //     "https://www.google.com/");
+                                              WebViewPage(link.url);
+                                              // } else {
+                                              //   print(link.text);
+                                              //   print('no problem');
+                                              // }
+                                            },
+                                            text:
+                                                "${snapshot.data.docs[index]['message']}",
+                                            style:
+                                                TextStyle(color: Colors.black),
+                                            linkStyle:
+                                                TextStyle(color: Colors.blue),
+                                            options:
+                                                LinkifyOptions(humanize: false),
+                                          ),
+
+                                          // Text(
+                                          //     '${snapshot.data.docs[index]['message']}'),
                                           // trailing: Text(
                                           //     '${snapshot.data.docs[index]['createdOn'].toString().substring(10, 20)}'),
                                         ),
