@@ -47,11 +47,14 @@ class _WebViewPageState extends State<WebViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(10, 10, 10, 1),
-        title: const Text('youtube'),
+        backgroundColor: Color.fromRGBO(20, 20, 20, 1),
+        title: Text(
+          '${widget.linkview}',
+          style: TextStyle(fontSize: 14),
+        ),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         actions: <Widget>[
-          NavigationControls(_controller.future),
+          //NavigationControls(_controller.future),
           SampleMenu(_controller.future),
         ],
       ),
@@ -61,7 +64,7 @@ class _WebViewPageState extends State<WebViewPage> {
         height: MediaQuery.of(context).size.height - 40,
         child: Builder(builder: (BuildContext context) {
           return WebView(
-            initialUrl: 'https://www.youtube.com/',
+            initialUrl: '${widget.linkview}',
             javascriptMode: JavascriptMode.unrestricted,
             onWebViewCreated: (WebViewController webViewController) {
               _controller.complete(webViewController);
@@ -90,8 +93,8 @@ class _WebViewPageState extends State<WebViewPage> {
           );
         }),
       ),
-      floatingActionButton: favoriteButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
+      // floatingActionButton: favoriteButton(),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
     );
   }
 
@@ -109,33 +112,33 @@ class _WebViewPageState extends State<WebViewPage> {
 //todo:
 // ignore: todo
 //TODO: flutter clipborad is where the magic happens
-  Widget favoriteButton() {
-    return FutureBuilder<WebViewController>(
-        future: _controller.future,
-        builder: (BuildContext context,
-            AsyncSnapshot<WebViewController> controller) {
-          if (controller.hasData) {
-            return FloatingActionButton(
-              backgroundColor: Color.fromRGBO(128, 128, 128, 1),
-              onPressed: () async {
-                final String url = (await controller.data.currentUrl());
-                // ignore: deprecated_member_use
+  // Widget favoriteButton() {
+  //   return FutureBuilder<WebViewController>(
+  //       future: _controller.future,
+  //       builder: (BuildContext context,
+  //           AsyncSnapshot<WebViewController> controller) {
+  //         if (controller.hasData) {
+  //           return FloatingActionButton(
+  //             backgroundColor: Color.fromRGBO(128, 128, 128, 1),
+  //             onPressed: () async {
+  //               final String url = (await controller.data.currentUrl());
+  //               // ignore: deprecated_member_use
 
-                print(url);
-                print("aljfehfiwehufiupewhfwehfoew");
-                FlutterClipboard.copy(url);
-                // ytStateController.checkLinkValidty(url); //check the link type
-                // roomLogicController.ytURL.value = url;
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(content: Text('Copied $url')),
-                );
-              },
-              child: const Icon(Icons.copy),
-            );
-          }
-          return Container();
-        });
-  }
+  //               print(url);
+  //               print("aljfehfiwehufiupewhfwehfoew");
+  //               FlutterClipboard.copy(url);
+  //               // ytStateController.checkLinkValidty(url); //check the link type
+  //               // roomLogicController.ytURL.value = url;
+  //               Scaffold.of(context).showSnackBar(
+  //                 SnackBar(content: Text('Copied $url')),
+  //               );
+  //             },
+  //             child: const Icon(Icons.copy),
+  //           );
+  //         }
+  //         return Container();
+  //       });
+  // }
 }
 
 enum MenuOptions {

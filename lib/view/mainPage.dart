@@ -8,6 +8,7 @@ import 'package:secretchat/model/contact.dart';
 import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/view/personal%20chat/ChatPagePersonal.dart';
 import 'package:secretchat/temp%20files/chatPage.dart';
+import 'package:secretchat/view/team%20chat/groupPage.dart';
 import 'package:secretchat/view/user%20views/noteSelf.dart';
 import 'package:secretchat/view/team%20chat/group_chat_page.dart';
 import 'package:secretchat/view/user%20views/searchPage.dart';
@@ -261,7 +262,7 @@ class _MainPageState extends State<MainPage> {
                                   ));
                                 else {
                                   // print(snapshot.data.docs[index]);
-                                  Get.to(GroupChatScreen(
+                                  Get.to(GroupPage(
                                     teamModel: TeamModel(
                                       // createdBy: snapshot.data.docs[index]
                                       //     ['createdBy'],

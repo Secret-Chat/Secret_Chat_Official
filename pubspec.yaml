@@ -52,6 +52,9 @@ dependencies:
   url_launcher: ^6.0.9
   flutter_linkify: ^4.1.0
 
+  # playing youtube video
+  youtube_player_flutter: ^8.0.0
+
   # copy stuff to the clipboard
   clipboard: ^0.1.2+8
 

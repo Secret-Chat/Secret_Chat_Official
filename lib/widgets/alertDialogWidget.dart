@@ -1,3 +1,4 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -73,11 +74,12 @@ class AlertDialogWidget {
                             'type': 'gifMessage',
                             'isTagMessage': false,
                             'isDeleted': false,
+                            'isPinMessage': false,
                             //'isGif': isGif,
                           }).then((value) => {text = ''});
 
                           Navigator.of(context).pop();
-                          Navigator.of(context).pop();
+                          //Navigator.of(context).pop();
                         },
                       ),
                     ),
@@ -110,6 +112,44 @@ class AlertDialogWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: ListTile(
+                      title: Text(
+                        'Copy',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      onTap: () async {
+                        await FlutterClipboard.copy(message);
+
+                        Navigator.of(context).pop();
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Color.fromRGBO(20, 20, 20, 1),
+                            content: Container(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.copy,
+                                    color: Colors.white,
+                                  ),
+                                  Container(
+                                    child: Text(
+                                      'The message has been copied',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   messageType == 'gifMessage' ||
                           sentBy != getxController.user.value.userId
                       ? Container()
@@ -134,81 +174,85 @@ class AlertDialogWidget {
                             },
                           ),
                         ),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: ListTile(
-                      title: isPinMessage == false
-                          ? Text(
-                              'Pin',
-                              style: TextStyle(color: Colors.white70),
-                            )
-                          : Text(
-                              'UnPin',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        isPinMessage == true
-                            ? onUnPin(messageId, teamModel)
-                            : showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                      title: Text('Pin Message'),
-                                      content: Container(
-                                          child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Container(
-                                            child: Text(
-                                                'Do you want to pin this message in the group?'),
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          Container(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                  messageType == 'gifMessage'
+                      ? Container()
+                      : Container(
+                          padding: EdgeInsets.all(10),
+                          child: ListTile(
+                            title: isPinMessage == false
+                                ? Text(
+                                    'Pin',
+                                    style: TextStyle(color: Colors.white70),
+                                  )
+                                : Text(
+                                    'UnPin',
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              isPinMessage == true
+                                  ? onUnPin(messageId, teamModel)
+                                  : showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                            title: Text('Pin Message'),
+                                            content: Container(
+                                                child: Column(
+                                              mainAxisSize: MainAxisSize.min,
                                               children: <Widget>[
-                                                Spacer(),
-                                                GestureDetector(
-                                                  child: Container(
-                                                    child: Text('Cancel'),
-                                                  ),
-                                                  onTap: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                                SizedBox(width: 20),
-                                                GestureDetector(
-                                                  child: Container(
-                                                    child: Text('Pin'),
-                                                  ),
-                                                  onTap: () async {
-                                                    await onPin(
-                                                        messageId,
-                                                        message,
-                                                        doc,
-                                                        sentBy,
-                                                        messageType,
-                                                        teamModel);
-                                                    Navigator.of(context).pop();
-                                                  },
+                                                Container(
+                                                  child: Text(
+                                                      'Do you want to pin this message in the group?'),
                                                 ),
                                                 SizedBox(
-                                                  width: 20,
+                                                  height: 20,
                                                 ),
+                                                Container(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: <Widget>[
+                                                      Spacer(),
+                                                      GestureDetector(
+                                                        child: Container(
+                                                          child: Text('Cancel'),
+                                                        ),
+                                                        onTap: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                      ),
+                                                      SizedBox(width: 20),
+                                                      GestureDetector(
+                                                        child: Container(
+                                                          child: Text('Pin'),
+                                                        ),
+                                                        onTap: () async {
+                                                          await onPin(
+                                                              messageId,
+                                                              message,
+                                                              doc,
+                                                              sentBy,
+                                                              messageType,
+                                                              teamModel);
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                      ),
+                                                      SizedBox(
+                                                        width: 20,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
                                               ],
-                                            ),
-                                          )
-                                        ],
-                                      )));
-                                });
-                      },
-                    ),
-                  ),
+                                            )));
+                                      });
+                            },
+                          ),
+                        ),
                   Container(
                     padding: EdgeInsets.all(10),
                     child: ListTile(
