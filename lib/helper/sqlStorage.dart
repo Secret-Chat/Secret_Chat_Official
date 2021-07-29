@@ -7,7 +7,7 @@ class SqlStore {
     return await sql.openDatabase(path.join(sqlPath, 'chats.db'),
         onCreate: (db, verion) {
       return db.execute(
-          'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT);');
+          'CREATE TABLE user_main_page(id TEXT PRIMARY KEY, title TEXT, text TEXT);');
     }, version: 1);
   }
 
