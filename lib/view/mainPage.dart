@@ -204,11 +204,44 @@ class _MainPageState extends State<MainPage> {
                                       "personal"
                                   ? '${snapshot.data.docs[index]["userName"]}'
                                   : '${snapshot.data.docs[index]['teamName']}'),
-                              subtitle: Text(snapshot.data.docs[index]
-                                          ['type'] ==
+                              subtitle: snapshot.data.docs[index]['type'] ==
                                       "personal"
-                                  ? '${snapshot.data.docs[index]["email"]}'
-                                  : ''),
+                                  ? Text(
+                                      '${snapshot.data.docs[index]["email"]}')
+                                  : Container(
+                                      height: 20,
+                                      child: StreamBuilder<QuerySnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('personal_connections')
+                                            .doc(snapshot.data.docs[index].id)
+                                            .collection('messages')
+                                            .orderBy('createdOn',
+                                                descending: true)
+                                            .snapshots(),
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot<QuerySnapshot>
+                                                snapshots) {
+                                          if (snapshots.hasError) {
+                                            return Text('Something went wrong');
+                                          }
+                                          if (snapshots.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Container();
+                                          }
+                                          if (snapshots.hasData) {
+                                            return ListView.builder(
+                                              itemBuilder: (context, index) {
+                                                return Text(snapshots
+                                                    .data.docs[0]['message']);
+                                              },
+                                              itemCount:
+                                                  snapshots.data.docs.length,
+                                            );
+                                          }
+                                          return Container();
+                                        },
+                                      ),
+                                    ),
                               onTap: () {
                                 //only go to personal if the type is personal
                                 if (snapshot.data.docs[index]['type'] ==

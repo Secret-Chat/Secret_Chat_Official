@@ -942,11 +942,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 ),
                                           subtitle: Text(
                                               '${snapshot.data.docs[index]['message']}'),
-                                          // trailing: snapshot.data.docs[index]
-                                          //             ['isEdited'] ==
-                                          //         true
-                                          //     ? Text('Edited')
-                                          //     : Container(),
+                                          // trailing: Text(
+                                          //     '${snapshot.data.docs[index]['createdOn'].toString().substring(10, 20)}'),
                                         ),
                                         onTap: () {
                                           AlertDialogWidget()
