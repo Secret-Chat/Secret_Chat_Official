@@ -1,15 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/chat_sync_controller.dart';
 import 'package:secretchat/model/contact.dart';
 import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/view/personal%20chat/ChatPagePersonal.dart';
 import 'package:secretchat/temp%20files/chatPage.dart';
+import 'package:secretchat/view/team%20chat/groupPage.dart';
 import 'package:secretchat/view/user%20views/noteSelf.dart';
 import 'package:secretchat/view/team%20chat/group_chat_page.dart';
 import 'package:secretchat/view/user%20views/searchPage.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'team chat/makeGroup.dart';
 import 'package:get/get.dart';
 import 'settingsPage.dart';
@@ -181,34 +184,68 @@ class _MainPageState extends State<MainPage> {
                             return ListTile(
                               leading: ClipOval(
                                 child: Container(
-                                    height: 50,
-                                    width: 50,
-                                    child: snapshot.data.docs[index]['type'] ==
-                                            "personal"
-                                        ? Text(
-                                            '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}')
-                                        : snapshot.data.docs[index]
-                                                    ["groupIcon"] !=
-                                                ''
-                                            ? Image.network(
-                                                snapshot.data.docs[index]
-                                                    ['groupIcon'],
-                                                fit: BoxFit.cover,
-                                              )
-                                            : Text(snapshot
-                                                .data.docs[index]['teamName']
-                                                .toString()
-                                                .substring(0, 1))),
+                                  height: 50,
+                                  width: 50,
+                                  child: snapshot.data.docs[index]['type'] ==
+                                          "personal"
+                                      ? Text(
+                                          '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}')
+                                      : snapshot.data.docs[index]
+                                                  ["groupIcon"] !=
+                                              ''
+                                          ? Image.network(
+                                              snapshot.data.docs[index]
+                                                  ['groupIcon'],
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Center(
+                                              child: Text(snapshot
+                                                  .data.docs[index]['teamName']
+                                                  .toString()
+                                                  .substring(0, 1))),
+                                ),
                               ),
                               title: Text(snapshot.data.docs[index]['type'] ==
                                       "personal"
                                   ? '${snapshot.data.docs[index]["userName"]}'
                                   : '${snapshot.data.docs[index]['teamName']}'),
-                              subtitle: Text(snapshot.data.docs[index]
-                                          ['type'] ==
+                              subtitle: snapshot.data.docs[index]['type'] ==
                                       "personal"
-                                  ? '${snapshot.data.docs[index]["email"]}'
-                                  : ''),
+                                  ? Text(
+                                      '${snapshot.data.docs[index]["email"]}')
+                                  : Container(
+                                      height: 20,
+                                      child: StreamBuilder<QuerySnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('personal_connections')
+                                            .doc(snapshot.data.docs[index].id)
+                                            .collection('messages')
+                                            .orderBy('createdOn',
+                                                descending: true)
+                                            .snapshots(),
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot<QuerySnapshot>
+                                                snapshots) {
+                                          if (snapshots.hasError) {
+                                            return Text('Something went wrong');
+                                          }
+                                          if (snapshots.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Container();
+                                          }
+                                          if (snapshots.hasData) {
+                                            return ListView.builder(
+                                              itemBuilder: (context, index) {
+                                                return Text(snapshots
+                                                    .data.docs[0]['message']);
+                                              },
+                                              itemCount: 1,
+                                            );
+                                          }
+                                          return Container();
+                                        },
+                                      ),
+                                    ),
                               onTap: () {
                                 //only go to personal if the type is personal
                                 if (snapshot.data.docs[index]['type'] ==
@@ -224,7 +261,7 @@ class _MainPageState extends State<MainPage> {
                                   ));
                                 else {
                                   // print(snapshot.data.docs[index]);
-                                  Get.to(GroupChatScreen(
+                                  Get.to(GroupPage(
                                     teamModel: TeamModel(
                                       // createdBy: snapshot.data.docs[index]
                                       //     ['createdBy'],
@@ -248,6 +285,35 @@ class _MainPageState extends State<MainPage> {
                       return Container();
                     }),
               ),
+              Container(
+                child: InkWell(
+                  child: Text('open google'),
+                  onTap: () => launch('https://www.google.com/'),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                child: Linkify(
+                  onOpen: (link) async {
+                    print("Linkify link = ${link.url}");
+                    var linkurl = "https://${link.url}";
+                    print(link.url);
+                    //if (await canLaunch(link.text)) {
+                    await launch(link.url);
+                    // } else {
+                    //   print(link.text);
+                    //   print('no problem');
+                    // }
+                  },
+                  text: "Linkify click -  https://www.google.com/",
+                  style: TextStyle(color: Colors.black),
+                  linkStyle: TextStyle(color: Colors.blue),
+                  options: LinkifyOptions(humanize: false),
+                ),
+              ),
+
               // Container(
               //   height: 200,
               //   width: 200,

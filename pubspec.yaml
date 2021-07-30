@@ -23,13 +23,40 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # firebase connection
   cloud_firestore: ^1.0.4
   firebase_auth: ^1.1.3
   firebase_core: ^1.1.0
-  shared_preferences: ^2.0.6
-  get: ^4.1.4
-  image_picker: ^0.8.1+4
+
+  # firebase storage for storing users images (<><>)
   firebase_storage: ^10.0.0
+
+  # getting inside mobiles data XD
+  shared_preferences: ^2.0.6
+  sqflite: ^2.0.0+3
+  path: ^1.8.0
+
+  # getting users images :}
+  image_picker: ^0.8.1+4
+
+  # state management :/
+  get: ^4.1.4
+  
+  # cheching if the user has network connection or not ?)
+  connectivity: ^3.0.6
+  data_connection_checker: ^0.3.4
+
+  # opening web browser in the app @)
+  webview_flutter: ^2.0.9
+  url_launcher: ^6.0.9
+  flutter_linkify: ^4.1.0
+
+  # playing youtube video
+  youtube_player_flutter: ^7.0.0+7
+
+  # copy stuff to the clipboard
+  clipboard: ^0.1.2+8
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

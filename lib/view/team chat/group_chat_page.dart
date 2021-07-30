@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/pollController.dart';
@@ -18,10 +19,14 @@ import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
 
 import 'package:secretchat/view/team%20chat/pinMessagesPage.dart';
+import 'package:secretchat/view/webViewPage.dart';
 
 import 'package:secretchat/widgets/custom_button.dart';
-import 'package:secretchat/widgets/gifWidget.dart';
+import 'package:secretchat/widgets/alertDialogWidget.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:secretchat/widgets/youtubeBottomSheet.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../main.dart';
 
@@ -29,7 +34,7 @@ class GroupChatScreen extends StatefulWidget {
   // final String groupChatID;
   final TeamModel teamModel;
 
-  const GroupChatScreen({this.teamModel});
+  GroupChatScreen({this.teamModel});
 
   @override
   _GroupChatScreenState createState() => _GroupChatScreenState();
@@ -41,6 +46,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   final _textController = TextEditingController();
   final getxController = Get.put(AuthController());
   final _pollQuestionController = TextEditingController();
+  String videoId;
+  YoutubePlayerController _controller;
 
   //final GifWidget gifWidget = GifWidget();
   // final _pollAnswerOne = TextEditingController();
@@ -63,13 +70,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+    _controller.dispose();
     _textController.dispose();
   }
 
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: 'J1gE9xvph-A',
+      flags: YoutubePlayerFlags(
+        mute: false,
+        autoPlay: true,
+        isLive: false,
+      ),
+    );
     listenForTaggingMembers();
     listenForGif();
   }
@@ -96,10 +113,19 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   //////////////////////////////////////////////////////////////////////////////////
   ///listening if it is gif or not jugad right now
   void listenForGif() {
-    _textController.addListener(() {
+    _textController.addListener(() async {
       if (_textController.text.contains('https://tse')) {
         AlertDialogWidget()
           ..showGif(text: _textController.text, teamModel: widget.teamModel);
+        _textController.text = '';
+        // FocusScopeNode currentFocus = FocusScope.of(context);
+
+        // if (!currentFocus.hasPrimaryFocus) {
+        //   currentFocus.unfocus();
+        // }
+        // if (currentFocus.hasPrimaryFocus) {
+        //   currentFocus.unfocus();
+        // }
       }
     });
   }
@@ -324,6 +350,84 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       showGallerySendDialog();
     }
     //Navigator.of(context).pop();
+  }
+
+  showYouBottomSheet(String linkurl) {
+    return Get.bottomSheet(
+      SingleChildScrollView(
+        child: Container(
+          height: 300,
+          color: Colors.white,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              Container(
+                height: 50,
+                color: Color.fromRGBO(20, 20, 20, 1),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    GestureDetector(
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    GestureDetector(
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        child: Text(
+                          'Open YouTube',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                      onTap: () async {
+                        await launch(linkurl);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: 250,
+                child: YoutubePlayer(
+                  controller: YoutubePlayerController(
+                    initialVideoId: '$videoId',
+                    flags: YoutubePlayerFlags(
+                      mute: false,
+                      autoPlay: true,
+                      isLive: false,
+                    ),
+                  ),
+                  showVideoProgressIndicator: true,
+                  progressIndicatorColor: Colors.white54,
+                  //videoProgressIndicatorColor: Colors.amber,
+                  progressColors: ProgressBarColors(
+                    playedColor: Colors.white,
+                    handleColor: Colors.white54,
+                  ),
+                  onReady: () {
+                    _controller.addListener(() {});
+                  },
+                  // onReady: () {
+                  //   _controller.addListener();
+                  // },
+                  // onReady () {
+                  //     _controller.addListener(listener);
+                  // },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   showLinkBottomSheet() {
@@ -554,695 +658,775 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       }),
                 ),
 
-                SingleChildScrollView(
-                  child: Container(
-                    height: MediaQuery.of(context).size.height - 188,
-                    color: Color.fromRGBO(23, 34, 24, 0.3),
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          // .collection('users/${getxController.authData.value}/mescsages')
-                          .collection('personal_connections')
-                          .doc('${widget.teamModel.teamId}')
-                          .collection('messages')
-                          .orderBy('createdOn', descending: true)
-                          .snapshots(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong');
-                        }
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Container();
-                          // Center(
-                          //   child: Container(
-                          //     child: CircularProgressIndicator(),
-                          //   ),
-                          // );
-                        }
-                        if (snapshot.hasData) {
-                          return Container(
-                            height: size.height - 200,
-                            child: ListView.builder(
-                                reverse: true,
-                                itemBuilder: (ctx, index) {
-                                  print(snapshot.data.docs[index].data());
-                                  if (snapshot.data.docs[index]['isDeleted'] ==
-                                      true) {
-                                    var messageId =
-                                        snapshot.data.docs[index].id;
-                                    print('plsplsplsplslsplspsplsplsps');
-                                    var link;
-                                    StreamBuilder<QuerySnapshot>(
-                                      stream: FirebaseFirestore.instance
-                                          .collection('personal_connections')
-                                          .doc(widget.teamModel.teamId)
-                                          .collection('messages')
-                                          .doc(messageId)
-                                          .collection('notShowFor')
-                                          .where('userId',
-                                              isEqualTo: getxController
-                                                  .user.value.userId)
-                                          .snapshots(),
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.hasData) {
-                                          print(
-                                              '${snapshot.data.docs.length} iod');
-                                          print('has data');
-                                          // setState(() {
+                Scrollbar(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      height: MediaQuery.of(context).size.height - 188,
+                      color: Color.fromRGBO(23, 34, 24, 0.3),
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            // .collection('users/${getxController.authData.value}/mescsages')
+                            .collection('personal_connections')
+                            .doc('${widget.teamModel.teamId}')
+                            .collection('messages')
+                            .orderBy('createdOn', descending: true)
+                            .snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Container();
+                            // Center(
+                            //   child: Container(
+                            //     child: CircularProgressIndicator(),
+                            //   ),
+                            // );
+                          }
+                          if (snapshot.hasData) {
+                            return Container(
+                              height: size.height - 200,
+                              child: Scrollbar(
+                                //isAlwaysShown: true,
+                                thickness: 5,
+                                radius: Radius.circular(5),
+                                //controller:
 
-                                          // });
-                                          if (snapshot.data.docs.length == 0) {
-                                            setState(() {
-                                              isDeletedMessage = false;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              isDeletedMessage = true;
-                                            });
-                                          }
+                                child: ListView.builder(
+                                    reverse: true,
+                                    itemBuilder: (ctx, index) {
+                                      print(snapshot.data.docs[index].data());
+                                      if (snapshot.data.docs[index]
+                                              ['isDeleted'] ==
+                                          true) {
+                                        var messageId =
+                                            snapshot.data.docs[index].id;
+                                        print('plsplsplsplslsplspsplsplsps');
+                                        var link;
+                                        StreamBuilder<QuerySnapshot>(
+                                          stream: FirebaseFirestore.instance
+                                              .collection(
+                                                  'personal_connections')
+                                              .doc(widget.teamModel.teamId)
+                                              .collection('messages')
+                                              .doc(messageId)
+                                              .collection('notShowFor')
+                                              .where('userId',
+                                                  isEqualTo: getxController
+                                                      .user.value.userId)
+                                              .snapshots(),
+                                          builder: (BuildContext context,
+                                              AsyncSnapshot<QuerySnapshot>
+                                                  snapshot) {
+                                            if (snapshot.hasData) {
+                                              print(
+                                                  '${snapshot.data.docs.length} iod');
+                                              print('has data');
+                                              // setState(() {
+
+                                              // });
+                                              if (snapshot.data.docs.length ==
+                                                  0) {
+                                                setState(() {
+                                                  isDeletedMessage = false;
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  isDeletedMessage = true;
+                                                });
+                                              }
+                                            }
+
+                                            return Container();
+                                          },
+                                        );
+                                        ////////////////////////////////////////////////////////////////////////////
+                                        // FirebaseFirestore.instance
+                                        //     .collection('personal_connections')
+                                        //     .doc(widget.teamModel.teamId)
+                                        //     .collection('messages')
+                                        //     .doc(messageId)
+                                        //     .collection('notShowFor')
+                                        //     .where('userId',
+                                        //         isEqualTo: getxController
+                                        //             .user.value.userId)
+                                        //     .snapshots()
+                                        //     .first
+                                        //     .then((value) => {
+                                        //           print(value.docs.isNotEmpty),
+                                        //           if (value.docs.isNotEmpty)
+                                        //             {isDeletedMessage = true}
+                                        //           else
+                                        //             {isDeletedMessage = false}
+                                        //         });
+                                        ////////////////////////////////////////////////////////////////////////////////
+                                        print('isitreacheing here');
+                                        print(isDeletedMessage);
+                                        if (isDeletedMessage == true) {
+                                          setState(() {
+                                            isDeletedMessage = false;
+                                          });
+                                          return Container();
+                                        }
+                                        if (snapshot.data.docs[index]['type'] ==
+                                            'textMessage') {
+                                          // if (snapshot.data.docs[index]['isGif'] ==
+                                          //     false) {
+                                          return GestureDetector(
+                                            child: ListTile(
+                                              leading: getxController
+                                                          .authData.value !=
+                                                      snapshot.data.docs[index]
+                                                          ['sentBy']
+                                                  ? Text(
+                                                      "${snapshot.data.docs[index]['sentBy']}")
+                                                  : SizedBox(
+                                                      height: 0,
+                                                      width: 0,
+                                                    ),
+                                              title: Text(
+                                                  '${snapshot.data.docs[index]['message']}'),
+                                              // trailing: snapshot.data.docs[index]
+                                              //             ['isEdited'] ==
+                                              //         true
+                                              //     ? Text('Edited')
+                                              //     : Container(),
+                                            ),
+                                            onTap: () {
+                                              AlertDialogWidget()
+                                                ..onTapOnMessage(
+                                                  snapshot.data.docs[index].id,
+                                                  snapshot.data.docs[index]
+                                                      ['message'],
+                                                  snapshot.data.docs[index]
+                                                      ['sentBy'],
+                                                  snapshot.data.docs[index]
+                                                      ['createdOn'],
+                                                  snapshot.data.docs[index]
+                                                      ['type'],
+                                                  snapshot.data.docs[index]
+                                                      ['isPinMessage'],
+                                                  widget.teamModel,
+                                                  snapshot.data.docs[index]
+                                                      ['isTagMessage'],
+                                                  taggedMembers,
+                                                );
+                                            },
+                                          );
+                                          //}
                                         }
 
-                                        return Container();
-                                      },
-                                    );
-                                    ////////////////////////////////////////////////////////////////////////////
-                                    // FirebaseFirestore.instance
-                                    //     .collection('personal_connections')
-                                    //     .doc(widget.teamModel.teamId)
-                                    //     .collection('messages')
-                                    //     .doc(messageId)
-                                    //     .collection('notShowFor')
-                                    //     .where('userId',
-                                    //         isEqualTo: getxController
-                                    //             .user.value.userId)
-                                    //     .snapshots()
-                                    //     .first
-                                    //     .then((value) => {
-                                    //           print(value.docs.isNotEmpty),
-                                    //           if (value.docs.isNotEmpty)
-                                    //             {isDeletedMessage = true}
-                                    //           else
-                                    //             {isDeletedMessage = false}
-                                    //         });
-                                    ////////////////////////////////////////////////////////////////////////////////
-                                    print('isitreacheing here');
-                                    print(isDeletedMessage);
-                                    if (isDeletedMessage == true) {
-                                      setState(() {
-                                        isDeletedMessage = false;
-                                      });
-                                      return Container();
-                                    }
-                                    if (snapshot.data.docs[index]['type'] ==
-                                        'textMessage') {
-                                      // if (snapshot.data.docs[index]['isGif'] ==
-                                      //     false) {
-                                      return GestureDetector(
-                                        child: ListTile(
-                                          leading: getxController
-                                                      .authData.value !=
-                                                  snapshot.data.docs[index]
-                                                      ['sentBy']
-                                              ? Text(
-                                                  "${snapshot.data.docs[index]['sentBy']}")
-                                              : SizedBox(
-                                                  height: 0,
-                                                  width: 0,
-                                                ),
-                                          title: Text(
-                                              '${snapshot.data.docs[index]['message']}'),
-                                          // trailing: snapshot.data.docs[index]
-                                          //             ['isEdited'] ==
-                                          //         true
-                                          //     ? Text('Edited')
-                                          //     : Container(),
-                                        ),
-                                        onTap: () {
-                                          AlertDialogWidget()
-                                            ..onTapOnMessage(
-                                              snapshot.data.docs[index].id,
-                                              snapshot.data.docs[index]
-                                                  ['message'],
-                                              snapshot.data.docs[index]
-                                                  ['sentBy'],
-                                              snapshot.data.docs[index]
-                                                  ['createdOn'],
-                                              snapshot.data.docs[index]['type'],
-                                              snapshot.data.docs[index]
-                                                  ['isPinMessage'],
-                                              widget.teamModel,
-                                              snapshot.data.docs[index]
-                                                  ['isTagMessage'],
-                                              taggedMembers,
-                                            );
-                                        },
-                                      );
-                                      //}
-                                    }
-
-                                    if (snapshot.data.docs[index]['type'] ==
-                                        'editedMessage') {
-                                      // if (snapshot.data.docs[index]['isGif'] ==
-                                      //     false) {
-                                      return GestureDetector(
-                                        child: ListTile(
-                                          leading: getxController
-                                                      .authData.value !=
-                                                  snapshot.data.docs[index]
-                                                      ['sentBy']
-                                              ? Text(
-                                                  "${snapshot.data.docs[index]['sentBy']}")
-                                              : SizedBox(
-                                                  height: 0,
-                                                  width: 0,
-                                                ),
-                                          title: Text(
-                                              '${snapshot.data.docs[index]['message']}'),
-                                          trailing: Text('Edited'),
-                                        ),
-                                        onTap: () {
-                                          AlertDialogWidget()
-                                            ..onTapOnMessage(
-                                                snapshot.data.docs[index].id,
-                                                snapshot.data.docs[index]
-                                                    ['message'],
-                                                snapshot.data.docs[index]
-                                                    ['sentBy'],
-                                                snapshot.data.docs[index]
-                                                    ['createdOn'],
-                                                snapshot.data.docs[index]
-                                                    ['type'],
-                                                snapshot.data.docs[index]
-                                                    ['isPinMessage'],
-                                                widget.teamModel,
-                                                snapshot.data.docs[index]
-                                                    ['isTagMessage'],
-                                                taggedMembers);
-                                        },
-                                      );
-                                      //}
-                                    }
-
-                                    //////////////////////////////////////////////////////////////
-                                    ///getting the gif messages over here
-                                    if (snapshot.data.docs[index]['type'] ==
-                                        'gifMessage') {
-                                      link = snapshot
-                                          .data.docs[index]['message']
-                                          .toString()
-                                          .trimRight();
-                                      print('${link}hi');
-                                      return GestureDetector(
-                                        child: Container(
-                                          height: 200,
-                                          width: 200,
-                                          child: Image.network(
-                                            '$link',
-                                            loadingBuilder:
-                                                (BuildContext context,
-                                                    Widget child,
-                                                    ImageChunkEvent
-                                                        loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: loadingProgress
-                                                              .expectedTotalBytes !=
-                                                          null
-                                                      ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          loadingProgress
-                                                              .expectedTotalBytes
-                                                      : null,
-                                                ),
-                                              );
+                                        if (snapshot.data.docs[index]['type'] ==
+                                            'editedMessage') {
+                                          // if (snapshot.data.docs[index]['isGif'] ==
+                                          //     false) {
+                                          return GestureDetector(
+                                            child: ListTile(
+                                              leading: getxController
+                                                          .authData.value !=
+                                                      snapshot.data.docs[index]
+                                                          ['sentBy']
+                                                  ? Text(
+                                                      "${snapshot.data.docs[index]['sentBy']}")
+                                                  : SizedBox(
+                                                      height: 0,
+                                                      width: 0,
+                                                    ),
+                                              title: Text(
+                                                  '${snapshot.data.docs[index]['message']}'),
+                                              trailing: Text('Edited'),
+                                            ),
+                                            onTap: () {
+                                              AlertDialogWidget()
+                                                ..onTapOnMessage(
+                                                    snapshot
+                                                        .data.docs[index].id,
+                                                    snapshot.data.docs[index]
+                                                        ['message'],
+                                                    snapshot.data.docs[index]
+                                                        ['sentBy'],
+                                                    snapshot.data.docs[index]
+                                                        ['createdOn'],
+                                                    snapshot.data.docs[index]
+                                                        ['type'],
+                                                    snapshot.data.docs[index]
+                                                        ['isPinMessage'],
+                                                    widget.teamModel,
+                                                    snapshot.data.docs[index]
+                                                        ['isTagMessage'],
+                                                    taggedMembers);
                                             },
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          AlertDialogWidget()
-                                            ..onTapOnMessage(
-                                                snapshot.data.docs[index].id,
-                                                snapshot.data.docs[index]
-                                                    ['message'],
-                                                snapshot.data.docs[index]
-                                                    ['sentBy'],
-                                                snapshot.data.docs[index]
-                                                    ['createdOn'],
-                                                snapshot.data.docs[index]
-                                                    ['type'],
-                                                snapshot.data.docs[index]
-                                                    ['isPinMessage'],
-                                                widget.teamModel,
-                                                snapshot.data.docs[index]
-                                                    ['isTagMessage'],
-                                                taggedMembers);
-                                        },
-                                      );
-                                    }
+                                          );
+                                          //}
+                                        }
 
-                                    if (snapshot.data.docs[index]['type'] ==
-                                        'imageMessage') {
-                                      var link = snapshot
-                                          .data.docs[index]['message']
-                                          .toString()
-                                          .trimRight();
-                                      print('${link}hi');
-                                      return GestureDetector(
-                                        child: Container(
-                                          height: 200,
-                                          width: 200,
-                                          child: Image.network(
-                                            '$link',
-                                            loadingBuilder:
-                                                (BuildContext context,
-                                                    Widget child,
-                                                    ImageChunkEvent
-                                                        loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: loadingProgress
-                                                              .expectedTotalBytes !=
-                                                          null
-                                                      ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          loadingProgress
-                                                              .expectedTotalBytes
-                                                      : null,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          // AlertDialogWidget()
-                                          //   ..onTapOnMessage(
-                                          //       snapshot.data.docs[index].id,
-                                          //       snapshot.data.docs[index]
-                                          //           ['message'],
-                                          //       snapshot.data.docs[index]
-                                          //           ['sentBy'],
-                                          //       snapshot.data.docs[index]
-                                          //           ['createdOn'],
-                                          //       snapshot.data.docs[index]
-                                          //           ['type'],
-                                          //       snapshot.data.docs[index]
-                                          //           ['isPinMessage'],
-                                          //       widget.teamModel,
-                                          //       snapshot.data.docs[index]
-                                          //           ['isTagMessage'],
-                                          //       taggedMembers);
-                                        },
-                                      );
-                                    }
-
-                                    // .doc(
-                                    //     '${getxController.user.value.userId}')
-                                    // .get()
-                                    // .then((value) => print(
-                                    //     '${value['userId']} ridbah'))
-
-                                    // if (!FirebaseFirestore.instance
-                                    //     .collection('personal_connections')
-                                    //     .doc(widget.teamModel.teamId)
-                                    //     .collection('messages')
-                                    //     .doc(messageId)
-                                    //     .collection('notShowFor')
-                                    //     .doc(getxController.user.value.userId)
-                                    //     .get()
-                                    //     .isBlank) {
-                                    //   print('whyme');
-                                    //   return Container();
-                                    // }
-                                    // if (snapshot.data.docs[index]['type'] ==
-                                    //     'textMessage') {
-                                    //   // if (snapshot.data.docs[index]['isGif'] ==
-                                    //   //     false) {
-                                    //   return GestureDetector(
-                                    //     child: ListTile(
-                                    //       leading: getxController
-                                    //                   .authData.value !=
-                                    //               snapshot.data.docs[index]
-                                    //                   ['sentBy']
-                                    //           ? Text(
-                                    //               "${snapshot.data.docs[index]['sentBy']}")
-                                    //           : SizedBox(
-                                    //               height: 0,
-                                    //               width: 0,
-                                    //             ),
-                                    //       title: Text(
-                                    //           '${snapshot.data.docs[index]['message']}'),
-                                    //       // trailing: snapshot.data.docs[index]
-                                    //       //             ['isEdited'] ==
-                                    //       //         true
-                                    //       //     ? Text('Edited')
-                                    //       //     : Container(),
-                                    //     ),
-                                    //     onTap: () {
-                                    //       onTapOnMessage(
-                                    //         snapshot.data.docs[index].id,
-                                    //         snapshot.data.docs[index]
-                                    //             ['message'],
-                                    //         snapshot.data.docs[index]['sentBy'],
-                                    //         snapshot.data.docs[index]
-                                    //             ['createdOn'],
-                                    //         snapshot.data.docs[index]['type'],
-                                    //       );
-                                    //     },
-                                    //   );
-                                    // }
-                                  } else {
-                                    print('rayyanlovessaurab');
-
-                                    if (snapshot.data.docs[index]['type'] ==
-                                        'textMessage') {
-                                      // if (snapshot.data.docs[index]['isGif'] ==
-                                      //     false) {
-                                      return GestureDetector(
-                                        child: ListTile(
-                                          leading: getxController
-                                                      .authData.value !=
-                                                  snapshot.data.docs[index]
-                                                      ['sentBy']
-                                              ? Text(
-                                                  "${snapshot.data.docs[index]['sentBy']}")
-                                              : SizedBox(
-                                                  height: 0,
-                                                  width: 0,
-                                                ),
-                                          title: Text(
-                                              '${snapshot.data.docs[index]['message']}'),
-                                          // trailing: snapshot.data.docs[index]
-                                          //             ['isEdited'] ==
-                                          //         true
-                                          //     ? Text('Edited')
-                                          //     : Container(),
-                                        ),
-                                        onTap: () {
-                                          AlertDialogWidget()
-                                            ..onTapOnMessage(
-                                                snapshot.data.docs[index].id,
-                                                snapshot.data.docs[index]
-                                                    ['message'],
-                                                snapshot.data.docs[index]
-                                                    ['sentBy'],
-                                                snapshot.data.docs[index]
-                                                    ['createdOn'],
-                                                snapshot.data.docs[index]
-                                                    ['type'],
-                                                snapshot.data.docs[index]
-                                                    ['isPinMessage'],
-                                                widget.teamModel,
-                                                snapshot.data.docs[index]
-                                                    ['isTagMessage'],
-                                                taggedMembers);
-                                        },
-                                      );
-                                    }
-
-                                    if (snapshot.data.docs[index]['type'] ==
-                                        'editedMessage') {
-                                      // if (snapshot.data.docs[index]['isGif'] ==
-                                      //     false) {
-                                      return GestureDetector(
-                                        child: ListTile(
-                                          leading: getxController
-                                                      .authData.value !=
-                                                  snapshot.data.docs[index]
-                                                      ['sentBy']
-                                              ? Text(
-                                                  "${snapshot.data.docs[index]['sentBy']}")
-                                              : SizedBox(
-                                                  height: 0,
-                                                  width: 0,
-                                                ),
-                                          title: Text(
-                                              '${snapshot.data.docs[index]['message']}'),
-                                          trailing: Text('Edited'),
-                                        ),
-                                        onTap: () {
-                                          AlertDialogWidget()
-                                            ..onTapOnMessage(
-                                                snapshot.data.docs[index].id,
-                                                snapshot.data.docs[index]
-                                                    ['message'],
-                                                snapshot.data.docs[index]
-                                                    ['sentBy'],
-                                                snapshot.data.docs[index]
-                                                    ['createdOn'],
-                                                snapshot.data.docs[index]
-                                                    ['type'],
-                                                snapshot.data.docs[index]
-                                                    ['isPinMessage'],
-                                                widget.teamModel,
-                                                snapshot.data.docs[index]
-                                                    ['isTagMessage'],
-                                                taggedMembers);
-                                        },
-                                      );
-                                      //}
-
-                                    }
-
-                                    //////////////////////////////////////////////////////////////
-                                    ///getting the gif messages over here
-                                    if (snapshot.data.docs[index]['type'] ==
-                                        'gifMessage') {
-                                      var link = snapshot
-                                          .data.docs[index]['message']
-                                          .toString()
-                                          .trimRight();
-                                      print('${link}hi');
-                                      return GestureDetector(
-                                        child: Container(
-                                          height: 200,
-                                          width: 200,
-                                          child: Image.network(
-                                            '$link',
-                                            loadingBuilder:
-                                                (BuildContext context,
-                                                    Widget child,
-                                                    ImageChunkEvent
-                                                        loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: loadingProgress
-                                                              .expectedTotalBytes !=
-                                                          null
-                                                      ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          loadingProgress
-                                                              .expectedTotalBytes
-                                                      : null,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          AlertDialogWidget()
-                                            ..onTapOnMessage(
-                                              snapshot.data.docs[index].id,
-                                              snapshot.data.docs[index]
-                                                  ['message'],
-                                              snapshot.data.docs[index]
-                                                  ['sentBy'],
-                                              snapshot.data.docs[index]
-                                                  ['createdOn'],
-                                              snapshot.data.docs[index]['type'],
-                                              snapshot.data.docs[index]
-                                                  ['isPinMessage'],
-                                              widget.teamModel,
-                                              snapshot.data.docs[index]
-                                                  ['isTagMessage'],
-                                              taggedMembers,
-                                            );
-                                        },
-                                      );
-                                    }
-                                  }
-
-                                  if (snapshot.data.docs[index]['type'] ==
-                                      'imageMessage') {
-                                    var link = snapshot
-                                        .data.docs[index]['message']
-                                        .toString()
-                                        .trimRight();
-                                    print('${link}hi');
-                                    return GestureDetector(
-                                      child: Container(
-                                        height: 200,
-                                        width: 200,
-                                        child: Image.network(
-                                          '$link',
-                                          loadingBuilder: (BuildContext context,
-                                              Widget child,
-                                              ImageChunkEvent loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                value: loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes
-                                                    : null,
+                                        //////////////////////////////////////////////////////////////
+                                        ///getting the gif messages over here
+                                        if (snapshot.data.docs[index]['type'] ==
+                                            'gifMessage') {
+                                          link = snapshot
+                                              .data.docs[index]['message']
+                                              .toString()
+                                              .trimRight();
+                                          print('${link}hi');
+                                          return GestureDetector(
+                                            child: Container(
+                                              height: 200,
+                                              width: 200,
+                                              child: Image.network(
+                                                '$link',
+                                                loadingBuilder:
+                                                    (BuildContext context,
+                                                        Widget child,
+                                                        ImageChunkEvent
+                                                            loadingProgress) {
+                                                  if (loadingProgress == null) {
+                                                    return child;
+                                                  }
+                                                  return Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      value: loadingProgress
+                                                                  .expectedTotalBytes !=
+                                                              null
+                                                          ? loadingProgress
+                                                                  .cumulativeBytesLoaded /
+                                                              loadingProgress
+                                                                  .expectedTotalBytes
+                                                          : null,
+                                                    ),
+                                                  );
+                                                },
                                               ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      onTap: () {
-                                        // AlertDialogWidget()
-                                        //   ..onTapOnMessage(
-                                        //       snapshot.data.docs[index].id,
-                                        //       snapshot.data.docs[index]
-                                        //           ['message'],
-                                        //       snapshot.data.docs[index]
-                                        //           ['sentBy'],
-                                        //       snapshot.data.docs[index]
-                                        //           ['createdOn'],
-                                        //       snapshot.data.docs[index]
-                                        //           ['type'],
-                                        //       snapshot.data.docs[index]
-                                        //           ['isPinMessage'],
-                                        //       widget.teamModel,
-                                        //       snapshot.data.docs[index]
-                                        //           ['isTagMessage'],
-                                        //       taggedMembers);
-                                      },
-                                    );
-                                  }
+                                            ),
+                                            onTap: () {
+                                              AlertDialogWidget()
+                                                ..onTapOnMessage(
+                                                    snapshot
+                                                        .data.docs[index].id,
+                                                    snapshot.data.docs[index]
+                                                        ['message'],
+                                                    snapshot.data.docs[index]
+                                                        ['sentBy'],
+                                                    snapshot.data.docs[index]
+                                                        ['createdOn'],
+                                                    snapshot.data.docs[index]
+                                                        ['type'],
+                                                    snapshot.data.docs[index]
+                                                        ['isPinMessage'],
+                                                    widget.teamModel,
+                                                    snapshot.data.docs[index]
+                                                        ['isTagMessage'],
+                                                    taggedMembers);
+                                            },
+                                          );
+                                        }
 
-                                  if (snapshot.data.docs[index]['type'] ==
-                                      'pollMessage') {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.red)),
-                                      height: 250,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            '${snapshot.data.docs[index]['sentBy']}',
-                                            style: TextStyle(fontSize: 10),
+                                        if (snapshot.data.docs[index]['type'] ==
+                                            'imageMessage') {
+                                          var link = snapshot
+                                              .data.docs[index]['message']
+                                              .toString()
+                                              .trimRight();
+                                          print('${link}hi');
+                                          return GestureDetector(
+                                            child: Container(
+                                              height: 200,
+                                              width: 200,
+                                              child: Image.network(
+                                                '$link',
+                                                loadingBuilder:
+                                                    (BuildContext context,
+                                                        Widget child,
+                                                        ImageChunkEvent
+                                                            loadingProgress) {
+                                                  if (loadingProgress == null) {
+                                                    return child;
+                                                  }
+                                                  return Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      value: loadingProgress
+                                                                  .expectedTotalBytes !=
+                                                              null
+                                                          ? loadingProgress
+                                                                  .cumulativeBytesLoaded /
+                                                              loadingProgress
+                                                                  .expectedTotalBytes
+                                                          : null,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            onTap: () {
+                                              // AlertDialogWidget()
+                                              //   ..onTapOnMessage(
+                                              //       snapshot.data.docs[index].id,
+                                              //       snapshot.data.docs[index]
+                                              //           ['message'],
+                                              //       snapshot.data.docs[index]
+                                              //           ['sentBy'],
+                                              //       snapshot.data.docs[index]
+                                              //           ['createdOn'],
+                                              //       snapshot.data.docs[index]
+                                              //           ['type'],
+                                              //       snapshot.data.docs[index]
+                                              //           ['isPinMessage'],
+                                              //       widget.teamModel,
+                                              //       snapshot.data.docs[index]
+                                              //           ['isTagMessage'],
+                                              //       taggedMembers);
+                                            },
+                                          );
+                                        }
+
+                                        // .doc(
+                                        //     '${getxController.user.value.userId}')
+                                        // .get()
+                                        // .then((value) => print(
+                                        //     '${value['userId']} ridbah'))
+
+                                        // if (!FirebaseFirestore.instance
+                                        //     .collection('personal_connections')
+                                        //     .doc(widget.teamModel.teamId)
+                                        //     .collection('messages')
+                                        //     .doc(messageId)
+                                        //     .collection('notShowFor')
+                                        //     .doc(getxController.user.value.userId)
+                                        //     .get()
+                                        //     .isBlank) {
+                                        //   print('whyme');
+                                        //   return Container();
+                                        // }
+                                        // if (snapshot.data.docs[index]['type'] ==
+                                        //     'textMessage') {
+                                        //   // if (snapshot.data.docs[index]['isGif'] ==
+                                        //   //     false) {
+                                        //   return GestureDetector(
+                                        //     child: ListTile(
+                                        //       leading: getxController
+                                        //                   .authData.value !=
+                                        //               snapshot.data.docs[index]
+                                        //                   ['sentBy']
+                                        //           ? Text(
+                                        //               "${snapshot.data.docs[index]['sentBy']}")
+                                        //           : SizedBox(
+                                        //               height: 0,
+                                        //               width: 0,
+                                        //             ),
+                                        //       title: Text(
+                                        //           '${snapshot.data.docs[index]['message']}'),
+                                        //       // trailing: snapshot.data.docs[index]
+                                        //       //             ['isEdited'] ==
+                                        //       //         true
+                                        //       //     ? Text('Edited')
+                                        //       //     : Container(),
+                                        //     ),
+                                        //     onTap: () {
+                                        //       onTapOnMessage(
+                                        //         snapshot.data.docs[index].id,
+                                        //         snapshot.data.docs[index]
+                                        //             ['message'],
+                                        //         snapshot.data.docs[index]['sentBy'],
+                                        //         snapshot.data.docs[index]
+                                        //             ['createdOn'],
+                                        //         snapshot.data.docs[index]['type'],
+                                        //       );
+                                        //     },
+                                        //   );
+                                        // }
+                                      } else {
+                                        print('rayyanlovessaurab');
+
+                                        if (snapshot.data.docs[index]['type'] ==
+                                            'textMessage') {
+                                          // if (snapshot.data.docs[index]['isGif'] ==
+                                          //     false) {
+                                          return GestureDetector(
+                                            child: ListTile(
+                                              title: getxController
+                                                          .authData.value !=
+                                                      snapshot.data.docs[index]
+                                                          ['sentBy']
+                                                  ? Text(
+                                                      "${snapshot.data.docs[index]['sentByName']}")
+                                                  : SizedBox(
+                                                      height: 0,
+                                                      width: 0,
+                                                    ),
+                                              subtitle: Linkify(
+                                                onOpen: (link) async {
+                                                  print(
+                                                      "Linkify link = ${link.url}");
+                                                  var linkurl =
+                                                      "https://${link.url}";
+                                                  print(link.url);
+                                                  // if (await canLaunch(link.text)) {
+                                                  // await launch(
+                                                  //     "https://www.google.com/");
+                                                  if (link.url.contains(
+                                                      "www.youtube.com")) {
+                                                    setState(() {
+                                                      videoId = YoutubePlayer
+                                                          .convertUrlToId(
+                                                              "${link.url}");
+                                                      print(videoId);
+                                                    });
+
+                                                    return showYouBottomSheet(
+                                                        link.url);
+                                                    // return YoutubeBottomSheet()
+                                                    //   ..showYouBottomSheet(
+                                                    //       videoId,
+                                                    //       link.url,
+                                                    //       context,
+                                                    //       _controller);
+                                                  }
+                                                  Get.to(WebViewPage(link.url));
+
+                                                  // } else {
+                                                  //   print(link.text);
+                                                  //   print('no problem');
+                                                  // }
+                                                },
+                                                text:
+                                                    "${snapshot.data.docs[index]['message']}",
+                                                style: TextStyle(
+                                                    color: Colors.black45),
+                                                linkStyle: TextStyle(
+                                                    color: Colors.blue),
+                                                options: LinkifyOptions(
+                                                    humanize: false),
+                                              ),
+
+                                              // Text(
+                                              //     '${snapshot.data.docs[index]['message']}'),
+                                              // trailing: Text(
+                                              //     '${snapshot.data.docs[index]['createdOn'].toString().substring(10, 20)}'),
+                                            ),
+                                            onTap: () {
+                                              AlertDialogWidget()
+                                                ..onTapOnMessage(
+                                                    snapshot
+                                                        .data.docs[index].id,
+                                                    snapshot.data.docs[index]
+                                                        ['message'],
+                                                    snapshot.data.docs[index]
+                                                        ['sentBy'],
+                                                    snapshot.data.docs[index]
+                                                        ['createdOn'],
+                                                    snapshot.data.docs[index]
+                                                        ['type'],
+                                                    snapshot.data.docs[index]
+                                                        ['isPinMessage'],
+                                                    widget.teamModel,
+                                                    snapshot.data.docs[index]
+                                                        ['isTagMessage'],
+                                                    taggedMembers);
+                                            },
+                                          );
+                                        }
+
+                                        if (snapshot.data.docs[index]['type'] ==
+                                            'editedMessage') {
+                                          // if (snapshot.data.docs[index]['isGif'] ==
+                                          //     false) {
+                                          return GestureDetector(
+                                            child: ListTile(
+                                              title: getxController
+                                                          .authData.value !=
+                                                      snapshot.data.docs[index]
+                                                          ['sentBy']
+                                                  ? Text(
+                                                      "${snapshot.data.docs[index]['sentByName']}")
+                                                  : SizedBox(
+                                                      height: 0,
+                                                      width: 0,
+                                                    ),
+                                              subtitle: Linkify(
+                                                onOpen: (link) async {
+                                                  print(
+                                                      "Linkify link = ${link.url}");
+                                                  var linkurl =
+                                                      "https://${link.url}";
+                                                  print(link.url);
+                                                  // if (await canLaunch(link.text)) {
+                                                  // await launch(
+                                                  //     "https://www.google.com/");
+                                                  Get.to(WebViewPage(link.url));
+
+                                                  // } else {
+                                                  //   print(link.text);
+                                                  //   print('no problem');
+                                                  // }
+                                                },
+                                                text:
+                                                    "${snapshot.data.docs[index]['message']}",
+                                                style: TextStyle(
+                                                    color: Colors.black45),
+                                                linkStyle: TextStyle(
+                                                    color: Colors.blue),
+                                                options: LinkifyOptions(
+                                                    humanize: false),
+                                              ),
+
+                                              // Text(
+                                              //     '${snapshot.data.docs[index]['message']}'),
+                                              // trailing: Text(
+                                              //     '${snapshot.data.docs[index]['createdOn'].toString().substring(10, 20)}'),
+
+                                              trailing: Text('Edited'),
+                                            ),
+                                            onTap: () {
+                                              AlertDialogWidget()
+                                                ..onTapOnMessage(
+                                                    snapshot
+                                                        .data.docs[index].id,
+                                                    snapshot.data.docs[index]
+                                                        ['message'],
+                                                    snapshot.data.docs[index]
+                                                        ['sentBy'],
+                                                    snapshot.data.docs[index]
+                                                        ['createdOn'],
+                                                    snapshot.data.docs[index]
+                                                        ['type'],
+                                                    snapshot.data.docs[index]
+                                                        ['isPinMessage'],
+                                                    widget.teamModel,
+                                                    snapshot.data.docs[index]
+                                                        ['isTagMessage'],
+                                                    taggedMembers);
+                                            },
+                                          );
+                                          //}
+
+                                        }
+
+                                        //////////////////////////////////////////////////////////////
+                                        ///getting the gif messages over here
+                                        if (snapshot.data.docs[index]['type'] ==
+                                            'gifMessage') {
+                                          var link = snapshot
+                                              .data.docs[index]['message']
+                                              .toString()
+                                              .trimRight();
+                                          print('${link}hi');
+                                          return GestureDetector(
+                                            child: Container(
+                                              height: 200,
+                                              width: 200,
+                                              child: Image.network(
+                                                '$link',
+                                                loadingBuilder:
+                                                    (BuildContext context,
+                                                        Widget child,
+                                                        ImageChunkEvent
+                                                            loadingProgress) {
+                                                  if (loadingProgress == null) {
+                                                    return child;
+                                                  }
+                                                  return Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      value: loadingProgress
+                                                                  .expectedTotalBytes !=
+                                                              null
+                                                          ? loadingProgress
+                                                                  .cumulativeBytesLoaded /
+                                                              loadingProgress
+                                                                  .expectedTotalBytes
+                                                          : null,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            onTap: () {
+                                              print('hey');
+                                              AlertDialogWidget()
+                                                ..onTapOnMessage(
+                                                  snapshot.data.docs[index].id,
+                                                  snapshot.data.docs[index]
+                                                      ['message'],
+                                                  snapshot.data.docs[index]
+                                                      ['sentBy'],
+                                                  snapshot.data.docs[index]
+                                                      ['createdOn'],
+                                                  snapshot.data.docs[index]
+                                                      ['type'],
+                                                  snapshot.data.docs[index]
+                                                      ['isPinMessage'],
+                                                  widget.teamModel,
+                                                  snapshot.data.docs[index]
+                                                      ['isTagMessage'],
+                                                  taggedMembers,
+                                                );
+                                            },
+                                          );
+                                        }
+                                      }
+
+                                      if (snapshot.data.docs[index]['type'] ==
+                                          'imageMessage') {
+                                        var link = snapshot
+                                            .data.docs[index]['message']
+                                            .toString()
+                                            .trimRight();
+                                        print('${link}hi');
+                                        return GestureDetector(
+                                          child: Container(
+                                            height: 200,
+                                            width: 200,
+                                            child: Image.network(
+                                              '$link',
+                                              loadingBuilder:
+                                                  (BuildContext context,
+                                                      Widget child,
+                                                      ImageChunkEvent
+                                                          loadingProgress) {
+                                                if (loadingProgress == null) {
+                                                  return child;
+                                                }
+                                                return Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    value: loadingProgress
+                                                                .expectedTotalBytes !=
+                                                            null
+                                                        ? loadingProgress
+                                                                .cumulativeBytesLoaded /
+                                                            loadingProgress
+                                                                .expectedTotalBytes
+                                                        : null,
+                                                  ),
+                                                );
+                                              },
+                                            ),
                                           ),
-                                          Text(
-                                            '${snapshot.data.docs[index]['question']}',
-                                            style: TextStyle(fontSize: 20),
-                                          ),
-                                          //render options for users to Tap
-                                          StreamBuilder<QuerySnapshot>(
-                                            stream: FirebaseFirestore.instance
-                                                .collection(
-                                                    'personal_connections')
-                                                .doc(
-                                                    '${widget.teamModel.teamId}')
-                                                .collection('messages')
-                                                .doc(snapshot
-                                                    .data.docs[index].id)
-                                                .collection('pollOptions')
-                                                .snapshots(),
-                                            builder: (ctx,
-                                                AsyncSnapshot<QuerySnapshot>
-                                                    optionSnapshot) {
-                                              if (optionSnapshot.hasError) {
-                                                return Text(
-                                                    "Some error occured");
-                                              } else if (optionSnapshot
-                                                  .hasData) {
-                                                return Expanded(
-                                                  // height: 200,
-                                                  child: Container(
-                                                    child: ListView.builder(
-                                                      physics:
-                                                          NeverScrollableScrollPhysics(),
-                                                      itemBuilder:
-                                                          (ctx, optionIndex) {
-                                                        return Container(
-                                                          height: 50,
-                                                          child: Card(
-                                                            child: Stack(
-                                                              children: [
-                                                                StreamBuilder(
-                                                                  stream: pollController.usersWhoPolled(
-                                                                      teamId: widget
-                                                                          .teamModel
-                                                                          .teamId,
-                                                                      messageId: snapshot
-                                                                          .data
-                                                                          .docs[
-                                                                              index]
-                                                                          .id),
-                                                                  builder: (ctx,
-                                                                      allUsersPolledSnapShot) {
-                                                                    if (allUsersPolledSnapShot
-                                                                        .hasData) {
-                                                                      return StreamBuilder<
-                                                                          QuerySnapshot>(
-                                                                        stream: FirebaseFirestore
-                                                                            .instance
-                                                                            .collection('personal_connections')
-                                                                            .doc('${widget.teamModel.teamId}')
-                                                                            .collection('messages')
-                                                                            .doc(snapshot.data.docs[index].id)
-                                                                            .collection('pollOptions')
-                                                                            .doc(optionSnapshot.data.docs[optionIndex].id)
-                                                                            .collection('usersPolled')
-                                                                            .snapshots(),
-                                                                        builder:
-                                                                            (context,
-                                                                                specificPollSnapshot) {
-                                                                          if (specificPollSnapshot
-                                                                              .hasData) {
-                                                                            return FractionallySizedBox(
-                                                                              widthFactor: allUsersPolledSnapShot.data.docs.length == 0 ? 0 : specificPollSnapshot.data.docs.length / allUsersPolledSnapShot.data.docs.length,
-                                                                              child: Container(
-                                                                                color: Colors.greenAccent,
-                                                                              ),
-                                                                            );
-                                                                          }
-                                                                          return Container();
-                                                                        },
-                                                                      );
-                                                                    }
-                                                                    return Container();
-                                                                  },
-                                                                ),
-                                                                ListTile(
-                                                                  title: Text(
-                                                                      '${optionSnapshot.data.docs[optionIndex]['pollText']}'),
-                                                                  subtitle:
-                                                                      Text(
-                                                                    '',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            10),
-                                                                  ),
-                                                                  trailing:
-                                                                      IconButton(
-                                                                          onPressed:
-                                                                              () {
+                                          onTap: () {
+                                            // AlertDialogWidget()
+                                            //   ..onTapOnMessage(
+                                            //       snapshot.data.docs[index].id,
+                                            //       snapshot.data.docs[index]
+                                            //           ['message'],
+                                            //       snapshot.data.docs[index]
+                                            //           ['sentBy'],
+                                            //       snapshot.data.docs[index]
+                                            //           ['createdOn'],
+                                            //       snapshot.data.docs[index]
+                                            //           ['type'],
+                                            //       snapshot.data.docs[index]
+                                            //           ['isPinMessage'],
+                                            //       widget.teamModel,
+                                            //       snapshot.data.docs[index]
+                                            //           ['isTagMessage'],
+                                            //       taggedMembers);
+                                          },
+                                        );
+                                      }
+
+                                      if (snapshot.data.docs[index]['type'] ==
+                                          'pollMessage') {
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.red)),
+                                          height: 250,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text(
+                                                '${snapshot.data.docs[index]['sentBy']}',
+                                                style: TextStyle(fontSize: 10),
+                                              ),
+                                              Text(
+                                                '${snapshot.data.docs[index]['question']}',
+                                                style: TextStyle(fontSize: 20),
+                                              ),
+                                              //render options for users to Tap
+                                              StreamBuilder<QuerySnapshot>(
+                                                stream: FirebaseFirestore
+                                                    .instance
+                                                    .collection(
+                                                        'personal_connections')
+                                                    .doc(
+                                                        '${widget.teamModel.teamId}')
+                                                    .collection('messages')
+                                                    .doc(snapshot
+                                                        .data.docs[index].id)
+                                                    .collection('pollOptions')
+                                                    .snapshots(),
+                                                builder: (ctx,
+                                                    AsyncSnapshot<QuerySnapshot>
+                                                        optionSnapshot) {
+                                                  if (optionSnapshot.hasError) {
+                                                    return Text(
+                                                        "Some error occured");
+                                                  } else if (optionSnapshot
+                                                      .hasData) {
+                                                    return Expanded(
+                                                      // height: 200,
+                                                      child: Container(
+                                                        child: ListView.builder(
+                                                          physics:
+                                                              NeverScrollableScrollPhysics(),
+                                                          itemBuilder: (ctx,
+                                                              optionIndex) {
+                                                            return Container(
+                                                              height: 50,
+                                                              child: Card(
+                                                                child: Stack(
+                                                                  children: [
+                                                                    StreamBuilder(
+                                                                      stream: pollController.usersWhoPolled(
+                                                                          teamId: widget
+                                                                              .teamModel
+                                                                              .teamId,
+                                                                          messageId: snapshot
+                                                                              .data
+                                                                              .docs[index]
+                                                                              .id),
+                                                                      builder: (ctx,
+                                                                          allUsersPolledSnapShot) {
+                                                                        if (allUsersPolledSnapShot
+                                                                            .hasData) {
+                                                                          return StreamBuilder<
+                                                                              QuerySnapshot>(
+                                                                            stream:
+                                                                                FirebaseFirestore.instance.collection('personal_connections').doc('${widget.teamModel.teamId}').collection('messages').doc(snapshot.data.docs[index].id).collection('pollOptions').doc(optionSnapshot.data.docs[optionIndex].id).collection('usersPolled').snapshots(),
+                                                                            builder:
+                                                                                (context, specificPollSnapshot) {
+                                                                              if (specificPollSnapshot.hasData) {
+                                                                                return FractionallySizedBox(
+                                                                                  widthFactor: allUsersPolledSnapShot.data.docs.length == 0 ? 0 : specificPollSnapshot.data.docs.length / allUsersPolledSnapShot.data.docs.length,
+                                                                                  child: Container(
+                                                                                    color: Colors.greenAccent,
+                                                                                  ),
+                                                                                );
+                                                                              }
+                                                                              return Container();
+                                                                            },
+                                                                          );
+                                                                        }
+                                                                        return Container();
+                                                                      },
+                                                                    ),
+                                                                    ListTile(
+                                                                      title: Text(
+                                                                          '${optionSnapshot.data.docs[optionIndex]['pollText']}'),
+                                                                      subtitle:
+                                                                          Text(
+                                                                        '',
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                10),
+                                                                      ),
+                                                                      trailing: IconButton(
+                                                                          onPressed: () {
                                                                             //remove the poll for that user
                                                                             pollController.revertPollOptions(
                                                                                 messageId: snapshot.data.docs[index].id,
@@ -1250,77 +1434,67 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                                                 pollId: optionSnapshot.data.docs[optionIndex].id,
                                                                                 userId: getxController.user.value.userId);
                                                                           },
-                                                                          icon:
-                                                                              Icon(Icons.clear)),
-                                                                  onTap: () {
-                                                                    //send the poll of that specific user
-                                                                    pollController.sendPollAnswer(
-                                                                        messageId: snapshot
-                                                                            .data
-                                                                            .docs[
-                                                                                index]
-                                                                            .id,
-                                                                        pollOptionId: optionSnapshot
-                                                                            .data
-                                                                            .docs[
-                                                                                optionIndex]
-                                                                            .id,
-                                                                        teamId: widget
-                                                                            .teamModel
-                                                                            .teamId,
-                                                                        userNameofPoller: getxController
-                                                                            .user
-                                                                            .value
-                                                                            .userName,
-                                                                        userPollingId: getxController
-                                                                            .user
-                                                                            .value
-                                                                            .userId);
-                                                                  },
+                                                                          icon: Icon(Icons.clear)),
+                                                                      onTap:
+                                                                          () {
+                                                                        //send the poll of that specific user
+                                                                        pollController.sendPollAnswer(
+                                                                            messageId:
+                                                                                snapshot.data.docs[index].id,
+                                                                            pollOptionId: optionSnapshot.data.docs[optionIndex].id,
+                                                                            teamId: widget.teamModel.teamId,
+                                                                            userNameofPoller: getxController.user.value.userName,
+                                                                            userPollingId: getxController.user.value.userId);
+                                                                      },
+                                                                    ),
+                                                                  ],
                                                                 ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                      itemCount: optionSnapshot
-                                                          .data.docs.length,
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                              return Container();
-                                            },
+                                                              ),
+                                                            );
+                                                          },
+                                                          itemCount:
+                                                              optionSnapshot
+                                                                  .data
+                                                                  .docs
+                                                                  .length,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                  return Container();
+                                                },
+                                              ),
+                                              StreamBuilder<QuerySnapshot>(
+                                                stream: pollController
+                                                    .usersWhoPolled(
+                                                        teamId: widget
+                                                            .teamModel.teamId,
+                                                        messageId: snapshot.data
+                                                            .docs[index].id),
+                                                builder: (BuildContext ctx,
+                                                    AsyncSnapshot<QuerySnapshot>
+                                                        usersWhopolledSnapsho) {
+                                                  if (usersWhopolledSnapsho
+                                                      .hasData) {
+                                                    return Text(
+                                                        '${usersWhopolledSnapsho.data.docs.length} polled');
+                                                  }
+                                                  return Container();
+                                                },
+                                              ),
+                                            ],
                                           ),
-                                          StreamBuilder<QuerySnapshot>(
-                                            stream:
-                                                pollController.usersWhoPolled(
-                                                    teamId:
-                                                        widget.teamModel.teamId,
-                                                    messageId: snapshot
-                                                        .data.docs[index].id),
-                                            builder: (BuildContext ctx,
-                                                AsyncSnapshot<QuerySnapshot>
-                                                    usersWhopolledSnapsho) {
-                                              if (usersWhopolledSnapsho
-                                                  .hasData) {
-                                                return Text(
-                                                    '${usersWhopolledSnapsho.data.docs.length} polled');
-                                              }
-                                              return Container();
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
-                                  return Container();
-                                },
-                                itemCount: snapshot.data.docs.length),
-                          );
-                        }
-                        return Container();
-                      },
+                                        );
+                                      }
+                                      return Container();
+                                    },
+                                    itemCount: snapshot.data.docs.length),
+                              ),
+                            );
+                          }
+                          return Container();
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -1440,6 +1614,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             'isTagMessage': isTagMessage,
                                             'isDeleted': false,
                                             'isPinMessage': false,
+                                            'sentByName': getxController
+                                                .user.value.userName,
                                             //'isImage': false,
                                           },
                                         ).then(
