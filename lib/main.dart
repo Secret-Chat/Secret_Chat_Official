@@ -48,6 +48,7 @@ class MyApp extends StatelessWidget {
                 userEmail: value['email'],
                 userId: value['userId'],
                 userName: value['username'],
+                phoneNumber: value['phoneNumber'],
               );
             });
             print("Check: ${getxController.authData.value}");

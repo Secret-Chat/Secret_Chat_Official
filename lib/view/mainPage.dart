@@ -236,6 +236,10 @@ class _MainPageState extends State<MainPage> {
                                           if (snapshots.hasData) {
                                             return ListView.builder(
                                               itemBuilder: (context, index) {
+                                                if (snapshots
+                                                    .data.docs.isEmpty) {
+                                                  return Container();
+                                                }
                                                 return Text(snapshots
                                                     .data.docs[0]['message']);
                                               },
