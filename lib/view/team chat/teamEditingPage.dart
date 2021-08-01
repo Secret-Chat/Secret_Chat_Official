@@ -13,8 +13,8 @@ import '../../main.dart';
 
 class TeamEditingPage extends StatefulWidget {
   final TeamModel teamModel;
-  final teamName;
-  final teamDescription;
+  var teamName;
+  var teamDescription;
 
   TeamEditingPage({this.teamModel, this.teamName, this.teamDescription});
   //const TeamEditingPage({ Key? key }) : super(key: key);
@@ -29,6 +29,31 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
   final getxController = Get.put(AuthController());
   File pickingImage;
   File pickingGallery;
+  bool pickImageTrue = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // titleChange();
+    // descriptionChange();
+  }
+
+  // void titleChange() {
+  //   _titleController.addListener(() {
+  //     if (_titleController.text != widget.teamName) {
+  //       _titleController.text = _titleController.text;
+  //     }
+  //   });
+  // }
+
+  // void descriptionChange() {
+  //   _descriptionController.addListener(() {
+  //     if (_descriptionController.text != widget.teamDescription) {
+  //       _descriptionController.text = _descriptionController.text;
+  //     }
+  //   });
+  // }
 
   void showImageSendDialog() {
     showDialog(
@@ -122,6 +147,8 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                                   });
                                 });
                               });
+
+                              pickImageTrue = true;
 
                               Navigator.of(context).pop();
                               Navigator.of(context).pop();
@@ -231,6 +258,8 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                                 });
                               });
 
+                              pickImageTrue = true;
+
                               Navigator.of(context).pop();
                               Navigator.of(context).pop();
                             },
@@ -327,6 +356,23 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                   'description': _descriptionController.text,
                 });
 
+                if (pickImageTrue) {
+                  setState(() {
+                    pickImageTrue = false;
+                  });
+                  Future.delayed(Duration(milliseconds: 500), () {
+                    Navigator.of(context).pop();
+                  });
+
+                  Future.delayed(Duration(milliseconds: 500), () {
+                    Navigator.of(context).pop();
+                  });
+
+                  Future.delayed(Duration(milliseconds: 500), () {
+                    Navigator.of(context).pop();
+                  });
+                }
+
                 Navigator.of(context).pop();
               },
             ),
@@ -406,6 +452,9 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                     child: TextField(
                       controller: _titleController,
                       decoration: InputDecoration(),
+                      onChanged: (value) => {
+                        widget.teamName = value,
+                      },
                     ),
                   ),
                 ],
@@ -421,6 +470,9 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
               padding: EdgeInsets.symmetric(horizontal: 5, vertical: 7),
               child: TextField(
                 controller: _descriptionController,
+                onChanged: (value) => {
+                  widget.teamDescription = value,
+                },
                 textAlign: TextAlign.justify,
                 textAlignVertical: TextAlignVertical.bottom,
                 decoration: InputDecoration(

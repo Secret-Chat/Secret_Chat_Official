@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/pollController.dart';
+import 'package:secretchat/controller/replyToMessage.dart';
 import 'package:secretchat/model/poll_model.dart';
 import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/model/user_in_group.dart';
@@ -14,6 +15,7 @@ import '../main.dart';
 class AlertDialogWidget {
   final getxController = Get.put(AuthController());
   final _editingController = TextEditingController();
+  final replyMessageController = Get.put(ReplyMessageController());
   var pinMessages = 0;
   //const GifWidget({ Key? key }) : super(key: key);
 
@@ -112,6 +114,24 @@ class AlertDialogWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  messageType == 'gifMessage'
+                      ? Container()
+                      : Container(
+                          padding: EdgeInsets.all(10),
+                          child: ListTile(
+                            title: Text(
+                              'Reply',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              replyMessageController.replyToMessage.value =
+                                  true;
+                              replyMessageController.messageId.value =
+                                  messageId;
+                            },
+                          ),
+                        ),
                   Container(
                     padding: EdgeInsets.all(10),
                     child: ListTile(
