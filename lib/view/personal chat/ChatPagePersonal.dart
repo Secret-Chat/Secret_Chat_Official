@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/controller/chat_sync_controller.dart';
 import '../../model/contact.dart';
 
 class ChatPagePersonal extends StatefulWidget {
@@ -18,15 +19,13 @@ class ChatPagePersonal extends StatefulWidget {
 class _ChatPagePersonalState extends State<ChatPagePersonal> {
   final _textController = TextEditingController();
   final getxController = Get.put(AuthController());
-
+  final chatSyncController = ChatSyncController();
 
   //dispose the controllers
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _textController.dispose();
-    
   }
 
   @override
@@ -69,6 +68,10 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
                       }
 
                       if (snapshot.hasData) {
+                        //keep in local storage
+                        chatSyncController.syncFromServerPersonalConnectionList(
+                            snapshot.data.docs,
+                            widget.otherUserContactModal.connectionId);
                         return ListView.builder(
                             reverse: true,
                             itemBuilder: (ctx, index) {
@@ -134,6 +137,15 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
                             _textController.text = '';
                           },
                         ),
+                      ),
+                      Container(
+                        height: 30,
+                        width: 30,
+                        child: RaisedButton(onPressed: () {
+                          print('predd');
+                          chatSyncController.checkIfDBWorked(
+                              widget.otherUserContactModal.connectionId);
+                        }),
                       )
                     ],
                   ),

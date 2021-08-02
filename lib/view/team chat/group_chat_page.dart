@@ -1,11 +1,7 @@
 import 'dart:io';
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
@@ -13,22 +9,16 @@ import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/pollController.dart';
 import 'package:secretchat/controller/replyToMessage.dart';
 import 'package:secretchat/controller/tagListController.dart';
-import 'package:secretchat/model/poll_model.dart';
 import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
-
 import 'package:secretchat/view/team%20chat/pinMessagesPage.dart';
 import 'package:secretchat/view/webViewPage.dart';
-
-import 'package:secretchat/widgets/custom_button.dart';
 import 'package:secretchat/widgets/alertDialogWidget.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:secretchat/widgets/youtubeBottomSheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
 import '../../main.dart';
 
 class GroupChatScreen extends StatefulWidget {
