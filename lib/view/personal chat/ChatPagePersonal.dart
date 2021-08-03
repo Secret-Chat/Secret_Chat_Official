@@ -41,6 +41,19 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
           width: MediaQuery.of(context).size.width,
           child: Column(
             children: <Widget>[
+              Obx(
+                () => !chatSyncController.connectedToInternet.value
+                    ? Container(
+                        height: 40,
+                        child: Center(
+                          child: Text(
+                            'No Internet Connection ! ',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ),
               SingleChildScrollView(
                 child: Container(
                   height: MediaQuery.of(context).size.height - 168,
@@ -141,11 +154,24 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
                       Container(
                         height: 30,
                         width: 30,
-                        child: RaisedButton(onPressed: () {
-                          print('predd');
-                          chatSyncController.checkIfDBWorked(
-                              widget.otherUserContactModal.connectionId);
-                        }),
+                        child: RaisedButton(
+                          onPressed: () {
+                            chatSyncController.checkIfDBWorked(
+                                widget.otherUserContactModal.connectionId);
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      Container(
+                        height: 30,
+                        width: 30,
+                        child: RaisedButton(
+                          color: Colors.red,
+                          onPressed: () {
+                            chatSyncController.deleteTable(
+                                widget.otherUserContactModal.connectionId);
+                          },
+                        ),
                       )
                     ],
                   ),

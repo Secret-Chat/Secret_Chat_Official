@@ -11,7 +11,7 @@ class SqlStore {
           return db.execute(
               'CREATE TABLE $chatId(messageId TEXT PRIMARY KEY,messageText TEXT);');
         },
-        version: 2,
+        version: 1,
         onOpen: (db) {
           print('onOpen Called');
           return db.execute(
