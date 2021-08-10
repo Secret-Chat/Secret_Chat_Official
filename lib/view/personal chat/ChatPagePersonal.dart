@@ -374,19 +374,19 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
           width: MediaQuery.of(context).size.width,
           child: Column(
             children: <Widget>[
-              Obx(
-                () => !chatSyncController.connectedToInternet.value
-                    ? Container(
-                        height: 40,
-                        child: Center(
-                          child: Text(
-                            'No Internet Connection ! ',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        ),
-                      )
-                    : Container(),
-              ),
+              // Obx(
+              //   () => !chatSyncController.connectedToInternet.value
+              //       ? Container(
+              //           height: 40,
+              //           child: Center(
+              //             child: Text(
+              //               'No Internet Connection ! ',
+              //               style: TextStyle(fontSize: 20),
+              //             ),
+              //           ),
+              //         )
+              //       : Container(),
+              // ),
               SingleChildScrollView(
                 child: Container(
                   height: MediaQuery.of(context).size.height - 168,
@@ -555,16 +555,16 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
                         height: 30,
                         width: 30,
 
-                        child: RaisedButton(onPressed: () {
-                          print('predd');
-                          chatSyncController
-                              .checkIfDBWorked(widget.personalChatModel.chatId);
-                        }),
+                        // child: RaisedButton(onPressed: () {
+                        //   print('predd');
+                        //   chatSyncController
+                        //       .checkIfDBWorked(widget.personalChatModel.chatId);
+                        // }),
 
                         child: RaisedButton(
                           onPressed: () {
                             chatSyncController.checkIfDBWorked(
-                                widget.otherUserContactModal.connectionId);
+                                widget.personalChatModel.chatId);
                           },
                         ),
                       ),
@@ -575,11 +575,10 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
                         child: RaisedButton(
                           color: Colors.red,
                           onPressed: () {
-                            chatSyncController.deleteTable(
-                                widget.otherUserContactModal.connectionId);
+                            chatSyncController
+                                .deleteTable(widget.personalChatModel.chatId);
                           },
                         ),
-
                       )
                     ],
                   ),
