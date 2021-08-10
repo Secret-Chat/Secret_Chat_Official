@@ -2,6 +2,7 @@ import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/pollController.dart';
 import 'package:secretchat/controller/replyToMessage.dart';
@@ -216,9 +217,9 @@ class AlertDialogWidget {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                            title: Text('Pin Message'),
-                                            content: Container(
-                                                child: Column(
+                                          title: Text('Pin Message'),
+                                          content: Container(
+                                            child: Column(
                                               mainAxisSize: MainAxisSize.min,
                                               children: <Widget>[
                                                 Container(
@@ -268,8 +269,11 @@ class AlertDialogWidget {
                                                   ),
                                                 )
                                               ],
-                                            )));
-                                      });
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
                             },
                           ),
                         ),
@@ -555,6 +559,158 @@ class AlertDialogWidget {
         .collection('pinMessages')
         .doc(messageId)
         .delete();
+  }
+
+  unPinAll(TeamModel teamModel) {
+    return showDialog(
+      context: navigatorKey.currentContext,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Fuck?'),
+          content: Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  child: Text(
+                      'Are you sure you want to unpin all the messages of this group?'),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Spacer(),
+                      GestureDetector(
+                        child: Container(
+                          child: Text('Cancel'),
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      SizedBox(width: 20),
+                      GestureDetector(
+                        child: Container(
+                          child: Text('Yes'),
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          unPinAllFinal(teamModel);
+                        },
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  unPinAllFinal(TeamModel teamModel) {
+    return showDialog(
+        context: navigatorKey.currentContext,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Fuckagain?'),
+            content: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    child: Text(
+                        'Are you really sure you want to unpin all the messages of this group?'),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Spacer(),
+                        GestureDetector(
+                          child: Container(
+                            child: Text('Cancel'),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        SizedBox(width: 20),
+                        GestureDetector(
+                          child: Container(
+                            child: Text('Yes'),
+                          ),
+                          onTap: () {
+                            onUnPinAll(teamModel);
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        SizedBox(
+                          width: 20,
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  onUnPinAll(TeamModel teamModel) async {
+    await FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(teamModel.teamId)
+        .update({'pinMessages': 0});
+
+    await FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(teamModel.teamId)
+        .collection('messages')
+        .get()
+        .then((value) {
+      for (DocumentSnapshot pinmessages in value.docs) {
+        pinmessages.reference.update({'isPinMessage': false});
+      }
+    });
+
+    // await StreamBuilder<QuerySnapshot>(
+    //   stream:
+    // var pin = await FirebaseFirestore.instance
+    //     .collection('personal_connections')
+    //     .doc(teamModel.teamId)
+    //     .collection('messages')
+    //     .get();
+
+    //   builder: (context, snapshots) {
+    //     if (snapshots.hasData) {
+
+    //     }
+    //   },
+    // );
+
+    await FirebaseFirestore.instance
+        .collection('personal_connections')
+        .doc(teamModel.teamId)
+        .collection('pinMessages')
+        .get()
+        .then((value) {
+      for (DocumentSnapshot pinMessages in value.docs) {
+        pinMessages.reference.delete();
+      }
+    });
   }
 
   pollingSheet({PollController pollController, TeamModel teamModel}) {

@@ -6,6 +6,7 @@ import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/model/team_model.dart';
 import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/view/mainPage.dart';
+import 'package:secretchat/view/settingsPage.dart';
 import 'package:secretchat/view/team%20chat/addMemberPage.dart';
 import 'package:secretchat/view/team%20chat/teamEditingPage.dart';
 import 'package:secretchat/view/user%20views/profileDetail.dart';
@@ -352,6 +353,10 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                                                 snapshots.data.docs[index].id,
                                           ),
                                         );
+                                      } else {
+                                        Navigator.of(context).pop();
+                                        Navigator.of(context).pop();
+                                        Get.to(SettingsPage());
                                       }
                                       return null;
                                     },
