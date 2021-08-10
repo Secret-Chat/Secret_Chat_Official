@@ -59,6 +59,7 @@ class _MainPageState extends State<MainPage> {
               Icons.more_vert,
               color: Theme.of(context).primaryIconTheme.color,
             ),
+            underline: Container(),
             items: [
               DropdownMenuItem(
                 child: Container(
@@ -188,8 +189,10 @@ class _MainPageState extends State<MainPage> {
                                   width: 50,
                                   child: snapshot.data.docs[index]['type'] ==
                                           "personal"
-                                      ? Text(
-                                          '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}')
+                                      ? Center(
+                                          child: Text(
+                                              '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}'),
+                                        )
                                       : snapshot.data.docs[index]
                                                   ["groupIcon"] !=
                                               ''
@@ -211,8 +214,46 @@ class _MainPageState extends State<MainPage> {
                                   : '${snapshot.data.docs[index]['teamName']}'),
                               subtitle: snapshot.data.docs[index]['type'] ==
                                       "personal"
-                                  ? Text(
-                                      '${snapshot.data.docs[index]["email"]}')
+                                  // ? Text(
+                                  //     '${snapshot.data.docs[index]["email"]}')
+                                  ? Container(
+                                      height: 20,
+                                      child: StreamBuilder<QuerySnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('personal_connections')
+                                            .doc(snapshot.data.docs[index].id)
+                                            .collection('messages')
+                                            .orderBy('createdOn',
+                                                descending: true)
+                                            .snapshots(),
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot<QuerySnapshot>
+                                                snapshots) {
+                                          if (snapshots.hasError) {
+                                            return Text('Something went wrong');
+                                          }
+                                          if (snapshots.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Container();
+                                          }
+                                          if (snapshots.hasData) {
+                                            return ListView.builder(
+                                              itemBuilder: (context, index) {
+                                                if (snapshots
+                                                    .data.docs.isEmpty) {
+                                                  return Text(
+                                                      '${snapshot.data.docs[index]["email"]}');
+                                                }
+                                                return Text(snapshots
+                                                    .data.docs[0]['message']);
+                                              },
+                                              itemCount: 1,
+                                            );
+                                          }
+                                          return Container();
+                                        },
+                                      ),
+                                    )
                                   : Container(
                                       height: 20,
                                       child: StreamBuilder<QuerySnapshot>(
@@ -255,9 +296,10 @@ class _MainPageState extends State<MainPage> {
                                 if (snapshot.data.docs[index]['type'] ==
                                     "personal")
                                   Get.to(ChatPagePersonal(
-                                    otherUserContactModal: Contacts(
-                                        connectionId:
-                                            snapshot.data.docs[index].id,
+                                    personalChatModel: Contacts(
+                                        chatId: snapshot.data.docs[index].id,
+                                        otherUserId: snapshot.data.docs[index]
+                                            ["userId"],
                                         otherUserEmail:
                                             snapshot.data.docs[index]["email"],
                                         otherUserName: snapshot.data.docs[index]

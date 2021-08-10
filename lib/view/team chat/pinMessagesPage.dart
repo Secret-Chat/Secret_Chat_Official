@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/model/team_model.dart';
+import 'package:secretchat/widgets/alertDialogWidget.dart';
 
 class PinMessagesPage extends StatefulWidget {
   final TeamModel teamModel;
@@ -180,11 +181,16 @@ class _PinMessagesPageState extends State<PinMessagesPage> {
                   ),
                 ),
               ),
-              Container(
-                height: 50,
-                child: Center(
-                  child: Text('UNPIN ALL MESSAGES'),
+              GestureDetector(
+                child: Container(
+                  height: 50,
+                  child: Center(
+                    child: Text('UNPIN ALL MESSAGES'),
+                  ),
                 ),
+                onTap: () {
+                  AlertDialogWidget()..unPinAll(widget.teamModel);
+                },
               )
             ],
           ),

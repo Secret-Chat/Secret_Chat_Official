@@ -1,11 +1,13 @@
 class Contacts {
   String otherUserName;
   String otherUserEmail;
-  String connectionId;
+  String chatId;
+  String otherUserId;
 
   Contacts({
     this.otherUserName,
     this.otherUserEmail,
-    this.connectionId,
+    this.chatId,
+    this.otherUserId,
   });
 }
