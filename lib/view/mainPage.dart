@@ -16,6 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'team chat/makeGroup.dart';
 import 'package:get/get.dart';
 import 'settingsPage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -32,6 +33,8 @@ class _MainPageState extends State<MainPage> {
     // TODO: implement initState
 
     super.initState();
+    FirebaseMessaging.onMessage;
+
     // fetchFromServer();
   }
 

@@ -32,6 +32,9 @@ dependencies:
   # firebase storage for storing users images (<><>)
   firebase_storage: ^10.0.0
 
+  # firebase cloud messaging
+  firebase_messaging: ^10.0.4
+
   # getting inside mobiles data XD
   shared_preferences: ^2.0.6
   sqflite: ^2.0.0+3

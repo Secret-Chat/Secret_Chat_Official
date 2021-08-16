@@ -197,6 +197,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  firebase_messaging:
+    dependency: "direct main"
+    description:
+      name: firebase_messaging
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "10.0.4"
+  firebase_messaging_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_messaging_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.3"
+  firebase_messaging_web:
+    dependency: transitive
+    description:
+      name: firebase_messaging_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.3"
   firebase_storage:
     dependency: "direct main"
     description:
@@ -237,6 +258,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.1.0"
+  flutter_otp:
+    dependency: "direct main"
+    description:
+      name: flutter_otp
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -441,6 +469,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  sms:
+    dependency: transitive
+    description:
+      name: sms
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.4"
   source_span:
     dependency: transitive
     description:
