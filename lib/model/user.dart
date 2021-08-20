@@ -4,23 +4,23 @@ import 'package:flutter/foundation.dart';
 
 class UserModel {
   String userEmail;
-  String password;
+  String? password;
   String userName;
-  String name;
-  String photoUrl;
-  String status;
+  String? name;
+  String? photoUrl;
+  String? status;
   String userId;
-  String phoneNumber;
-  List<String> contactDetails; //list of contacts in the phone
+  String? phoneNumber;
+  List<String>? contactDetails; //list of contacts in the phone
 
   UserModel({
-    this.userEmail,
+    required this.userEmail,
     this.password,
-    this.userName,
+    required this.userName,
     this.name,
     this.photoUrl,
     this.status,
-    this.userId,
+    required this.userId,
     this.phoneNumber,
     this.contactDetails,
   });

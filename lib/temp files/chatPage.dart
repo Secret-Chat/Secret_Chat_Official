@@ -84,7 +84,7 @@ class _ChatPageState extends State<ChatPage> {
 
                                       .collection('users')
                                       .doc(
-                                          '${snapshot.data.docs[index]['sentBy']}')
+                                          '${snapshot.data!.docs[index]['sentBy']}')
                                       .snapshots(),
                                   builder: (context, userSnapshot) {
                                     if (userSnapshot.hasError) {
@@ -103,20 +103,20 @@ class _ChatPageState extends State<ChatPage> {
                                       return ListTile(
                                         leading: getxController
                                                     .authData.value ==
-                                                snapshot.data.docs[index]
+                                                snapshot.data!.docs[index]
                                                     ['sentBy']
                                             ? Text(
-                                                "${userSnapshot.data.data()['username']}")
+                                                "${userSnapshot.data!.data()!['username']}")
                                             : Text(
-                                                "${userSnapshot.data.data()['username']}"),
+                                                "${userSnapshot.data!.data()!['username']}"),
                                         title: Text(
-                                            '${snapshot.data.docs[index]['message']}'),
+                                            '${snapshot.data!.docs[index]['message']}'),
                                       );
                                     }
                                     return Container();
                                   });
                             },
-                            itemCount: snapshot.data.docs.length);
+                            itemCount: snapshot.data!.docs.length);
                       }
 
                       return Container();

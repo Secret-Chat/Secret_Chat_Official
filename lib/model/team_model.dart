@@ -1,9 +1,9 @@
 class TeamModel {
-  final String teamId;
-  final String teamName;
-  final String createdOn;
-  final String createdBy;
-  final String groupIcon;
+  final String? teamId;
+  final String? teamName;
+  final String? createdOn;
+  final String? createdBy;
+  final String? groupIcon;
 
   TeamModel(
       {this.teamId,

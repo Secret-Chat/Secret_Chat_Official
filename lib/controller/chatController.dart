@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class ChatController extends GetxController {
   var emailFound = false.obs;
-  Future<void> searchEmailId({String email}) async {
+  Future<void> searchEmailId({String? email}) async {
     var result = FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
@@ -19,7 +19,7 @@ class ChatController extends GetxController {
         .where('email', isEqualTo: email)
         .get();
 
-    if (result2.isBlank) {
+    if (result2.isBlank!) {
       print("fuck");
     }
     print(result2.docs.first['email']);
@@ -27,10 +27,5 @@ class ChatController extends GetxController {
     print(emailFound);
   }
 
-  void connectWithUser()
-  {
-    
-  }
-  
-  
+  void connectWithUser() {}
 }

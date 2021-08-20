@@ -1,7 +1,7 @@
 class PersonalChatModel {
-  String chatId;
-  String userOne;
-  String userTwo;
+  String? chatId;
+  String? userOne;
+  String? userTwo;
 
   PersonalChatModel({
     this.chatId,

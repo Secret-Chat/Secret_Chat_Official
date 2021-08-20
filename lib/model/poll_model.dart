@@ -1,6 +1,6 @@
 class PollOption {
-  String pollText; //option text
-  int pollIndex; //to keep the order intact for every user
+  String? pollText; //option text
+  int? pollIndex; //to keep the order intact for every user
 
   //constructor
 
@@ -14,7 +14,7 @@ class PollOption {
     ''';
   }
 
-  Map<String, String> toMap() {
+  Map<String?, String?> toMap() {
     return {
       "pollText": pollText,
       "pollIndex": pollIndex.toString(),

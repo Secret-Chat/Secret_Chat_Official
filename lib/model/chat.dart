@@ -10,9 +10,10 @@ is_chat_of_group
 */
 
 class Chat {
-  String senderName;
-  String sentBy;
-  String message;
-  String timestamp;
+  String? senderName;
+  String? sentBy;
+  String? message;
+  String? timestamp;
 // String imagrURL
+  Chat({this.senderName, this.sentBy, this.message, this.timestamp});
 }

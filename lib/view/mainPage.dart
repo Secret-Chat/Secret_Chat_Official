@@ -54,8 +54,11 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat Page'),
-        backgroundColor: Theme.of(context).primaryColor,
+        title: Text(
+          'Messages',
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
         actions: [
           DropdownButton(
             icon: Icon(
@@ -135,29 +138,32 @@ class _MainPageState extends State<MainPage> {
       body: Center(
         child: Container(
           alignment: Alignment.topCenter,
+          color: Colors.white,
           child: Column(
             children: <Widget>[
               ListTile(
-                leading: Icon(Icons.note),
+                leading: ClipOval(
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        color: Color.fromRGBO(175, 103, 235, 0.3)),
+                    child: Center(
+                      child: Icon(
+                        Icons.notes,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
                 title: Text('Note to self'),
-                tileColor: Color.fromRGBO(20, 20, 20, 0.2),
+                //tileColor: Color.fromRGBO(20, 20, 20, 0.2),
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => NoteSelf()));
                 },
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.circle,
-                  color: Colors.black,
-                ),
-                title: Text('Other User'),
-                tileColor: Color.fromRGBO(34, 23, 24, 0.3),
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ChatPage()));
-                },
-              ),
+
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -172,11 +178,11 @@ class _MainPageState extends State<MainPage> {
                           child: CircularProgressIndicator(),
                         );
                       }
-                      // if (snapshot.hasError) {
-                      //   Center(
-                      //     child: CircularProgressIndicator(),
-                      //   );
-                      // }
+                      if (snapshot.hasError) {
+                        Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
 
                       if (snapshot.hasData) {
                         // chatSyncController.syncFromServerPersonalConnectionList(

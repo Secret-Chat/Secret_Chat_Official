@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
   final getxController = Get.put(AuthController());
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext? context) {
     return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -40,18 +40,18 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
         highlightColor: Color.fromRGBO(100, 100, 100, 0.4),
       ),
-      home: StreamBuilder<User>(
+      home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, AsyncSnapshot<User> userSnapshot) {
+        builder: (context, AsyncSnapshot<User?> userSnapshot) {
           if (userSnapshot.hasData) {
             //return ChatPage();
             // getxController.user.value = UserModel(
             //     userEmail: userSnapshot.data.email,
             //     userId: userSnapshot.data.uid);
-            getxController.authData.value = userSnapshot.data.uid;
+            getxController.authData.value = userSnapshot.data!.uid;
             FirebaseFirestore.instance
                 .collection("users")
-                .doc(userSnapshot.data.uid)
+                .doc(userSnapshot.data!.uid)
                 .get()
                 .then((value) {
               getxController.user.value = UserModel(

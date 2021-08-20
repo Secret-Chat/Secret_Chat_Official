@@ -154,18 +154,18 @@ enum MenuOptions {
 class SampleMenu extends StatelessWidget {
   SampleMenu(this.controller);
 
-  final Future<WebViewController> controller;
+  final Future<WebViewController?> controller;
   final CookieManager cookieManager = CookieManager();
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<WebViewController>(
+  Widget build(BuildContext? context) {
+    return FutureBuilder<WebViewController?>(
       future: controller,
       builder:
-          (BuildContext context, AsyncSnapshot<WebViewController> controller) {
-        return PopupMenuButton<MenuOptions>(
-          onSelected: (MenuOptions value) {
-            switch (value) {
+          (BuildContext context, AsyncSnapshot<WebViewController?> controller) {
+        return PopupMenuButton<MenuOptions?>(
+          onSelected: (MenuOptions? value) {
+            switch (value!) {
               case MenuOptions.showUserAgent:
                 _onShowUserAgent(controller.data, context);
                 break;
@@ -189,33 +189,33 @@ class SampleMenu extends StatelessWidget {
                 break;
             }
           },
-          itemBuilder: (BuildContext context) => <PopupMenuItem<MenuOptions>>[
-            PopupMenuItem<MenuOptions>(
+          itemBuilder: (BuildContext context) => <PopupMenuItem<MenuOptions?>>[
+            PopupMenuItem<MenuOptions?>(
               value: MenuOptions.showUserAgent,
               child: const Text('Show user agent'),
               enabled: controller.hasData,
             ),
-            const PopupMenuItem<MenuOptions>(
+            const PopupMenuItem<MenuOptions?>(
               value: MenuOptions.listCookies,
               child: Text('List cookies'),
             ),
-            const PopupMenuItem<MenuOptions>(
+            const PopupMenuItem<MenuOptions?>(
               value: MenuOptions.clearCookies,
               child: Text('Clear cookies'),
             ),
-            const PopupMenuItem<MenuOptions>(
+            const PopupMenuItem<MenuOptions?>(
               value: MenuOptions.addToCache,
               child: Text('Add to cache'),
             ),
-            const PopupMenuItem<MenuOptions>(
+            const PopupMenuItem<MenuOptions?>(
               value: MenuOptions.listCache,
               child: Text('List cache'),
             ),
-            const PopupMenuItem<MenuOptions>(
+            const PopupMenuItem<MenuOptions?>(
               value: MenuOptions.clearCache,
               child: Text('Clear cache'),
             ),
-            const PopupMenuItem<MenuOptions>(
+            const PopupMenuItem<MenuOptions?>(
               value: MenuOptions.navigationDelegate,
               child: Text('Navigation Delegate example'),
             ),
@@ -226,19 +226,19 @@ class SampleMenu extends StatelessWidget {
   }
 
   void _onShowUserAgent(
-      WebViewController controller, BuildContext context) async {
+      WebViewController? controller, BuildContext? context) async {
     // Send a message with the user agent string to the Toaster JavaScript channel we registered
     // with the WebView.
-    await controller.evaluateJavascript(
+    await controller!.evaluateJavascript(
         'Toaster.postMessage("User Agent: " + navigator.userAgent);');
   }
 
   void _onListCookies(
-      WebViewController controller, BuildContext context) async {
+      WebViewController? controller, BuildContext? context) async {
     final String cookies =
-        await controller.evaluateJavascript('document.cookie');
+        await controller!.evaluateJavascript('document.cookie');
     // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(SnackBar(
+    Scaffold.of(context!).showSnackBar(SnackBar(
       content: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
@@ -250,46 +250,49 @@ class SampleMenu extends StatelessWidget {
     ));
   }
 
-  void _onAddToCache(WebViewController controller, BuildContext context) async {
-    await controller.evaluateJavascript(
+  void _onAddToCache(
+      WebViewController? controller, BuildContext? context) async {
+    await controller!.evaluateJavascript(
         'caches.open("test_caches_entry"); localStorage["test_localStorage"] = "dummy_entry";');
     // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(const SnackBar(
+    Scaffold.of(context!).showSnackBar(const SnackBar(
       content: Text('Added a test entry to cache.'),
     ));
   }
 
-  void _onListCache(WebViewController controller, BuildContext context) async {
-    await controller.evaluateJavascript('caches.keys()'
+  void _onListCache(
+      WebViewController? controller, BuildContext? context) async {
+    await controller!.evaluateJavascript('caches.keys()'
         '.then((cacheKeys) => JSON.stringify({"cacheKeys" : cacheKeys, "localStorage" : localStorage}))'
         '.then((caches) => Toaster.postMessage(caches))');
   }
 
-  void _onClearCache(WebViewController controller, BuildContext context) async {
-    await controller.clearCache();
+  void _onClearCache(
+      WebViewController? controller, BuildContext? context) async {
+    await controller!.clearCache();
     // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(const SnackBar(
+    Scaffold.of(context!).showSnackBar(const SnackBar(
       content: Text("Cache cleared."),
     ));
   }
 
-  void _onClearCookies(BuildContext context) async {
+  void _onClearCookies(BuildContext? context) async {
     final bool hadCookies = await cookieManager.clearCookies();
     String message = 'There were cookies. Now, they are gone!';
     if (!hadCookies) {
       message = 'There are no cookies.';
     }
     // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(SnackBar(
+    Scaffold.of(context!).showSnackBar(SnackBar(
       content: Text(message),
     ));
   }
 
   void _onNavigationDelegateExample(
-      WebViewController controller, BuildContext context) async {
+      WebViewController? controller, BuildContext? context) async {
     final String contentBase64 =
         base64Encode(const Utf8Encoder().convert(kNavigationExamplePage));
-    await controller.loadUrl('data:text/html;base64,$contentBase64');
+    await controller!.loadUrl('data:text/html;base64,$contentBase64');
   }
 
   Widget _getCookieList(String cookies) {
@@ -311,17 +314,17 @@ class NavigationControls extends StatelessWidget {
   const NavigationControls(this._webViewControllerFuture)
       : assert(_webViewControllerFuture != null);
 
-  final Future<WebViewController> _webViewControllerFuture;
+  final Future<WebViewController?> _webViewControllerFuture;
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<WebViewController>(
+  Widget build(BuildContext? context) {
+    return FutureBuilder<WebViewController?>(
       future: _webViewControllerFuture,
       builder:
-          (BuildContext context, AsyncSnapshot<WebViewController> snapshot) {
+          (BuildContext context, AsyncSnapshot<WebViewController?> snapshot) {
         final bool webViewReady =
             snapshot.connectionState == ConnectionState.done;
-        final WebViewController controller = snapshot.data;
+        final WebViewController? controller = snapshot.data;
         return Row(
           children: <Widget>[
             IconButton(
@@ -329,7 +332,7 @@ class NavigationControls extends StatelessWidget {
               onPressed: !webViewReady
                   ? null
                   : () async {
-                      if (await controller.canGoBack()) {
+                      if (await controller!.canGoBack()) {
                         await controller.goBack();
                       } else {
                         // ignore: deprecated_member_use
@@ -345,7 +348,7 @@ class NavigationControls extends StatelessWidget {
               onPressed: !webViewReady
                   ? null
                   : () async {
-                      if (await controller.canGoForward()) {
+                      if (await controller!.canGoForward()) {
                         await controller.goForward();
                       } else {
                         // ignore: deprecated_member_use
@@ -362,7 +365,7 @@ class NavigationControls extends StatelessWidget {
               onPressed: !webViewReady
                   ? null
                   : () {
-                      controller.reload();
+                      controller!.reload();
                     },
             ),
           ],

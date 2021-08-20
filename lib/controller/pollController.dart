@@ -27,11 +27,11 @@ class PollController extends GetxController {
   }
 
   Future<void> sendAllOptionsToFirebase(
-      {String teamId,
-      String sentBy,
-      String messageText,
-      String type,
-      bool isDeleted}) async {
+      {required String teamId,
+      required String sentBy,
+      required String messageText,
+      required String type,
+      required bool isDeleted}) async {
     print('''
     CHeck data: 
     teamId: $teamId,
@@ -62,7 +62,7 @@ class PollController extends GetxController {
         // }
         print(element.pollText);
         if (element.pollText != null) {
-          return FirebaseFirestore.instance
+          FirebaseFirestore.instance
               // .collection(
               //     'personal_connections')  //${getxController.authData}/messages')
               .collection('personal_connections')
@@ -77,11 +77,11 @@ class PollController extends GetxController {
   }
 
   Future<void> sendPollAnswer({
-    String teamId,
-    String userPollingId,
-    String userNameofPoller,
-    String pollOptionId,
-    String messageId,
+    required String teamId,
+    required String userPollingId,
+    required String userNameofPoller,
+    required String pollOptionId,
+    required String messageId,
   }) async {
     //check if user has already polled
     FirebaseFirestore.instance
@@ -126,7 +126,8 @@ class PollController extends GetxController {
     });
   }
 
-  Stream<QuerySnapshot> usersWhoPolled({String teamId, String messageId}) {
+  Stream<QuerySnapshot> usersWhoPolled(
+      {required String teamId, required String messageId}) {
     return FirebaseFirestore.instance
         .collection('personal_connections')
         .doc('$teamId')
@@ -137,7 +138,9 @@ class PollController extends GetxController {
   }
 
   Stream<QuerySnapshot> usersWhoPolledOnSpecificOption(
-      {String teamId, String messageId, String pollId}) {
+      {required String teamId,
+      required String messageId,
+      required String pollId}) {
     return FirebaseFirestore.instance
         .collection('personal_connections')
         .doc('$teamId')
@@ -150,7 +153,10 @@ class PollController extends GetxController {
   }
 
   void revertPollOptions(
-      {String teamId, String messageId, String pollId, String userId}) {
+      {required String teamId,
+      required String messageId,
+      required String pollId,
+      required String userId}) {
     //remove that user from that specific option
     FirebaseFirestore.instance
         .collection('personal_connections')

@@ -18,9 +18,9 @@ class UserOperations extends GetxController {
         "userId": getxController.user.value.userId
       },
       "userTwo": {
-        "email": document.data()['email'],
-        "userName": document.data()['username'],
-        "userId": document.data()['userId']
+        "email": document.data()!['email'],
+        "userName": document.data()!['username'],
+        "userId": document.data()!['userId']
       }
     });
     print("Doc iD ${docId.id}");
@@ -34,16 +34,16 @@ class UserOperations extends GetxController {
         .doc(docId.id)
         .set({
       "type": "personal",
-      "email": document.data()['email'],
-      "userId": document.data()['userId'],
-      "userName": document.data()['username'],
+      "email": document.data()!['email'],
+      "userId": document.data()!['userId'],
+      "userName": document.data()!['username'],
       // "connectionID": docId.id
     });
 
     // add for the other user
     FirebaseFirestore.instance
         .collection("users")
-        .doc(document.data()['userId'])
+        .doc(document.data()!['userId'])
         .collection("connections")
         .doc(docId.id)
         .set({
@@ -56,18 +56,18 @@ class UserOperations extends GetxController {
   }
 
   Future<bool> ifUserExist({
-    DocumentSnapshot document,
-    AuthController getxController,
+    required DocumentSnapshot document,
+    required AuthController getxController,
   }) async {
     // bool userExists = false; //initially the user won't exist
     print("docid ${document.id}");
-    print("emailof other : ${document.data()['email']}");
+    print("emailof other : ${document.data()!['email']}");
     print("userExists function called ${getxController.authData.value}");
     QuerySnapshot result = await FirebaseFirestore.instance
         .collection('users')
         .doc(getxController.authData.value)
         .collection("connections")
-        .where('email', isEqualTo: document.data()['email'])
+        .where('email', isEqualTo: document.data()!['email'])
         .get();
     //doc length zero - so user doc not exist
     print("len ${result.docs.length}");
