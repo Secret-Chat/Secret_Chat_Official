@@ -482,6 +482,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         // ),
 
         centerTitle: true,
+        backgroundColor: Color.fromRGBO(175, 103, 235, 0.3),
+        elevation: 0,
         title: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
               .collection('personal_connections')
@@ -1084,70 +1086,98 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 // if (snapshot.data.docs[index]['isGif'] ==
                                                 //     false) {
                                                 return GestureDetector(
-                                                  child: ListTile(
-                                                    title: getxController
-                                                                .authData
-                                                                .value !=
+                                                  child: Container(
+                                                    width: 100,
+                                                    margin:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 2,
+                                                            horizontal: 5),
+                                                    //padding: EdgeInsets.all(10),
+                                                    constraints: BoxConstraints(
+                                                        minWidth: 100,
+                                                        maxWidth: 250),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(3),
+                                                      ),
+                                                      color: Colors.white,
+                                                    ),
+                                                    alignment: getxController
+                                                                .user
+                                                                .value
+                                                                .userId ==
                                                             snapshot.data
                                                                     .docs[index]
                                                                 ['sentBy']
-                                                        ? Text(
-                                                            "${snapshot.data.docs[index]['sentByName']}")
-                                                        : SizedBox(
-                                                            height: 0,
-                                                            width: 0,
-                                                          ),
-                                                    subtitle: Linkify(
-                                                      onOpen: (link) async {
-                                                        print(
-                                                            "Linkify link = ${link.url}");
-                                                        var linkurl =
-                                                            "https://${link.url}";
-                                                        print(link.url);
-                                                        // if (await canLaunch(link.text)) {
-                                                        // await launch(
-                                                        //     "https://www.google.com/");
-                                                        if (link.url.contains(
-                                                            "www.youtube.com")) {
-                                                          setState(() {
-                                                            videoId = YoutubePlayer
-                                                                .convertUrlToId(
-                                                                    "${link.url}");
-                                                            print(videoId);
-                                                          });
+                                                        ? Alignment.centerRight
+                                                        : Alignment.centerLeft,
+                                                    child: ListTile(
+                                                      title: getxController
+                                                                  .authData
+                                                                  .value !=
+                                                              snapshot.data
+                                                                          .docs[
+                                                                      index]
+                                                                  ['sentBy']
+                                                          ? Text(
+                                                              "${snapshot.data.docs[index]['sentByName']}")
+                                                          : SizedBox(
+                                                              height: 0,
+                                                              width: 0,
+                                                            ),
+                                                      subtitle: Linkify(
+                                                        onOpen: (link) async {
+                                                          print(
+                                                              "Linkify link = ${link.url}");
+                                                          var linkurl =
+                                                              "https://${link.url}";
+                                                          print(link.url);
+                                                          // if (await canLaunch(link.text)) {
+                                                          // await launch(
+                                                          //     "https://www.google.com/");
+                                                          if (link.url.contains(
+                                                              "www.youtube.com")) {
+                                                            setState(() {
+                                                              videoId = YoutubePlayer
+                                                                  .convertUrlToId(
+                                                                      "${link.url}");
+                                                              print(videoId);
+                                                            });
 
-                                                          return showYouBottomSheet(
-                                                              link.url);
-                                                          // return YoutubeBottomSheet()
-                                                          //   ..showYouBottomSheet(
-                                                          //       videoId,
-                                                          //       link.url,
-                                                          //       context,
-                                                          //       _controller);
-                                                        }
-                                                        Get.to(WebViewPage(
-                                                            link.url));
+                                                            return showYouBottomSheet(
+                                                                link.url);
+                                                            // return YoutubeBottomSheet()
+                                                            //   ..showYouBottomSheet(
+                                                            //       videoId,
+                                                            //       link.url,
+                                                            //       context,
+                                                            //       _controller);
+                                                          }
+                                                          Get.to(WebViewPage(
+                                                              link.url));
 
-                                                        // } else {
-                                                        //   print(link.text);
-                                                        //   print('no problem');
-                                                        // }
-                                                      },
-                                                      text:
-                                                          "${snapshot.data.docs[index]['message']}",
-                                                      style: TextStyle(
-                                                          color:
-                                                              Colors.black45),
-                                                      linkStyle: TextStyle(
-                                                          color: Colors.blue),
-                                                      options: LinkifyOptions(
-                                                          humanize: false),
+                                                          // } else {
+                                                          //   print(link.text);
+                                                          //   print('no problem');
+                                                          // }
+                                                        },
+                                                        text:
+                                                            "${snapshot.data.docs[index]['message']}",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.black45),
+                                                        linkStyle: TextStyle(
+                                                            color: Colors.blue),
+                                                        options: LinkifyOptions(
+                                                            humanize: false),
+                                                      ),
+
+                                                      // Text(
+                                                      //     '${snapshot.data.docs[index]['message']}'),
+                                                      // trailing: Text(
+                                                      //     '${snapshot.data.docs[index]['createdOn'].toString().substring(10, 20)}'),
                                                     ),
-
-                                                    // Text(
-                                                    //     '${snapshot.data.docs[index]['message']}'),
-                                                    // trailing: Text(
-                                                    //     '${snapshot.data.docs[index]['createdOn'].toString().substring(10, 20)}'),
                                                   ),
                                                   onTap: () {
                                                     AlertDialogWidget()

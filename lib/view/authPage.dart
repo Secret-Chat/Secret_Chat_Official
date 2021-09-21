@@ -45,6 +45,8 @@ class _AuthPageState extends State<AuthPage> {
           'username': username,
           'email': email,
           'userId': authResult.user.uid,
+          'name': '',
+          'about': '',
           'phoneNumber': '',
         });
       }

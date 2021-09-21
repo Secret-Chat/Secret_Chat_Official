@@ -34,10 +34,19 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search Page'),
+        title: Text(
+          'Add Friend',
+          style: TextStyle(
+            color: Color.fromRGBO(175, 103, 235, 0.3),
+          ),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
       ),
       body: Container(
         height: MediaQuery.of(context).size.height - 68,
+        color: Colors.white,
         child: Column(
           children: <Widget>[
             Container(
@@ -139,8 +148,21 @@ class _SearchPageState extends State<SearchPage> {
                             print(document.data()['username']);
                             ///////////////////////////////////////////////////////////////////////
                             return ListTile(
-                              title: new Text(document.data()['email']),
-                              subtitle: new Text(document.data()['username']),
+                              leading: ClipOval(
+                                child: Container(
+                                  height: 50,
+                                  width: 50,
+                                  color: Color.fromRGBO(175, 103, 235, 0.3),
+                                  child: Center(
+                                    child: Text(
+                                      '${document.data()["username"].toString().substring(0, 1)}',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              title: new Text(document.data()['username']),
+                              subtitle: new Text(document.data()['about']),
                               onTap: () async {
                                 //don't add if connection is already there
                                 bool userExists =
@@ -153,6 +175,8 @@ class _SearchPageState extends State<SearchPage> {
                                 if (!userExists) {
                                   await userOperations.addContact(
                                       document, getxController);
+
+                                  Navigator.of(context).pop();
                                 } else {
                                   //TODO: send the user to chat page if the connection is already there
 

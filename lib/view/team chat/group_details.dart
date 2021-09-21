@@ -342,6 +342,8 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                                     ),
                                     title: Text(
                                         '${snapshots.data.docs[index]['username']}'),
+                                    // subtitle: Text(snapshots.data.docs.
+                                    //     '${snapshots.data.docs[index]['about']}'),
                                     trailing: Text(
                                         '${snapshots.data.docs[index]['role']}'),
                                     onTap: () {

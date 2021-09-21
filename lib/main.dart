@@ -58,6 +58,8 @@ class MyApp extends StatelessWidget {
                 userEmail: value['email'],
                 userId: value['userId'],
                 userName: value['username'],
+                name: value['name'],
+                about: value['about'],
                 phoneNumber: value['phoneNumber'],
               );
             });
