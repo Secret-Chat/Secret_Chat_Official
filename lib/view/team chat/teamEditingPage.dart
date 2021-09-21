@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/model/team_model.dart';
+import 'package:secretchat/view/mainPage.dart';
 import 'package:secretchat/view/team%20chat/teamName.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -128,7 +129,7 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                                   .doc('${widget.teamModel.teamId}')
                                   .update({'groupIcon': url});
 
-                              await FirebaseFirestore.instance
+                              FirebaseFirestore.instance
                                   .collection('personal_connections')
                                   .doc('${widget.teamModel.teamId}')
                                   .collection('users')
@@ -150,8 +151,7 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
 
                               pickImageTrue = true;
 
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
+                              Get.offAll(MainPage());
                             },
                           ),
                         ),
@@ -238,7 +238,7 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                                   .doc('${widget.teamModel.teamId}')
                                   .update({'groupIcon': url});
 
-                              await FirebaseFirestore.instance
+                              FirebaseFirestore.instance
                                   .collection('personal_connections')
                                   .doc('${widget.teamModel.teamId}')
                                   .collection('users')
@@ -260,8 +260,7 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
 
                               pickImageTrue = true;
 
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
+                              Get.offAll(MainPage());
                             },
                           ),
                         ),
