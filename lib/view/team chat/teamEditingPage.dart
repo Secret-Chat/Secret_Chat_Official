@@ -383,7 +383,7 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
         child: Column(
           children: <Widget>[
             Container(
-              height: 150,
+              height: 200,
               child: Stack(
                 children: [
                   Container(
@@ -398,7 +398,7 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                           if (snapshot.hasData) {
                             if (snapshot.data['groupIcon'] != '') {
                               return Container(
-                                height: 150,
+                                height: 200,
                                 width: MediaQuery.of(context).size.width,
                                 child: Image.network(
                                   snapshot.data['groupIcon'],
@@ -407,7 +407,7 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                               );
                             }
                             return Container(
-                              height: 150,
+                              height: 200,
                               child: Center(
                                 child: Text('No group icon'),
                               ),
@@ -417,10 +417,10 @@ class _TeamEditingPageState extends State<TeamEditingPage> {
                         }),
                   ),
                   Container(
-                    height: 150,
+                    height: 200,
                     //alignment: AlignmentGeometry.lerp(2, 3, 6),
 
-                    padding: EdgeInsets.only(top: 110, left: 20),
+                    padding: EdgeInsets.only(top: 160, left: 20),
                     child: GestureDetector(
                       child: Text(
                         'change the group icon',

@@ -108,7 +108,7 @@ class AlertDialogWidget {
         context: navigatorKey.currentContext,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: Colors.black87,
+            backgroundColor: Colors.white,
             content: Container(
               width: MediaQuery.of(context).size.width - 200,
               child: Column(
@@ -122,7 +122,7 @@ class AlertDialogWidget {
                           child: ListTile(
                             title: Text(
                               'Reply',
-                              style: TextStyle(color: Colors.white70),
+                              style: TextStyle(color: Colors.black45),
                             ),
                             onTap: () {
                               Navigator.of(context).pop();
@@ -138,7 +138,7 @@ class AlertDialogWidget {
                     child: ListTile(
                       title: Text(
                         'Copy',
-                        style: TextStyle(color: Colors.white70),
+                        style: TextStyle(color: Colors.black45),
                       ),
                       onTap: () async {
                         await FlutterClipboard.copy(message);
@@ -179,7 +179,7 @@ class AlertDialogWidget {
                           child: ListTile(
                             title: Text(
                               'Edit',
-                              style: TextStyle(color: Colors.white70),
+                              style: TextStyle(color: Colors.black45),
                             ),
                             onTap: () {
                               Navigator.of(context).pop();
@@ -203,11 +203,11 @@ class AlertDialogWidget {
                             title: isPinMessage == false
                                 ? Text(
                                     'Pin',
-                                    style: TextStyle(color: Colors.white70),
+                                    style: TextStyle(color: Colors.black45),
                                   )
                                 : Text(
                                     'UnPin',
-                                    style: TextStyle(color: Colors.white70),
+                                    style: TextStyle(color: Colors.black45),
                                   ),
                             onTap: () {
                               Navigator.of(context).pop();
@@ -282,7 +282,7 @@ class AlertDialogWidget {
                     child: ListTile(
                       title: Text(
                         'Delete',
-                        style: TextStyle(color: Colors.white70),
+                        style: TextStyle(color: Colors.black45),
                       ),
                       onTap: () {
                         //if (sentBy == getxController.user.value.userId) {

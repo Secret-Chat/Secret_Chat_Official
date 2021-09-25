@@ -41,6 +41,18 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
         centerTitle: true,
+        leading: Container(
+          child: GestureDetector(
+            child: Icon(
+              Icons.arrow_back,
+              size: 25,
+              color: Color.fromRGBO(175, 103, 235, 0.3),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
         elevation: 0,
         backgroundColor: Colors.white,
       ),

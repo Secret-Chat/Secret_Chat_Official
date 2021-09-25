@@ -369,6 +369,7 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
         ),
       ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Container(
           height: MediaQuery.of(context).size.height - 68,
           width: MediaQuery.of(context).size.width,
@@ -388,6 +389,7 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
               //       : Container(),
               // ),
               SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Container(
                   height: MediaQuery.of(context).size.height - 168,
                   color: Color.fromRGBO(23, 34, 24, 0.3),
@@ -415,11 +417,12 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
 
                       if (snapshot.hasData) {
                         //keep in local storage
-                        chatSyncController.syncFromServerPersonalConnectionList(
-                            snapshot.data.docs,
-                            widget.personalChatModel.chatId);
+                        // chatSyncController.syncFromServerPersonalConnectionList(
+                        //     snapshot.data.docs,
+                        //     widget.personalChatModel.chatId);
                         return ListView.builder(
                             reverse: true,
+                            physics: BouncingScrollPhysics(),
                             itemBuilder: (ctx, index) {
                               return (snapshot.data.docs[index]
                                                   ['deleteForOne'] ==
@@ -435,69 +438,177 @@ class _ChatPagePersonalState extends State<ChatPagePersonal> {
                                                   .otherUserId)
                                   ? Container()
                                   : GestureDetector(
-                                      child: ListTile(
-                                        title: getxController.authData.value !=
-                                                snapshot.data.docs[index]
-                                                    ['sentBy']
-                                            ? Text(
-                                                "${widget.personalChatModel.otherUserName}")
-                                            : SizedBox(
-                                                height: 0,
-                                                width: 0,
+                                      // child: ListTile(
+                                      //   title: getxController.authData.value !=
+                                      //           snapshot.data.docs[index]
+                                      //               ['sentBy']
+                                      //       ? Text(
+                                      //           "${widget.personalChatModel.otherUserName}")
+                                      //       : Container(),
+                                      //   // title: Text(
+                                      //   //     '${snapshot.data.docs[index]['message']}'),
+                                      //   subtitle: Linkify(
+                                      //     onOpen: (link) async {
+                                      //       print("Linkify link = ${link.url}");
+                                      //       var linkurl = "https://${link.url}";
+                                      //       print(link.url);
+                                      //       // if (await canLaunch(link.text)) {
+                                      //       // await launch(
+                                      //       //     "https://www.google.com/");
+                                      //       if (link.url.contains("youtu")) {
+                                      //         setState(() {
+                                      //           videoId = YoutubePlayer
+                                      //               .convertUrlToId(
+                                      //                   "${link.url}");
+                                      //           print(videoId);
+                                      //         });
+
+                                      //         return showYouBottomSheet(
+                                      //             link.url);
+                                      //         // return YoutubeBottomSheet()
+                                      //         //   ..showYouBottomSheet(
+                                      //         //       videoId,
+                                      //         //       link.url,
+                                      //         //       context,
+                                      //         //       _controller);
+                                      //       }
+                                      //       Get.to(WebViewPage(link.url));
+
+                                      //       // } else {
+                                      //       //   print(link.text);
+                                      //       //   print('no problem');
+                                      //       // }
+                                      //     },
+                                      //     text:
+                                      //         "${snapshot.data.docs[index]['message']}",
+                                      //     style:
+                                      //         TextStyle(color: Colors.black45),
+                                      //     linkStyle:
+                                      //         TextStyle(color: Colors.blue),
+                                      //     options:
+                                      //         LinkifyOptions(humanize: false),
+                                      //   ),
+                                      // ),
+                                      // onTap: () {
+                                      //   onTapMessage(
+                                      //       snapshot.data.docs[index].id,
+                                      //       snapshot.data.docs[index]
+                                      //           ['message'],
+                                      //       snapshot.data.docs[index]
+                                      //           ['sentBy']);
+                                      //   // dropDownButtonShow();
+                                      // },
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 1),
+                                        padding: EdgeInsets.only(
+                                            right: 10,
+                                            left: 10,
+                                            top: 2,
+                                            bottom: 2),
+                                        //color: Color.fromRGBO(10, 10, 255, 0.3),
+                                        alignment:
+                                            getxController.authData.value !=
+                                                    snapshot.data.docs[index]
+                                                        ['sentBy']
+                                                ? Alignment.bottomLeft
+                                                : Alignment.bottomRight,
+                                        child: Container(
+                                          padding: EdgeInsets.only(
+                                              right: 11,
+                                              bottom: 7,
+                                              left: 12,
+                                              top: 9),
+                                          decoration: BoxDecoration(
+                                            color: Color.fromRGBO(
+                                                200, 30, 50, 0.3),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15)),
+                                          ),
+                                          //width: 20,
+                                          constraints: BoxConstraints(
+                                            minWidth: 10,
+                                            maxWidth: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.8,
+                                          ),
+                                          alignment:
+                                              getxController.authData.value !=
+                                                      snapshot.data.docs[index]
+                                                          ['sentBy']
+                                                  ? Alignment.centerLeft
+                                                  : Alignment.bottomRight,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: getxController
+                                                        .authData.value !=
+                                                    snapshot.data.docs[index]
+                                                        ['sentBy']
+                                                ? CrossAxisAlignment.start
+                                                : CrossAxisAlignment.end,
+                                            children: [
+                                              getxController.authData.value !=
+                                                      snapshot.data.docs[index]
+                                                          ['sentBy']
+                                                  ? Container(
+                                                      child: Text(
+                                                          "${widget.personalChatModel.otherUserName}"),
+                                                    )
+                                                  : Container(),
+                                              Container(
+                                                child: Linkify(
+                                                  onOpen: (link) async {
+                                                    print(
+                                                        "Linkify link = ${link.url}");
+                                                    var linkurl =
+                                                        "https://${link.url}";
+                                                    print(link.url);
+                                                    // if (await canLaunch(link.text)) {
+                                                    // await launch(
+                                                    //     "https://www.google.com/");
+                                                    if (link.url
+                                                        .contains("youtu")) {
+                                                      // setState(() {
+                                                      //   videoId = YoutubePlayer
+                                                      //       .convertUrlToId(
+                                                      //           "${link.url}");
+                                                      //   print(videoId);
+                                                      // });
+
+                                                      // return showYouBottomSheet(
+                                                      //     link.url);
+                                                      // return YoutubeBottomSheet()
+                                                      //   ..showYouBottomSheet(
+                                                      //       videoId,
+                                                      //       link.url,
+                                                      //       context,
+                                                      //       _controller);
+                                                    }
+                                                    Get.to(
+                                                        WebViewPage(link.url));
+
+                                                    // } else {
+                                                    //   print(link.text);
+                                                    //   print('no problem');
+                                                    // }
+                                                  },
+                                                  text:
+                                                      "${snapshot.data.docs[index]['message']}",
+                                                  style: TextStyle(
+                                                      color: Colors.black45),
+                                                  linkStyle: TextStyle(
+                                                      color: Colors.blue),
+                                                  options: LinkifyOptions(
+                                                      humanize: false),
+                                                ),
                                               ),
-                                        // title: Text(
-                                        //     '${snapshot.data.docs[index]['message']}'),
-                                        subtitle: Linkify(
-                                          onOpen: (link) async {
-                                            print("Linkify link = ${link.url}");
-                                            var linkurl = "https://${link.url}";
-                                            print(link.url);
-                                            // if (await canLaunch(link.text)) {
-                                            // await launch(
-                                            //     "https://www.google.com/");
-                                            if (link.url.contains("youtu")) {
-                                              setState(() {
-                                                videoId = YoutubePlayer
-                                                    .convertUrlToId(
-                                                        "${link.url}");
-                                                print(videoId);
-                                              });
-
-                                              return showYouBottomSheet(
-                                                  link.url);
-                                              // return YoutubeBottomSheet()
-                                              //   ..showYouBottomSheet(
-                                              //       videoId,
-                                              //       link.url,
-                                              //       context,
-                                              //       _controller);
-                                            }
-                                            Get.to(WebViewPage(link.url));
-
-                                            // } else {
-                                            //   print(link.text);
-                                            //   print('no problem');
-                                            // }
-                                          },
-                                          text:
-                                              "${snapshot.data.docs[index]['message']}",
-                                          style:
-                                              TextStyle(color: Colors.black45),
-                                          linkStyle:
-                                              TextStyle(color: Colors.blue),
-                                          options:
-                                              LinkifyOptions(humanize: false),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      onTap: () {
-                                        onTapMessage(
-                                            snapshot.data.docs[index].id,
-                                            snapshot.data.docs[index]
-                                                ['message'],
-                                            snapshot.data.docs[index]
-                                                ['sentBy']);
-                                        // dropDownButtonShow();
-                                      },
                                     );
                             },
                             itemCount: snapshot.data.docs.length);
