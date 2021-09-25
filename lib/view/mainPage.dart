@@ -6,8 +6,11 @@ import 'package:secretchat/controller/auth_controller.dart';
 import 'package:secretchat/controller/chat_sync_controller.dart';
 import 'package:secretchat/model/contact.dart';
 import 'package:secretchat/model/team_model.dart';
+import 'package:secretchat/view/callPage.dart';
+import 'package:secretchat/view/listChatScreen.dart';
 import 'package:secretchat/view/personal%20chat/ChatPagePersonal.dart';
 import 'package:secretchat/temp%20files/chatPage.dart';
+import 'package:secretchat/view/storyPage.dart';
 import 'package:secretchat/view/team%20chat/groupPage.dart';
 import 'package:secretchat/view/user%20views/noteSelf.dart';
 import 'package:secretchat/view/team%20chat/group_chat_page.dart';
@@ -23,10 +26,12 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage>
+    with SingleTickerProviderStateMixin {
   // final instance = FirebaseFirestore.instance;
   final getxController = Get.put(AuthController());
   final ChatSyncController chatSyncController = Get.put(ChatSyncController());
+  TabController tabController;
 
   @override
   void initState() {
@@ -36,6 +41,24 @@ class _MainPageState extends State<MainPage> {
     FirebaseMessaging.onMessage;
 
     // fetchFromServer();
+    tabController = TabController(vsync: this, length: 3)
+      ..addListener(() {
+        setState(() {
+          switch (tabController.index) {
+            case 0:
+              break;
+            case 1:
+              //fabIcon = Icons.message;
+              break;
+            case 2:
+              //fabIcon = Icons.camera_enhance;
+              break;
+            case 3:
+              //fabIcon = Icons.call;
+              break;
+          }
+        });
+      });
   }
 
   // void fetchFromServer() {
@@ -60,373 +83,460 @@ class _MainPageState extends State<MainPage> {
             color: Color.fromRGBO(175, 103, 235, 0.3),
           ),
         ),
-        centerTitle: true,
+        //centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        actions: [
-          DropdownButton(
-            icon: Icon(
-              Icons.more_vert,
-              color: Color.fromRGBO(175, 103, 235, 0.3),
+        bottom: TabBar(
+          tabs: [
+            Tab(
+              child: Text(
+                "CHATS",
+                style: TextStyle(
+                  color: Color.fromRGBO(175, 103, 235, 0.3),
+                ),
+              ),
             ),
-            underline: Container(),
-            items: [
-              DropdownMenuItem(
-                child: Container(
-                  // margin: EdgeInsets.zero,
-                  // color: Color.fromRGBO(175, 103, 235, 0.3),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.exit_to_app,
-                        color: Color.fromRGBO(175, 103, 235, 0.3),
-                        size: 20,
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text(('Logout'))
-                    ],
-                  ),
+            Tab(
+              child: Text(
+                "STORY",
+                style: TextStyle(
+                  color: Color.fromRGBO(175, 103, 235, 0.3),
                 ),
-                value: 'logout',
               ),
-              DropdownMenuItem(
-                child: Container(
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.settings,
-                        color: Color.fromRGBO(175, 103, 235, 0.3),
-                        size: 20,
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text(('Settings'))
-                    ],
-                  ),
+            ),
+            Tab(
+              child: Text(
+                "CALLS",
+                style: TextStyle(
+                  color: Color.fromRGBO(175, 103, 235, 0.3),
                 ),
-                value: 'settings',
               ),
-              DropdownMenuItem(
-                child: Container(
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.person_add,
-                        color: Color.fromRGBO(175, 103, 235, 0.3),
-                        size: 20,
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text(('Make Group'))
-                    ],
+            ),
+          ],
+          indicatorColor: Color.fromRGBO(175, 103, 235, 0.3),
+          controller: tabController,
+        ),
+        actions: [
+          Container(
+            //padding: EdgeInsets.only(right: 20),
+            child: GestureDetector(
+              child: Icon(
+                Icons.search,
+                size: 25,
+                color: Color.fromRGBO(175, 103, 235, 0.3),
+              ),
+              onTap: () {
+                Get.to(SearchPage());
+              },
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(right: 0),
+            child: PopupMenuButton(
+              icon: Icon(
+                Icons.more_vert,
+                color: Color.fromRGBO(175, 103, 235, 0.3),
+              ),
+              //underline: Container(),
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  child: Container(
+                    // margin: EdgeInsets.zero,
+                    // color: Color.fromRGBO(175, 103, 235, 0.3),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.exit_to_app,
+                          color: Color.fromRGBO(175, 103, 235, 0.3),
+                          size: 20,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(('Logout'))
+                      ],
+                    ),
                   ),
+                  value: 'logout',
                 ),
-                value: 'group',
-              ),
-            ],
-            onChanged: (itemIdentifier) {
-              if (itemIdentifier == 'logout') {
-                FirebaseAuth.instance.signOut();
-              }
-              if (itemIdentifier == 'settings') {
-                // Navigator.of(context).pushNamed(SettingsPage));
-                Get.to(SettingsPage());
-              }
-              if (itemIdentifier == 'group') {
-                // Navigator.of(context).pushNamed(SettingsPage));
-                Get.to(MakeGroup());
-              }
-            },
+                PopupMenuItem(
+                  child: Container(
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.settings,
+                          color: Color.fromRGBO(175, 103, 235, 0.3),
+                          size: 20,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(('Settings'))
+                      ],
+                    ),
+                  ),
+                  value: 'settings',
+                ),
+                PopupMenuItem(
+                  child: Container(
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.person_add,
+                          color: Color.fromRGBO(175, 103, 235, 0.3),
+                          size: 20,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(('Make Group'))
+                      ],
+                    ),
+                  ),
+                  value: 'group',
+                ),
+              ],
+              onSelected: (itemIdentifier) {
+                if (itemIdentifier == 'logout') {
+                  FirebaseAuth.instance.signOut();
+                }
+                if (itemIdentifier == 'settings') {
+                  // Navigator.of(context).pushNamed(SettingsPage));
+                  Get.to(SettingsPage());
+                }
+                if (itemIdentifier == 'group') {
+                  // Navigator.of(context).pushNamed(SettingsPage));
+                  Get.to(MakeGroup());
+                }
+              },
+            ),
           ),
         ],
       ),
-      body: Center(
-        child: Container(
-          alignment: Alignment.topCenter,
-          color: Colors.white,
-          child: Column(
-            children: <Widget>[
-              ListTile(
-                leading: ClipOval(
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(175, 103, 235, 0.3)),
-                    child: Center(
-                      child: Icon(
-                        Icons.notes,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                title: Text('Note to self'),
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => NoteSelf()));
-                },
-              ),
-              // ListTile(
-              //   leading: Icon(
-              //     Icons.circle,
-              //     color: Colors.black,
-              //   ),
-              //   title: Text('Other User'),
-              //   tileColor: Color.fromRGBO(34, 23, 24, 0.3),
-              //   onTap: () {
-              //     Navigator.push(context,
-              //         MaterialPageRoute(builder: (context) => ChatPage()));
-              //   },
-              // ),
-              Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection("users")
-                        .doc(getxController.user.value.userId)
-                        .collection("connections")
-                        .snapshots(),
-                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      // print(snapshot.data);
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      // if (snapshot.hasError) {
-                      //   Center(
-                      //     child: CircularProgressIndicator(),
-                      //   );
-                      // }
-
-                      if (snapshot.hasData) {
-                        // chatSyncController.syncFromServerPersonalConnectionList(
-                        //     data: snapshot.data.docs);
-
-                        return ListView.builder(
-                          itemBuilder: (ctx, index) {
-                            print("type: ${snapshot.data.docs[index]['type']}");
-                            return Container(
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 2, horizontal: 5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(9),
-                                ),
-                                color: Color.fromRGBO(175, 103, 235, 0.05),
-                              ),
-                              child: ListTile(
-                                leading: ClipOval(
-                                  child: Container(
-                                    height: 50,
-                                    width: 50,
-                                    color: Color.fromRGBO(175, 103, 235, 0.3),
-                                    child: snapshot.data.docs[index]['type'] ==
-                                            "personal"
-                                        ? Center(
-                                            child: Text(
-                                              '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          )
-                                        : snapshot.data.docs[index]
-                                                    ["groupIcon"] !=
-                                                ''
-                                            ? Image.network(
-                                                snapshot.data.docs[index]
-                                                    ['groupIcon'],
-                                                fit: BoxFit.cover,
-                                              )
-                                            : Center(
-                                                child: Text(
-                                                  snapshot.data
-                                                      .docs[index]['teamName']
-                                                      .toString()
-                                                      .substring(0, 1),
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                  ),
-                                ),
-                                title: Text(snapshot.data.docs[index]['type'] ==
-                                        "personal"
-                                    ? '${snapshot.data.docs[index]["userName"]}'
-                                    : '${snapshot.data.docs[index]['teamName']}'),
-                                subtitle: snapshot.data.docs[index]['type'] ==
-                                        "personal"
-                                    // ? Text(
-                                    //     '${snapshot.data.docs[index]["email"]}')
-                                    ? Container(
-                                        height: 20,
-                                        child: StreamBuilder<QuerySnapshot>(
-                                          stream: FirebaseFirestore.instance
-                                              .collection(
-                                                  'personal_connections')
-                                              .doc(snapshot.data.docs[index].id)
-                                              .collection('messages')
-                                              .orderBy('createdOn',
-                                                  descending: true)
-                                              .snapshots(),
-                                          builder: (BuildContext context,
-                                              AsyncSnapshot<QuerySnapshot>
-                                                  snapshots) {
-                                            if (snapshots.hasError) {
-                                              return Text(
-                                                  'Something went wrong');
-                                            }
-                                            if (snapshots.connectionState ==
-                                                ConnectionState.waiting) {
-                                              return Container();
-                                            }
-                                            if (snapshots.hasData) {
-                                              return ListView.builder(
-                                                itemBuilder: (context, index) {
-                                                  if (snapshots
-                                                      .data.docs.isEmpty) {
-                                                    return Text(
-                                                        '${snapshot.data.docs[index]["email"]}');
-                                                  }
-                                                  return Text(snapshots
-                                                      .data.docs[0]['message']);
-                                                },
-                                                itemCount: 1,
-                                              );
-                                            }
-                                            return Container();
-                                          },
-                                        ),
-                                      )
-                                    : Container(
-                                        height: 20,
-                                        child: StreamBuilder<QuerySnapshot>(
-                                          stream: FirebaseFirestore.instance
-                                              .collection(
-                                                  'personal_connections')
-                                              .doc(snapshot.data.docs[index].id)
-                                              .collection('messages')
-                                              .orderBy('createdOn',
-                                                  descending: true)
-                                              .snapshots(),
-                                          builder: (BuildContext context,
-                                              AsyncSnapshot<QuerySnapshot>
-                                                  snapshots) {
-                                            if (snapshots.hasError) {
-                                              return Text(
-                                                  'Something went wrong');
-                                            }
-                                            if (snapshots.connectionState ==
-                                                ConnectionState.waiting) {
-                                              return Container();
-                                            }
-                                            if (snapshots.hasData) {
-                                              return ListView.builder(
-                                                itemBuilder: (context, index) {
-                                                  if (snapshots
-                                                      .data.docs.isEmpty) {
-                                                    return Container();
-                                                  }
-                                                  return Text(snapshots
-                                                      .data.docs[0]['message']);
-                                                },
-                                                itemCount: 1,
-                                              );
-                                            }
-                                            return Container();
-                                          },
-                                        ),
-                                      ),
-                                onTap: () {
-                                  //only go to personal if the type is personal
-                                  if (snapshot.data.docs[index]['type'] ==
-                                      "personal")
-                                    Get.to(ChatPagePersonal(
-                                      personalChatModel: Contacts(
-                                          chatId: snapshot.data.docs[index].id,
-                                          otherUserId: snapshot.data.docs[index]
-                                              ["userId"],
-                                          otherUserEmail: snapshot
-                                              .data.docs[index]["email"],
-                                          otherUserName: snapshot
-                                              .data.docs[index]["userName"]),
-                                    ));
-                                  else {
-                                    // print(snapshot.data.docs[index]);
-                                    Get.to(GroupPage(
-                                      teamModel: TeamModel(
-                                        // createdBy: snapshot.data.docs[index]
-                                        //     ['createdBy'],
-                                        // createdOn: snapshot.data.docs[index]
-                                        //     ['createdOn'],
-                                        teamName: snapshot.data.docs[index]
-                                            ['teamName'],
-                                        teamId: snapshot.data.docs[index].id,
-                                        groupIcon: snapshot.data.docs[index]
-                                            ['groupIcon'],
-                                      ),
-                                    ));
-                                  }
-                                },
-                                //subtitle: new Text(document.data()['company']),
-                              ),
-                            );
-                          },
-                          itemCount: snapshot.data.docs.length,
-                        );
-                      }
-                      return Container();
-                    }),
-              ),
-              // Container(
-              //   child: InkWell(
-              //     child: Text('open google'),
-              //     onTap: () => launch('https://www.google.com/'),
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: 20,
-              // ),
-              // Container(
-              //   child: Linkify(
-              //     onOpen: (link) async {
-              //       print("Linkify link = ${link.url}");
-              //       var linkurl = "https://${link.url}";
-              //       print(link.url);
-              //       //if (await canLaunch(link.text)) {
-              //       await launch(link.url);
-              //       // } else {
-              //       //   print(link.text);
-              //       //   print('no problem');
-              //       // }
-              //     },
-              //     text: "Linkify click -  https://www.google.com/",
-              //     style: TextStyle(color: Colors.black),
-              //     linkStyle: TextStyle(color: Colors.blue),
-              //     options: LinkifyOptions(humanize: false),
-              //   ),
-              // ),
-
-              // Container(
-              //   height: 200,
-              //   width: 200,
-              //   child: Image.network(
-              //       'https://tse1.mm.bing.net/th?id=OGC.2bdbd4fdb7b20ac6c0718da73c598f3f&pid=Api&rurl=https%3a%2f%2fmedia.giphy.com%2fmedia%2f12XkB6MEykrhU4%2fgiphy.gif&ehk=kss5j0cNswFG2S9YcdxyRyLTAnW%2f2vFJfliBTHRWXwU%3d'),
-              // ),
-              // Container(
-              //   height: 200,
-              //   width: 200,
-              //   child: Image.network(
-              //       'https://tse1.mm.bing.net/th?id=OGC.6bf35a1f1359441764cf832b2d0f698b&pid=Api&rurl=https%3a%2f%2fmedia.tenor.co%2fimages%2f6bf35a1f1359441764cf832b2d0f698b%2fraw&ehk=NIfPGU4Hz93GH%2fwyKnuSpkGzH0lXjD%2fxVPhJL6QAZXM%3d'),
-              // ),
-            ],
-          ),
-        ),
+      body: TabBarView(
+        controller: tabController,
+        children: [
+          ListChatScreen(),
+          StoryPage(),
+          CallPage(),
+        ],
       ),
+      //  Center(
+      //   child: Container(
+      //     alignment: Alignment.topCenter,
+      //     color: Colors.white,
+      //     child: Column(
+      //       children: <Widget>[
+
+      //         ListTile(
+      //           leading: ClipOval(
+      //             child: Container(
+      //               height: 50,
+      //               width: 50,
+      //               decoration: BoxDecoration(
+      //                   color: Color.fromRGBO(175, 103, 235, 0.3)),
+      //               child: Center(
+      //                 child: Icon(
+      //                   Icons.notes,
+      //                   color: Colors.white,
+      //                 ),
+      //               ),
+      //             ),
+      //           ),
+      //           title: Text('Note to self'),
+      //           onTap: () {
+      //             Navigator.push(context,
+      //                 MaterialPageRoute(builder: (context) => NoteSelf()));
+      //           },
+      //         ),
+      //         // ListTile(
+      //         //   leading: Icon(
+      //         //     Icons.circle,
+      //         //     color: Colors.black,
+      //         //   ),
+      //         //   title: Text('Other User'),
+      //         //   tileColor: Color.fromRGBO(34, 23, 24, 0.3),
+      //         //   onTap: () {
+      //         //     Navigator.push(context,
+      //         //         MaterialPageRoute(builder: (context) => ChatPage()));
+      //         //   },
+      //         // ),
+      //         Expanded(
+      //           child: StreamBuilder<QuerySnapshot>(
+      //               stream: FirebaseFirestore.instance
+      //                   .collection("users")
+      //                   .doc(getxController.user.value.userId)
+      //                   .collection("connections")
+      //                   .snapshots(),
+      //               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      //                 // print(snapshot.data);
+      //                 if (snapshot.connectionState == ConnectionState.waiting) {
+      //                   return Center(
+      //                     child: CircularProgressIndicator(),
+      //                   );
+      //                 }
+      //                 // if (snapshot.hasError) {
+      //                 //   Center(
+      //                 //     child: CircularProgressIndicator(),
+      //                 //   );
+      //                 // }
+
+      //                 if (snapshot.hasData) {
+      //                   // chatSyncController.syncFromServerPersonalConnectionList(
+      //                   //     data: snapshot.data.docs);
+
+      //                   return ListView.builder(
+      //                     itemBuilder: (ctx, index) {
+      //                       print("type: ${snapshot.data.docs[index]['type']}");
+      //                       return Container(
+      //                         margin: EdgeInsets.symmetric(
+      //                             vertical: 2, horizontal: 5),
+      //                         decoration: BoxDecoration(
+      //                           borderRadius: BorderRadius.all(
+      //                             Radius.circular(9),
+      //                           ),
+      //                           color: Color.fromRGBO(175, 103, 235, 0.05),
+      //                         ),
+      //                         child: ListTile(
+      //                           leading:
+      //                               // ClipOval(
+      //                               //   child:
+      //                               Container(
+      //                             height: 60,
+      //                             width: 60,
+      //                             decoration: BoxDecoration(
+      //                               borderRadius: BorderRadius.all(
+      //                                 Radius.circular(10),
+      //                               ),
+      //                               color: Color.fromRGBO(175, 103, 235, 0.3),
+      //                             ),
+      //                             child: snapshot.data.docs[index]['type'] ==
+      //                                     "personal"
+      //                                 ? Center(
+      //                                     child: Text(
+      //                                       '${snapshot.data.docs[index]["userName"].toString().substring(0, 1)}',
+      //                                       style:
+      //                                           TextStyle(color: Colors.white),
+      //                                     ),
+      //                                   )
+      //                                 : snapshot.data.docs[index]
+      //                                             ["groupIcon"] !=
+      //                                         ''
+      //                                     ? Container(
+      //                                         clipBehavior: Clip.antiAlias,
+      //                                         decoration: BoxDecoration(
+      //                                           borderRadius: BorderRadius.all(
+      //                                             Radius.circular(10),
+      //                                           ),
+      //                                           color: Color.fromRGBO(
+      //                                               175, 103, 235, 0.3),
+      //                                         ),
+      //                                         child: Image.network(
+      //                                           snapshot.data.docs[index]
+      //                                               ['groupIcon'],
+      //                                           fit: BoxFit.cover,
+      //                                         ),
+      //                                       )
+      //                                     : Center(
+      //                                         child: Text(
+      //                                           snapshot.data
+      //                                               .docs[index]['teamName']
+      //                                               .toString()
+      //                                               .substring(0, 1),
+      //                                           style: TextStyle(
+      //                                               color: Colors.white),
+      //                                         ),
+      //                                       ),
+      //                           ),
+      //                           //),
+      //                           title: Text(snapshot.data.docs[index]['type'] ==
+      //                                   "personal"
+      //                               ? '${snapshot.data.docs[index]["userName"]}'
+      //                               : '${snapshot.data.docs[index]['teamName']}'),
+      //                           subtitle: snapshot.data.docs[index]['type'] ==
+      //                                   "personal"
+      //                               // ? Text(
+      //                               //     '${snapshot.data.docs[index]["email"]}')
+      //                               ? Container(
+      //                                   height: 20,
+      //                                   child: StreamBuilder<QuerySnapshot>(
+      //                                     stream: FirebaseFirestore.instance
+      //                                         .collection(
+      //                                             'personal_connections')
+      //                                         .doc(snapshot.data.docs[index].id)
+      //                                         .collection('messages')
+      //                                         .orderBy('createdOn',
+      //                                             descending: true)
+      //                                         .snapshots(),
+      //                                     builder: (BuildContext context,
+      //                                         AsyncSnapshot<QuerySnapshot>
+      //                                             snapshots) {
+      //                                       if (snapshots.hasError) {
+      //                                         return Text(
+      //                                             'Something went wrong');
+      //                                       }
+      //                                       if (snapshots.connectionState ==
+      //                                           ConnectionState.waiting) {
+      //                                         return Container();
+      //                                       }
+      //                                       if (snapshots.hasData) {
+      //                                         return ListView.builder(
+      //                                           itemBuilder: (context, index1) {
+      //                                             if (snapshots
+      //                                                 .data.docs.isEmpty) {
+      //                                               return Text(
+      //                                                   '${snapshot.data.docs[index]["email"]}');
+      //                                             }
+      //                                             return Text(snapshots
+      //                                                 .data.docs[0]['message']);
+      //                                           },
+      //                                           itemCount: 1,
+      //                                         );
+      //                                       }
+      //                                       return Container();
+      //                                     },
+      //                                   ),
+      //                                 )
+      //                               : Container(
+      //                                   height: 20,
+      //                                   child: StreamBuilder<QuerySnapshot>(
+      //                                     stream: FirebaseFirestore.instance
+      //                                         .collection(
+      //                                             'personal_connections')
+      //                                         .doc(snapshot.data.docs[index].id)
+      //                                         .collection('messages')
+      //                                         .orderBy('createdOn',
+      //                                             descending: true)
+      //                                         .snapshots(),
+      //                                     builder: (BuildContext context,
+      //                                         AsyncSnapshot<QuerySnapshot>
+      //                                             snapshots) {
+      //                                       if (snapshots.hasError) {
+      //                                         return Text(
+      //                                             'Something went wrong');
+      //                                       }
+      //                                       if (snapshots.connectionState ==
+      //                                           ConnectionState.waiting) {
+      //                                         return Container();
+      //                                       }
+      //                                       if (snapshots.hasData) {
+      //                                         return ListView.builder(
+      //                                           itemBuilder: (context, index) {
+      //                                             if (snapshots
+      //                                                 .data.docs.isEmpty) {
+      //                                               return Container();
+      //                                             }
+      //                                             return Text(snapshots.data
+      //                                                     .docs[0]['message']
+      //                                                     .toString()
+      //                                                     .contains(
+      //                                                         'https://tse')
+      //                                                 ? 'GIF'
+      //                                                 : snapshots
+      //                                                         .data
+      //                                                         .docs[0]
+      //                                                             ['message']
+      //                                                         .toString()
+      //                                                         .contains(
+      //                                                             'https://firebasestorage')
+      //                                                     ? 'Image'
+      //                                                     : snapshots
+      //                                                             .data.docs[0]
+      //                                                         ['message']);
+      //                                           },
+      //                                           itemCount: 1,
+      //                                         );
+      //                                       }
+      //                                       return Container();
+      //                                     },
+      //                                   ),
+      //                                 ),
+      //                           onTap: () {
+      //                             //only go to personal if the type is personal
+      //                             if (snapshot.data.docs[index]['type'] ==
+      //                                 "personal")
+      //                               Get.to(ChatPagePersonal(
+      //                                 personalChatModel: Contacts(
+      //                                     chatId: snapshot.data.docs[index].id,
+      //                                     otherUserId: snapshot.data.docs[index]
+      //                                         ["userId"],
+      //                                     otherUserEmail: snapshot
+      //                                         .data.docs[index]["email"],
+      //                                     otherUserName: snapshot
+      //                                         .data.docs[index]["userName"]),
+      //                               ));
+      //                             else {
+      //                               // print(snapshot.data.docs[index]);
+      //                               Get.to(GroupPage(
+      //                                 teamModel: TeamModel(
+      //                                   // createdBy: snapshot.data.docs[index]
+      //                                   //     ['createdBy'],
+      //                                   // createdOn: snapshot.data.docs[index]
+      //                                   //     ['createdOn'],
+      //                                   teamName: snapshot.data.docs[index]
+      //                                       ['teamName'],
+      //                                   teamId: snapshot.data.docs[index].id,
+      //                                   groupIcon: snapshot.data.docs[index]
+      //                                       ['groupIcon'],
+      //                                 ),
+      //                               ));
+      //                             }
+      //                           },
+      //                           //subtitle: new Text(document.data()['company']),
+      //                         ),
+      //                       );
+      //                     },
+      //                     itemCount: snapshot.data.docs.length,
+      //                   );
+      //                 }
+      //                 return Container();
+      //               }),
+      //         ),
+      //         // Container(
+      //         //   child: InkWell(
+      //         //     child: Text('open google'),
+      //         //     onTap: () => launch('https://www.google.com/'),
+      //         //   ),
+      //         // ),
+      //         // SizedBox(
+      //         //   height: 20,
+      //         // ),
+      //         // Container(
+      //         //   child: Linkify(
+      //         //     onOpen: (link) async {
+      //         //       print("Linkify link = ${link.url}");
+      //         //       var linkurl = "https://${link.url}";
+      //         //       print(link.url);
+      //         //       //if (await canLaunch(link.text)) {
+      //         //       await launch(link.url);
+      //         //       // } else {
+      //         //       //   print(link.text);
+      //         //       //   print('no problem');
+      //         //       // }
+      //         //     },
+      //         //     text: "Linkify click -  https://www.google.com/",
+      //         //     style: TextStyle(color: Colors.black),
+      //         //     linkStyle: TextStyle(color: Colors.blue),
+      //         //     options: LinkifyOptions(humanize: false),
+      //         //   ),
+      //         // ),
+
+      //         // Container(
+      //         //   height: 200,
+      //         //   width: 200,
+      //         //   child: Image.network(
+      //         //       'https://tse1.mm.bing.net/th?id=OGC.2bdbd4fdb7b20ac6c0718da73c598f3f&pid=Api&rurl=https%3a%2f%2fmedia.giphy.com%2fmedia%2f12XkB6MEykrhU4%2fgiphy.gif&ehk=kss5j0cNswFG2S9YcdxyRyLTAnW%2f2vFJfliBTHRWXwU%3d'),
+      //         // ),
+      //         // Container(
+      //         //   height: 200,
+      //         //   width: 200,
+      //         //   child: Image.network(
+      //         //       'https://tse1.mm.bing.net/th?id=OGC.6bf35a1f1359441764cf832b2d0f698b&pid=Api&rurl=https%3a%2f%2fmedia.tenor.co%2fimages%2f6bf35a1f1359441764cf832b2d0f698b%2fraw&ehk=NIfPGU4Hz93GH%2fwyKnuSpkGzH0lXjD%2fxVPhJL6QAZXM%3d'),
+      //         // ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
       floatingActionButton: FloatingActionButton(
         elevation: 0,
         child: Icon(Icons.messenger),

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/widgets/noteChatWidget.dart';
 
 class NoteSelf extends StatefulWidget {
   @override
@@ -33,8 +34,9 @@ class _NoteSelfState extends State<NoteSelf> {
         ),
       ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Container(
-          height: MediaQuery.of(context).size.height - 68,
+          height: MediaQuery.of(context).size.height - 80,
           child: Column(
             children: <Widget>[
               // Container(
@@ -50,7 +52,7 @@ class _NoteSelfState extends State<NoteSelf> {
                       .collection('users')
                       .doc('${getxController.authData.value}')
                       .collection('messages')
-                      .orderBy('createdOn', descending: false)
+                      .orderBy('createdOn', descending: true)
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -67,13 +69,14 @@ class _NoteSelfState extends State<NoteSelf> {
                     }
 
                     return new ListView(
-                      reverse: false,
+                      reverse: true,
                       children:
                           snapshot.data.docs.map((DocumentSnapshot document) {
-                        return new ListTile(
-                          title: new Text(document.data()['text']),
-                          //subtitle: new Text(document.data()['company']),
-                        );
+                        // return new ListTile(
+                        //   title: new Text(document.data()['text']),
+                        //   //subtitle: new Text(document.data()['company']),
+                        // );
+                        return NoteChatWidget(document.data()['text']);
                       }).toList(),
                     );
                   },

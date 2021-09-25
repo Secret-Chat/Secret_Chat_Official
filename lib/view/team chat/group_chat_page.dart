@@ -14,6 +14,7 @@ import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
 import 'package:secretchat/view/team%20chat/pinMessagesPage.dart';
+import 'package:secretchat/view/team%20chat/scrollGroupDetailsPage.dart';
 import 'package:secretchat/view/webViewPage.dart';
 import 'package:secretchat/widgets/alertDialogWidget.dart';
 import 'package:image_picker/image_picker.dart';
@@ -519,7 +520,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   onTap: () {
                     //show the Group Details
                     //and the list of users
-                    Get.to(GroupDetailsPage(
+                    Get.to(ScrollGroupDetailsPage(
                       // groupID: widget.teamModel.teamId,
                       teamModel: widget.teamModel,
                     ));
@@ -907,6 +908,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                     width: 200,
                                                     child: Image.network(
                                                       '$link',
+                                                      semanticLabel:
+                                                          'This is a GIF',
                                                       loadingBuilder: (BuildContext
                                                               context,
                                                           Widget child,
@@ -1087,15 +1090,18 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 //     false) {
                                                 return GestureDetector(
                                                   child: Container(
-                                                    width: 100,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
                                                     margin:
                                                         EdgeInsets.symmetric(
                                                             vertical: 2,
                                                             horizontal: 5),
                                                     //padding: EdgeInsets.all(10),
-                                                    constraints: BoxConstraints(
-                                                        minWidth: 100,
-                                                        maxWidth: 250),
+                                                    // constraints: BoxConstraints(
+                                                    //     minWidth: 100,
+                                                    //     maxWidth: 250),
                                                     decoration: BoxDecoration(
                                                       borderRadius:
                                                           BorderRadius.all(
@@ -1122,9 +1128,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                                   ['sentBy']
                                                           ? Text(
                                                               "${snapshot.data.docs[index]['sentByName']}")
-                                                          : SizedBox(
-                                                              height: 0,
-                                                              width: 0,
+                                                          : Text(
+                                                              "${snapshot.data.docs[index]['sentByName']}",
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.red,
+                                                              ),
                                                             ),
                                                       subtitle: Linkify(
                                                         onOpen: (link) async {
@@ -1871,7 +1880,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                   }
                                   if (snapshot.hasData) {
                                     return Container(
-                                      height: 65,
+                                      height: 65.1,
                                       child: Center(
                                         child: ListTile(
                                           title:
