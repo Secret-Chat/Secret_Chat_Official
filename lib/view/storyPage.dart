@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/view/story%20status/camera_main.dart';
 
 class StoryPage extends StatefulWidget {
   //const StoryPage({ Key? key }) : super(key: key);
@@ -21,7 +22,8 @@ class _StoryPageState extends State<StoryPage> {
         slivers: [
           SliverToBoxAdapter(
             child: ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              contentPadding:
+                  EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               leading: Container(
                 height: 60,
                 width: 60,
@@ -40,7 +42,9 @@ class _StoryPageState extends State<StoryPage> {
               ),
               title: Text('My Story'),
               subtitle: Text('Tap to add a story'),
-              onTap: () {},
+              onTap: () {
+                Get.to(() => CameraMain());
+              },
             ),
           ),
         ],

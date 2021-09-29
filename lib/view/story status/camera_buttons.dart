@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:secretchat/controller/storyController.dart';
+import 'package:secretchat/view/story%20status/after_camera_main.dart';
 
 class CameraButtons extends StatefulWidget {
   //const CameraButtons({ Key? key }) : super(key: key);
@@ -8,6 +12,8 @@ class CameraButtons extends StatefulWidget {
 }
 
 class _CameraButtonsState extends State<CameraButtons> {
+  final takeController = Get.put(StoryController());
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,6 +48,10 @@ class _CameraButtonsState extends State<CameraButtons> {
                 //         cameras[0], ResolutionPreset.ultraHigh);
                 // cameraContent = controller.initialize();
                 // cameraOpenFront = !cameraOpenFront;
+                XFile imagePath =
+                    await takeController.controller.value.takePicture();
+                takeController.imagePath.value = imagePath.path;
+                Get.to(AfterCameraMain());
 
                 // onNewCameraSelected(controller.description);
                 print('hey');
