@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,8 @@ import 'package:secretchat/view/authPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:secretchat/view/mainPage.dart';
+import 'package:secretchat/view/story%20status/camera_main.dart';
+import 'package:secretchat/view/story%20status/camera_preview.dart';
 import 'controller/auth_controller.dart';
 import 'model/user.dart';
 
@@ -21,6 +24,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MyApp());
@@ -58,6 +62,8 @@ class MyApp extends StatelessWidget {
                 userEmail: value['email'],
                 userId: value['userId'],
                 userName: value['username'],
+                name: value['name'],
+                about: value['about'],
                 phoneNumber: value['phoneNumber'],
               );
             });

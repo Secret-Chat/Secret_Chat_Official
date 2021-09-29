@@ -14,6 +14,7 @@ import 'package:secretchat/model/user_in_group.dart';
 import 'package:secretchat/view/team%20chat/adminLounge.dart';
 import 'package:secretchat/view/team%20chat/group_details.dart';
 import 'package:secretchat/view/team%20chat/pinMessagesPage.dart';
+import 'package:secretchat/view/team%20chat/scrollGroupDetailsPage.dart';
 import 'package:secretchat/view/webViewPage.dart';
 import 'package:secretchat/widgets/alertDialogWidget.dart';
 import 'package:image_picker/image_picker.dart';
@@ -482,6 +483,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         // ),
 
         centerTitle: true,
+        backgroundColor: Color.fromRGBO(175, 103, 235, 0.3),
+        elevation: 0,
         title: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
               .collection('personal_connections')
@@ -517,7 +520,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   onTap: () {
                     //show the Group Details
                     //and the list of users
-                    Get.to(GroupDetailsPage(
+                    Get.to(ScrollGroupDetailsPage(
                       // groupID: widget.teamModel.teamId,
                       teamModel: widget.teamModel,
                     ));
@@ -905,6 +908,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                     width: 200,
                                                     child: Image.network(
                                                       '$link',
+                                                      semanticLabel:
+                                                          'This is a GIF',
                                                       loadingBuilder: (BuildContext
                                                               context,
                                                           Widget child,
@@ -1084,70 +1089,104 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 // if (snapshot.data.docs[index]['isGif'] ==
                                                 //     false) {
                                                 return GestureDetector(
-                                                  child: ListTile(
-                                                    title: getxController
-                                                                .authData
-                                                                .value !=
+                                                  child: Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
+                                                    margin:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 2,
+                                                            horizontal: 5),
+                                                    //padding: EdgeInsets.all(10),
+                                                    // constraints: BoxConstraints(
+                                                    //     minWidth: 100,
+                                                    //     maxWidth: 250),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(3),
+                                                      ),
+                                                      color: Colors.white,
+                                                    ),
+                                                    alignment: getxController
+                                                                .user
+                                                                .value
+                                                                .userId ==
                                                             snapshot.data
                                                                     .docs[index]
                                                                 ['sentBy']
-                                                        ? Text(
-                                                            "${snapshot.data.docs[index]['sentByName']}")
-                                                        : SizedBox(
-                                                            height: 0,
-                                                            width: 0,
-                                                          ),
-                                                    subtitle: Linkify(
-                                                      onOpen: (link) async {
-                                                        print(
-                                                            "Linkify link = ${link.url}");
-                                                        var linkurl =
-                                                            "https://${link.url}";
-                                                        print(link.url);
-                                                        // if (await canLaunch(link.text)) {
-                                                        // await launch(
-                                                        //     "https://www.google.com/");
-                                                        if (link.url.contains(
-                                                            "www.youtube.com")) {
-                                                          setState(() {
-                                                            videoId = YoutubePlayer
-                                                                .convertUrlToId(
-                                                                    "${link.url}");
-                                                            print(videoId);
-                                                          });
+                                                        ? Alignment.centerRight
+                                                        : Alignment.centerLeft,
+                                                    child: ListTile(
+                                                      title: getxController
+                                                                  .authData
+                                                                  .value !=
+                                                              snapshot.data
+                                                                          .docs[
+                                                                      index]
+                                                                  ['sentBy']
+                                                          ? Text(
+                                                              "${snapshot.data.docs[index]['sentByName']}")
+                                                          : Text(
+                                                              "${snapshot.data.docs[index]['sentByName']}",
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.red,
+                                                              ),
+                                                            ),
+                                                      subtitle: Linkify(
+                                                        onOpen: (link) async {
+                                                          print(
+                                                              "Linkify link = ${link.url}");
+                                                          var linkurl =
+                                                              "https://${link.url}";
+                                                          print(link.url);
+                                                          // if (await canLaunch(link.text)) {
+                                                          // await launch(
+                                                          //     "https://www.google.com/");
+                                                          if (link.url.contains(
+                                                              "www.youtube.com")) {
+                                                            setState(() {
+                                                              videoId = YoutubePlayer
+                                                                  .convertUrlToId(
+                                                                      "${link.url}");
+                                                              print(videoId);
+                                                            });
 
-                                                          return showYouBottomSheet(
-                                                              link.url);
-                                                          // return YoutubeBottomSheet()
-                                                          //   ..showYouBottomSheet(
-                                                          //       videoId,
-                                                          //       link.url,
-                                                          //       context,
-                                                          //       _controller);
-                                                        }
-                                                        Get.to(WebViewPage(
-                                                            link.url));
+                                                            return showYouBottomSheet(
+                                                                link.url);
+                                                            // return YoutubeBottomSheet()
+                                                            //   ..showYouBottomSheet(
+                                                            //       videoId,
+                                                            //       link.url,
+                                                            //       context,
+                                                            //       _controller);
+                                                          }
+                                                          Get.to(WebViewPage(
+                                                              link.url));
 
-                                                        // } else {
-                                                        //   print(link.text);
-                                                        //   print('no problem');
-                                                        // }
-                                                      },
-                                                      text:
-                                                          "${snapshot.data.docs[index]['message']}",
-                                                      style: TextStyle(
-                                                          color:
-                                                              Colors.black45),
-                                                      linkStyle: TextStyle(
-                                                          color: Colors.blue),
-                                                      options: LinkifyOptions(
-                                                          humanize: false),
+                                                          // } else {
+                                                          //   print(link.text);
+                                                          //   print('no problem');
+                                                          // }
+                                                        },
+                                                        text:
+                                                            "${snapshot.data.docs[index]['message']}",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.black45),
+                                                        linkStyle: TextStyle(
+                                                            color: Colors.blue),
+                                                        options: LinkifyOptions(
+                                                            humanize: false),
+                                                      ),
+
+                                                      // Text(
+                                                      //     '${snapshot.data.docs[index]['message']}'),
+                                                      // trailing: Text(
+                                                      //     '${snapshot.data.docs[index]['createdOn'].toString().substring(10, 20)}'),
                                                     ),
-
-                                                    // Text(
-                                                    //     '${snapshot.data.docs[index]['message']}'),
-                                                    // trailing: Text(
-                                                    //     '${snapshot.data.docs[index]['createdOn'].toString().substring(10, 20)}'),
                                                   ),
                                                   onTap: () {
                                                     AlertDialogWidget()
@@ -1841,7 +1880,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                   }
                                   if (snapshot.hasData) {
                                     return Container(
-                                      height: 65,
+                                      height: 65.1,
                                       child: Center(
                                         child: ListTile(
                                           title:

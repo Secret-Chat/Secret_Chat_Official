@@ -8,7 +8,7 @@ class UserModel {
   String userName;
   String name;
   String photoUrl;
-  String status;
+  String about;
   String userId;
   String phoneNumber;
   List<String> contactDetails; //list of contacts in the phone
@@ -19,7 +19,7 @@ class UserModel {
     this.userName,
     this.name,
     this.photoUrl,
-    this.status,
+    this.about,
     this.userId,
     this.phoneNumber,
     this.contactDetails,

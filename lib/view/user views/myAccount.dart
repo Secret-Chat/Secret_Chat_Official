@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/view/user%20views/aboutPage.dart';
 import 'package:secretchat/view/user%20views/phoneNumber.dart';
 
 class MyAccount extends StatefulWidget {
@@ -105,6 +106,40 @@ class _MyAccountState extends State<MyAccount> {
                         ],
                       ),
                     ),
+                  ),
+                  GestureDetector(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 20),
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            child: Text(
+                              'About',
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          Container(
+                            child: Obx(
+                              () => getxController.user.value.about != ''
+                                  ? Text(
+                                      getxController.user.value.about,
+                                      style: TextStyle(color: Colors.black54),
+                                    )
+                                  : Text(
+                                      'Write a few words about yourself',
+                                      style: TextStyle(color: Colors.black54),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      print(getxController.user.value.phoneNumber);
+                      Get.to(AboutPage());
+                    },
                   ),
                   GestureDetector(
                     child: Container(
