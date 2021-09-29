@@ -29,91 +29,91 @@ class _CameraPreviewScreenState extends State<CameraPreviewScreen> {
     });
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final CameraController cameraController = controller;
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   final CameraController cameraController = controller;
 
-    // App state changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
+  //   // App state changed before we got the chance to initialize.
+  //   if (cameraController == null || !cameraController.value.isInitialized) {
+  //     return;
+  //   }
 
-    if (state == AppLifecycleState.inactive) {
-      cameraController.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      onNewCameraSelected(cameraController.description);
-    }
-  }
+  //   if (state == AppLifecycleState.inactive) {
+  //     cameraController.dispose();
+  //   } else if (state == AppLifecycleState.resumed) {
+  //     onNewCameraSelected(cameraController.description);
+  //   }
+  // }
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  void showInSnackBar(String message) {
-    // ignore: deprecated_member_use
-    _scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(message)));
-  }
+  // void showInSnackBar(String message) {
+  //   // ignore: deprecated_member_use
+  //   _scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(message)));
+  // }
 
-  void onNewCameraSelected(CameraDescription cameraDescription) async {
-    if (controller != null) {
-      await controller.dispose();
-    }
+  // void onNewCameraSelected(CameraDescription cameraDescription) async {
+  //   if (controller != null) {
+  //     await controller.dispose();
+  //   }
 
-    final CameraController cameraController = CameraController(
-      cameraDescription,
-      ResolutionPreset.max,
-      //enableAudio: enableAudio,
-      //imageFormatGroup: ImageFormatGroup.jpeg,
-    );
+  //   final CameraController cameraController = CameraController(
+  //     cameraDescription,
+  //     ResolutionPreset.max,
+  //     //enableAudio: enableAudio,
+  //     //imageFormatGroup: ImageFormatGroup.jpeg,
+  //   );
 
-    controller = cameraController;
+  //   controller = cameraController;
 
-    // If the controller is updated then update the UI.
-    cameraController.addListener(() {
-      if (mounted) setState(() {});
-      if (cameraController.value.hasError) {
-        showInSnackBar(
-            'Camera error ${cameraController.value.errorDescription}');
-      }
-    });
+  //   // If the controller is updated then update the UI.
+  //   cameraController.addListener(() {
+  //     if (mounted) setState(() {});
+  //     if (cameraController.value.hasError) {
+  //       showInSnackBar(
+  //           'Camera error ${cameraController.value.errorDescription}');
+  //     }
+  //   });
 
-    try {
-      await cameraController.initialize();
-      // await Future.wait([
-      //   // The exposure mode is currently not supported on the web.
-      //   ...(!kIsWeb
-      //       ? [
-      //           cameraController
-      //               .getMinExposureOffset()
-      //               .then((value) => _minAvailableExposureOffset = value),
-      //           cameraController
-      //               .getMaxExposureOffset()
-      //               .then((value) => _maxAvailableExposureOffset = value)
-      //         ]
-      //       : []),
-      //   cameraController
-      //       .getMaxZoomLevel()
-      //       .then((value) => _maxAvailableZoom = value),
-      //   cameraController
-      //       .getMinZoomLevel()
-      //       .then((value) => _minAvailableZoom = value),
-      //]);
-    } on CameraException catch (e) {
-      _showCameraException(e);
-    }
-    if (mounted) {
-      setState(() {});
-    }
-  }
+  //   try {
+  //     await cameraController.initialize();
+  //     // await Future.wait([
+  //     //   // The exposure mode is currently not supported on the web.
+  //     //   ...(!kIsWeb
+  //     //       ? [
+  //     //           cameraController
+  //     //               .getMinExposureOffset()
+  //     //               .then((value) => _minAvailableExposureOffset = value),
+  //     //           cameraController
+  //     //               .getMaxExposureOffset()
+  //     //               .then((value) => _maxAvailableExposureOffset = value)
+  //     //         ]
+  //     //       : []),
+  //     //   cameraController
+  //     //       .getMaxZoomLevel()
+  //     //       .then((value) => _maxAvailableZoom = value),
+  //     //   cameraController
+  //     //       .getMinZoomLevel()
+  //     //       .then((value) => _minAvailableZoom = value),
+  //     //]);
+  //   } on CameraException catch (e) {
+  //     _showCameraException(e);
+  //   }
+  //   if (mounted) {
+  //     setState(() {});
+  //   }
+  // }
 
-  void _showCameraException(CameraException e) {
-    //logError(e.code, e.description);
-    showInSnackBar('Error: ${e.code}\n${e.description}');
-  }
+  // void _showCameraException(CameraException e) {
+  //   //logError(e.code, e.description);
+  //   showInSnackBar('Error: ${e.code}\n${e.description}');
+  // }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   controller.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
