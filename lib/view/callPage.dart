@@ -11,8 +11,12 @@ class _CallPageState extends State<CallPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Colors.black,
       child: Center(
-        child: Text('Under Construction'),
+        child: Text(
+          'Under Construction',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }

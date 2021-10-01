@@ -74,29 +74,39 @@ class _ListChatScreenState extends State<ListChatScreen> {
     return Center(
       child: Container(
         alignment: Alignment.topCenter,
-        color: Colors.white,
+        color: Colors.black,
         child: Column(
           children: <Widget>[
-            ListTile(
-              leading: ClipOval(
-                child: Container(
-                  height: 50,
-                  width: 50,
-                  decoration:
-                      BoxDecoration(color: Color.fromRGBO(175, 103, 235, 0.3)),
-                  child: Center(
-                    child: Icon(
-                      Icons.notes,
-                      color: Colors.white,
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+              child: ListTile(
+                leading: ClipOval(
+                  child: Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(175, 103, 235, 0.3),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.notes,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
+                title: Text(
+                  'Note to self',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => NoteSelf()));
+                },
               ),
-              title: Text('Note to self'),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => NoteSelf()));
-              },
             ),
             // ListTile(
             //   leading: Icon(
@@ -196,10 +206,12 @@ class _ListChatScreenState extends State<ListChatScreen> {
                                           ),
                               ),
                               //),
-                              title: Text(snapshot.data.docs[index]['type'] ==
-                                      "personal"
-                                  ? '${snapshot.data.docs[index]["userName"]}'
-                                  : '${snapshot.data.docs[index]['teamName']}'),
+                              title: Text(
+                                snapshot.data.docs[index]['type'] == "personal"
+                                    ? '${snapshot.data.docs[index]["userName"]}'
+                                    : '${snapshot.data.docs[index]['teamName']}',
+                                style: TextStyle(color: Colors.white),
+                              ),
                               subtitle: snapshot.data.docs[index]['type'] ==
                                       "personal"
                                   // ? Text(
@@ -218,7 +230,11 @@ class _ListChatScreenState extends State<ListChatScreen> {
                                             AsyncSnapshot<QuerySnapshot>
                                                 snapshots) {
                                           if (snapshots.hasError) {
-                                            return Text('Something went wrong');
+                                            return Text(
+                                              'Something went wrong',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            );
                                           }
                                           if (snapshots.connectionState ==
                                               ConnectionState.waiting) {
@@ -230,10 +246,17 @@ class _ListChatScreenState extends State<ListChatScreen> {
                                                 if (snapshots
                                                     .data.docs.isEmpty) {
                                                   return Text(
-                                                      '${snapshot.data.docs[index]["email"]}');
+                                                    '${snapshot.data.docs[index]["email"]}',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  );
                                                 }
-                                                return Text(snapshots
-                                                    .data.docs[0]['message']);
+                                                return Text(
+                                                  snapshots.data.docs[0]
+                                                      ['message'],
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                );
                                               },
                                               itemCount: 1,
                                             );
@@ -256,7 +279,11 @@ class _ListChatScreenState extends State<ListChatScreen> {
                                             AsyncSnapshot<QuerySnapshot>
                                                 snapshots) {
                                           if (snapshots.hasError) {
-                                            return Text('Something went wrong');
+                                            return Text(
+                                              'Something went wrong',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            );
                                           }
                                           if (snapshots.connectionState ==
                                               ConnectionState.waiting) {
@@ -269,19 +296,27 @@ class _ListChatScreenState extends State<ListChatScreen> {
                                                     .data.docs.isEmpty) {
                                                   return Container();
                                                 }
-                                                return Text(snapshots
-                                                        .data.docs[0]['message']
-                                                        .toString()
-                                                        .contains('https://tse')
-                                                    ? 'GIF'
-                                                    : snapshots.data
-                                                            .docs[0]['message']
-                                                            .toString()
-                                                            .contains(
-                                                                'https://firebasestorage')
-                                                        ? 'Image'
-                                                        : snapshots.data.docs[0]
-                                                            ['message']);
+                                                return Text(
+                                                  snapshots.data
+                                                          .docs[0]['message']
+                                                          .toString()
+                                                          .contains(
+                                                              'https://tse')
+                                                      ? 'GIF'
+                                                      : snapshots
+                                                              .data
+                                                              .docs[0]
+                                                                  ['message']
+                                                              .toString()
+                                                              .contains(
+                                                                  'https://firebasestorage')
+                                                          ? 'Image'
+                                                          : snapshots
+                                                                  .data.docs[0]
+                                                              ['message'],
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                );
                                               },
                                               itemCount: 1,
                                             );

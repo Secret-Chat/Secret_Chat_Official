@@ -85,7 +85,7 @@ class _MainPageState extends State<MainPage>
           ),
         ),
         //centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         elevation: 0,
         bottom: TabBar(
           tabs: [

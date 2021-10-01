@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:secretchat/controller/auth_controller.dart';
+import 'package:secretchat/view/story%20status/camera_main.dart';
 
 class StoryPage extends StatefulWidget {
   //const StoryPage({ Key? key }) : super(key: key);
@@ -17,6 +18,7 @@ class _StoryPageState extends State<StoryPage> {
     return Container(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
+      color: Colors.black,
       child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
@@ -38,9 +40,18 @@ class _StoryPageState extends State<StoryPage> {
                   ),
                 ),
               ),
-              title: Text('My Story'),
-              subtitle: Text('Tap to add a story'),
-              onTap: () {},
+              title: Text(
+                'My Story',
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: Text(
+                'Tap to add a story',
+                style: TextStyle(color: Colors.white54),
+              ),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CameraMain()));
+              },
             ),
           ),
         ],
