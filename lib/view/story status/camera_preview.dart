@@ -1,169 +1,173 @@
-import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
+// import 'package:camera/camera.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:secretchat/controller/storyController.dart';
 
-List<CameraDescription> cameras;
+// List<CameraDescription> cameras;
 
-class CameraPreviewScreen extends StatefulWidget {
-  //const CameraPreview({ Key? key }) : super(key: key);
+// class CameraPreviewScreen extends StatefulWidget {
+//   //const CameraPreview({ Key? key }) : super(key: key);
 
-  @override
-  _CameraPreviewScreenState createState() => _CameraPreviewScreenState();
-}
+//   @override
+//   _CameraPreviewScreenState createState() => _CameraPreviewScreenState();
+// }
 
-class _CameraPreviewScreenState extends State<CameraPreviewScreen> {
-  CameraController controller;
+// class _CameraPreviewScreenState extends State<CameraPreviewScreen> {
+//   //var storyController = Get.put(RecordController());
 
-  Future<void> cameraContent;
+//   CameraController controller;
 
-  bool cameraOpenFront = true;
+//   Future<void> cameraContent;
 
-  @override
-  void initState() {
-    super.initState();
-    controller = CameraController(cameras[0], ResolutionPreset.ultraHigh);
-    cameraContent = controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    });
-  }
+//   bool cameraOpenFront = true;
 
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   final CameraController cameraController = controller;
+//   @override
+//   void initState() {
+//     super.initState();
+//     controller = CameraController(cameras[0], ResolutionPreset.ultraHigh);
+//     cameraContent = controller.initialize().then((_) {
+//       if (!mounted) {
+//         return;
+//       }
+//       setState(() {});
+//     });
+//   }
 
-  //   // App state changed before we got the chance to initialize.
-  //   if (cameraController == null || !cameraController.value.isInitialized) {
-  //     return;
-  //   }
+//   // @override
+//   // void didChangeAppLifecycleState(AppLifecycleState state) {
+//   //   final CameraController cameraController = controller;
 
-  //   if (state == AppLifecycleState.inactive) {
-  //     cameraController.dispose();
-  //   } else if (state == AppLifecycleState.resumed) {
-  //     onNewCameraSelected(cameraController.description);
-  //   }
-  // }
+//   //   // App state changed before we got the chance to initialize.
+//   //   if (cameraController == null || !cameraController.value.isInitialized) {
+//   //     return;
+//   //   }
 
-  // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+//   //   if (state == AppLifecycleState.inactive) {
+//   //     cameraController.dispose();
+//   //   } else if (state == AppLifecycleState.resumed) {
+//   //     onNewCameraSelected(cameraController.description);
+//   //   }
+//   // }
 
-  // void showInSnackBar(String message) {
-  //   // ignore: deprecated_member_use
-  //   _scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(message)));
-  // }
+//   // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // void onNewCameraSelected(CameraDescription cameraDescription) async {
-  //   if (controller != null) {
-  //     await controller.dispose();
-  //   }
+//   // void showInSnackBar(String message) {
+//   //   // ignore: deprecated_member_use
+//   //   _scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(message)));
+//   // }
 
-  //   final CameraController cameraController = CameraController(
-  //     cameraDescription,
-  //     ResolutionPreset.max,
-  //     //enableAudio: enableAudio,
-  //     //imageFormatGroup: ImageFormatGroup.jpeg,
-  //   );
+//   // void onNewCameraSelected(CameraDescription cameraDescription) async {
+//   //   if (controller != null) {
+//   //     await controller.dispose();
+//   //   }
 
-  //   controller = cameraController;
+//   //   final CameraController cameraController = CameraController(
+//   //     cameraDescription,
+//   //     ResolutionPreset.max,
+//   //     //enableAudio: enableAudio,
+//   //     //imageFormatGroup: ImageFormatGroup.jpeg,
+//   //   );
 
-  //   // If the controller is updated then update the UI.
-  //   cameraController.addListener(() {
-  //     if (mounted) setState(() {});
-  //     if (cameraController.value.hasError) {
-  //       showInSnackBar(
-  //           'Camera error ${cameraController.value.errorDescription}');
-  //     }
-  //   });
+//   //   controller = cameraController;
 
-  //   try {
-  //     await cameraController.initialize();
-  //     // await Future.wait([
-  //     //   // The exposure mode is currently not supported on the web.
-  //     //   ...(!kIsWeb
-  //     //       ? [
-  //     //           cameraController
-  //     //               .getMinExposureOffset()
-  //     //               .then((value) => _minAvailableExposureOffset = value),
-  //     //           cameraController
-  //     //               .getMaxExposureOffset()
-  //     //               .then((value) => _maxAvailableExposureOffset = value)
-  //     //         ]
-  //     //       : []),
-  //     //   cameraController
-  //     //       .getMaxZoomLevel()
-  //     //       .then((value) => _maxAvailableZoom = value),
-  //     //   cameraController
-  //     //       .getMinZoomLevel()
-  //     //       .then((value) => _minAvailableZoom = value),
-  //     //]);
-  //   } on CameraException catch (e) {
-  //     _showCameraException(e);
-  //   }
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
+//   //   // If the controller is updated then update the UI.
+//   //   cameraController.addListener(() {
+//   //     if (mounted) setState(() {});
+//   //     if (cameraController.value.hasError) {
+//   //       showInSnackBar(
+//   //           'Camera error ${cameraController.value.errorDescription}');
+//   //     }
+//   //   });
 
-  // void _showCameraException(CameraException e) {
-  //   //logError(e.code, e.description);
-  //   showInSnackBar('Error: ${e.code}\n${e.description}');
-  // }
+//   //   try {
+//   //     await cameraController.initialize();
+//   //     // await Future.wait([
+//   //     //   // The exposure mode is currently not supported on the web.
+//   //     //   ...(!kIsWeb
+//   //     //       ? [
+//   //     //           cameraController
+//   //     //               .getMinExposureOffset()
+//   //     //               .then((value) => _minAvailableExposureOffset = value),
+//   //     //           cameraController
+//   //     //               .getMaxExposureOffset()
+//   //     //               .then((value) => _maxAvailableExposureOffset = value)
+//   //     //         ]
+//   //     //       : []),
+//   //     //   cameraController
+//   //     //       .getMaxZoomLevel()
+//   //     //       .then((value) => _maxAvailableZoom = value),
+//   //     //   cameraController
+//   //     //       .getMinZoomLevel()
+//   //     //       .then((value) => _minAvailableZoom = value),
+//   //     //]);
+//   //   } on CameraException catch (e) {
+//   //     _showCameraException(e);
+//   //   }
+//   //   if (mounted) {
+//   //     setState(() {});
+//   //   }
+//   // }
 
-  // @override
-  // void dispose() {
-  //   controller.dispose();
-  //   super.dispose();
-  // }
+//   // void _showCameraException(CameraException e) {
+//   //   //logError(e.code, e.description);
+//   //   showInSnackBar('Error: ${e.code}\n${e.description}');
+//   // }
 
-  @override
-  Widget build(BuildContext context) {
-    if (!controller.value.isInitialized) {
-      return Container();
-    }
-    return Container(
-      //height: 100.h,
-      height: MediaQuery.of(context).size.height,
-      color: Colors.black,
-      child: Center(
-        child: Container(
-          //height: 90.h,
-          child: FutureBuilder(
-              future: cameraContent,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container(
-                    color: Colors.black,
-                    height: MediaQuery.of(context).size.height,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                    ),
-                  );
-                }
+//   // @override
+//   // void dispose() {
+//   //   controller.dispose();
+//   //   super.dispose();
+//   // }
 
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return Container(
-                    color: Colors.black,
-                    height: MediaQuery.of(context).size.height * 0.9,
-                    child: Center(
-                      child: CameraPreview(controller),
-                    ),
-                  );
-                }
+//   @override
+//   Widget build(BuildContext context) {
+//     if (!controller.value.isInitialized) {
+//       return Container();
+//     }
+//     return Container(
+//       //height: 100.h,
+//       height: MediaQuery.of(context).size.height,
+//       color: Colors.black,
+//       child: Center(
+//         child: Container(
+//           //height: 90.h,
+//           child: FutureBuilder(
+//               future: cameraContent,
+//               builder: (context, snapshot) {
+//                 if (snapshot.connectionState == ConnectionState.waiting) {
+//                   return Container(
+//                     color: Colors.black,
+//                     height: MediaQuery.of(context).size.height,
+//                     child: Center(
+//                       child: CircularProgressIndicator(
+//                         color: Colors.white,
+//                       ),
+//                     ),
+//                   );
+//                 }
 
-                return Container(
-                  color: Colors.black,
-                  height: MediaQuery.of(context).size.height,
-                  child: Center(
-                    child: Text('Camera'),
-                  ),
-                );
-              }
-              //child: CameraPreview(controller)),
-              ),
-        ),
-      ),
-    );
-  }
-}
+//                 if (snapshot.connectionState == ConnectionState.done) {
+//                   return Container(
+//                     color: Colors.black,
+//                     height: MediaQuery.of(context).size.height * 0.9,
+//                     child: Center(
+//                       child: CameraPreview(controller),
+//                     ),
+//                   );
+//                 }
+
+//                 return Container(
+//                   color: Colors.black,
+//                   height: MediaQuery.of(context).size.height,
+//                   child: Center(
+//                     child: Text('Camera'),
+//                   ),
+//                 );
+//               }
+//               //child: CameraPreview(controller)),
+//               ),
+//         ),
+//       ),
+//     );
+//   }
+// }
