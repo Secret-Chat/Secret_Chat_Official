@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:get/get.dart';
+import 'package:secretchat/view/story%20status/camera_main.dart';
 import 'package:secretchat/view/story%20status/camera_preview.dart';
 
 class RecordController extends GetxController {

@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:secretchat/view/story%20status/camera_buttons.dart';
 import 'package:secretchat/view/story%20status/camera_preview.dart';
+import 'package:secretchat/view/story%20status/preview_camera_screen.dart';
 
 List<CameraDescription> cameras;
 
@@ -29,6 +30,12 @@ class _CameraMainState extends State<CameraMain> {
       }
       setState(() {});
     });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -89,7 +96,52 @@ class _CameraMainState extends State<CameraMain> {
                       ),
                     ),
                   ),
-            CameraButtons(),
+            Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.transparent,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(),
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.2,
+                    width: MediaQuery.of(context).size.width,
+                    alignment: Alignment.topCenter,
+                    child: GestureDetector(
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(100),
+                          ),
+                          color: Colors.white,
+                        ),
+                      ),
+                      onTap: () async {
+                        // cameraOpenFront
+                        //     ? controller = CameraController(
+                        //         cameras[2], ResolutionPreset.ultraHigh)
+                        //     : controller = CameraController(
+                        //         cameras[0], ResolutionPreset.ultraHigh);
+                        // cameraContent = controller.initialize();
+                        // cameraOpenFront = !cameraOpenFront;
+                        XFile imagePath = await controller.takePicture();
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    PreviewCameraScreen(imagePath.path)));
+                        // onNewCameraSelected(controller.description);
+                        print('hey');
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
